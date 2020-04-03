@@ -10,10 +10,13 @@ cargo run
 ## Production
 
 ```sh
+# export DATABASE_URL=mysql://user:pass@localhost/dbname
+diesel migration run
+
 cargo build --release
-target/release/ruspk
+ROCKET_ENV=prod target/release/ruspk
 #or 
-cargo run --release
+ROCKET_ENV=prod cargo run --release
 ```
 
 # Guides

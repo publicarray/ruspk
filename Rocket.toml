@@ -1,6 +1,6 @@
 [global.databases]
 sqlite = { url = "db/database.sqlite" }
-mysql = { url = "ruspk:ruspk@localhost/ruspk" }
+mysql = { url = "mysql://ruspk:ruspk@localhost/ruspk" }
 limits = { forms = 83886080 } # 80Mb
 
 [development]

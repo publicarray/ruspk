@@ -5,9 +5,7 @@
 
 use rocket_contrib::databases::diesel;
 
-// #[database("sqlite")]
-// struct DbConnPool(diesel::SqliteConnection);
-#[database("sqlite")]
+#[database("mysql")]
 struct DbConnPool(diesel::MysqlConnection);
 
 #[get("/")]
@@ -16,5 +14,8 @@ fn index() -> &'static str {
 }
 
 fn main() {
-    rocket::ignite().attach(DbConnPool::fairing()).mount("/", routes![index]).launch();
+    rocket::ignite()
+        .attach(DbConnPool::fairing())
+        .mount("/", routes![index])
+        .launch();
 }
