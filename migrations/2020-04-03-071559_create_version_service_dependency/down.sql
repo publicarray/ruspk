@@ -1,0 +1,1 @@
+DROP TABLE version_service_dependency;

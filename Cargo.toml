@@ -1,0 +1,16 @@
+[package]
+name = "ruspk"
+version = "0.1.0"
+authors = ["Sebastian Schmidt <publicarray@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket = "0.4.4"
+diesel = "1.0"
+
+[dependencies.rocket_contrib]
+version = "0.4.4"
+default-features = false
+features = ["diesel_mysql_pool", "diesel_sqlite_pool"]
