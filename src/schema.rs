@@ -31,7 +31,8 @@ table! {
     description (version_id, language_id) {
         version_id -> Unsigned<Bigint>,
         language_id -> Unsigned<Bigint>,
-        description -> Text,
+        #[sql_name = "description"]
+        dec -> Text,
     }
 }
 
@@ -39,7 +40,8 @@ table! {
     displayname (version_id, language_id) {
         version_id -> Unsigned<Bigint>,
         language_id -> Unsigned<Bigint>,
-        displayname -> Varchar,
+        #[sql_name = "displayname"]
+        name -> Varchar,
     }
 }
 
@@ -67,7 +69,7 @@ table! {
     icon (id) {
         id -> Unsigned<Bigint>,
         version_id -> Unsigned<Bigint>,
-        size -> Enum,
+        size -> Varchar,
         path -> Varchar,
     }
 }
@@ -143,8 +145,9 @@ table! {
     version (id) {
         id -> Unsigned<Bigint>,
         package_id -> Unsigned<Bigint>,
-        version -> Unsigned<Integer>,
-        upstream_version -> Unsigned<Integer>,
+        #[sql_name = "version"]
+        ver -> Unsigned<Integer>,
+        upstream_version -> Varchar,
         changelog -> Nullable<Text>,
         report_url -> Nullable<Varchar>,
         distributor -> Nullable<Varchar>,
@@ -211,3 +214,4 @@ allow_tables_to_appear_in_same_query!(
     version,
     version_service_dependency,
 );
+

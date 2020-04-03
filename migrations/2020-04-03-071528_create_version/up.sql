@@ -1,8 +1,8 @@
 CREATE TABLE version (
     id SERIAL PRIMARY KEY,
-    package_id BIGINT UNSIGNED NOT NULL UNIQUE,
+    package_id BIGINT UNSIGNED NOT NULL,
     version INT UNSIGNED NOT NULL UNIQUE,
-    upstream_version INT UNSIGNED NOT NULL,
+    upstream_version VARCHAR(20) NOT NULL,
     changelog TEXT,
     report_url VARCHAR(255),
     distributor VARCHAR(255),
