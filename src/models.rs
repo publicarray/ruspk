@@ -18,6 +18,7 @@ pub struct Version {
     pub changelog: Option<String>,
     pub report_url: Option<String>,
     pub distributor: Option<String>,
+    pub distributor_url: Option<String>,
     pub maintainer: Option<String>,
     pub maintainer_url: Option<String>,
     pub dependencies: Option<String>,

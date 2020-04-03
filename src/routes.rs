@@ -21,11 +21,10 @@ pub fn list_packages(conn: DbConn) -> Result<Json<Vec<Package>>, String> {
     }).map(Json)
 }
 
-#[get("/package/<id>")]
-pub fn get_package_versions(conn: DbConn, id: usize) -> Result<Json<Vec<Version>>, String> {
+#[get("/package/<num>")]
+pub fn get_package_version(conn: DbConn, num: u64) -> Result<Json<Vec<Version>>, String> {
     use crate::schema::version::dsl::*;
-
-    version.load(&*conn.0).map_err(|err| -> String {
+    version.filter(package_id.eq(num)).load(&*conn.0).map_err(|err| -> String {
         println!("Error querying package: {:?}", err);
         "Error querying package from the database".into()
     }).map(Json)

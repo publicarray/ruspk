@@ -21,7 +21,7 @@ fn main() {
     rocket::ignite()
         .mount("/", routes![
             routes::index,
-            // routes::create_page_view,
+            routes::get_package_version,
             routes::list_packages,
         ])
         .attach(cors::CorsFairing)
