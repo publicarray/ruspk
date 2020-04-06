@@ -82,32 +82,32 @@ impl Default for Package {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct SynoResponse {
     keyrings: Option<Vec<String>>,
     packages: Vec<Package>,
-
 }
+
 #[get("/?<synorequest..>")]
 pub fn syno(synorequest: LenientForm<SynoRequest>) -> Json<SynoResponse> {
-    let mut sr = SynoResponse{ keyrings: None, packages: Vec::new() };
+    let mut sr = SynoResponse{ packages: Vec::new(), ..Default::default() };
+    use crate::schema::package::dsl::*;
+    use crate::schema::version::dsl::*;
     sr.packages.push(Package::new());
     Json(sr)
 #[get("/package")]
-pub fn list_packages(conn: DbConn) -> Result<Json<Vec<DbPackage>>, String> {
+pub fn list_packages(conn: DbConn) -> Json<Vec<(DbPackage, Vec<DbVersion>)>> {
     use crate::schema::package::dsl::*;
 
-    package.load(&conn.0).map_err(|err| -> String {
-        println!("Error querying package: {:?}", err);
-        "Error querying package from the database".into()
-    }).map(Json)
+    let p = package.load::<DbPackage>(&conn.0).expect("Error loading package");
+    // let p = package.find(1).get_result::<DbPackage>(&conn.0).expect("Error loading package");
+    let versions = DbVersion::belonging_to(&p).load::<DbVersion>(&conn.0).expect("Error loading version").grouped_by(&p);
+    let data = p.into_iter().zip(versions).collect::<Vec<_>>();
+    Json(data)
 }
 
 #[get("/package/<num>")]
-pub fn get_package_version(conn: DbConn, num: u64) -> Result<Json<Vec<DbVersion>>, String> {
+pub fn get_package_version(conn: DbConn, num: u64) -> Json<Vec<DbVersion>> {
     use crate::schema::version::dsl::*;
-    version.filter(package_id.eq(num)).load(&*conn.0).map_err(|err| -> String {
-        println!("Error querying package: {:?}", err);
-        "Error querying package from the database".into()
-    }).map(Json)
+    Json(version.filter(package_id.eq(num)).load(&*conn.0).expect("Error loading version"))
 }

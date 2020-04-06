@@ -11,7 +11,7 @@ pub struct DbPackage {
     pub insert_date: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
 #[table_name = "version"]
 pub struct DbVersion {
