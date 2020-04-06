@@ -13,6 +13,9 @@ pub mod cors;
 pub mod models;
 pub mod routes;
 pub mod schema;
+// use schema::package;
+// pub mod schema;
+// pub mod models;
 
 #[database("mysql")]
 pub struct DbConn(diesel::MysqlConnection);
@@ -21,6 +24,7 @@ fn main() {
     rocket::ignite()
         .mount("/", routes![
             routes::index,
+            routes::syno,
             routes::get_package_version,
             routes::list_packages,
         ])

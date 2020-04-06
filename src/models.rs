@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 
 #[derive(Serialize, Deserialize, Queryable)]
-pub struct Package {
+pub struct DbPackage {
     pub id: u64,
     pub author_user_id: Option<u64>,
     pub name: String,
@@ -10,7 +10,7 @@ pub struct Package {
 
 // #[derive(AsChangeset, Serialize, Deserialize, Queryable, Insertable)]
 #[derive(Serialize, Deserialize, Queryable)]
-pub struct Version {
+pub struct DbVersion {
     pub id: u64,
     pub package_id: u64,
     pub ver: u32,
