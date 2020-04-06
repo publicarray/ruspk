@@ -1,6 +1,9 @@
 use chrono::NaiveDateTime;
 
-#[derive(Serialize, Deserialize, Queryable)]
+use crate::schema::{package, version};
+
+#[derive(Serialize, Deserialize, Queryable, Identifiable)]
+#[table_name = "package"]
 pub struct DbPackage {
     pub id: u64,
     pub author_user_id: Option<u64>,
@@ -8,8 +11,9 @@ pub struct DbPackage {
     pub insert_date: Option<NaiveDateTime>,
 }
 
-// #[derive(AsChangeset, Serialize, Deserialize, Queryable, Insertable)]
-#[derive(Serialize, Deserialize, Queryable)]
+#[derive(Serialize, Deserialize, Queryable, Associations)]
+#[belongs_to(DbPackage, foreign_key = "package_id")]
+#[table_name = "version"]
 pub struct DbVersion {
     pub id: u64,
     pub package_id: u64,
