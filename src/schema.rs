@@ -32,7 +32,7 @@ table! {
         version_id -> Unsigned<Bigint>,
         language_id -> Unsigned<Bigint>,
         #[sql_name = "description"]
-        dec -> Text,
+        desc -> Text,
     }
 }
 
