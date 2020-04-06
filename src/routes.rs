@@ -1,8 +1,9 @@
 #![allow(unused)]
+
 use diesel::{self, prelude::*};
 
-use rocket_contrib::json::Json;
 use rocket::request::LenientForm;
+use rocket_contrib::json::Json;
 
 use crate::models::{DbPackage, DbVersion};
 // use crate::schema;
@@ -15,16 +16,16 @@ pub fn index() -> &'static str {
 
 #[derive(FromForm)]
 pub struct SynoRequest {
-    arch: String, // apollolake
-    build: usize, // 24922
-    language: String, // enu
-    major: u8, // 6
-    micro: u8, // 2
-    minor: u8, // 2
-    nano: Option<u8>, // 4
+    arch: String,                           // apollolake
+    build: usize,                           // 24922
+    language: String,                       // enu
+    major: u8,                              // 6
+    micro: u8,                              // 2
+    minor: u8,                              // 2
+    nano: Option<u8>,                       // 4
     package_update_channel: Option<String>, // beta
-    timezone: Option<String>, // London
-    unique: Option<String>, // synology_apollolake_418play
+    timezone: Option<String>,               // London
+    unique: Option<String>,                 // synology_apollolake_418play
 }
 
 #[derive(Serialize)]
@@ -90,7 +91,10 @@ pub struct SynoResponse {
 
 #[get("/?<synorequest..>")]
 pub fn syno(synorequest: LenientForm<SynoRequest>) -> Json<SynoResponse> {
-    let mut sr = SynoResponse{ packages: Vec::new(), ..Default::default() };
+    let mut sr = SynoResponse {
+        packages: Vec::new(),
+        ..Default::default()
+    };
     use crate::schema::package::dsl::*;
     use crate::schema::version::dsl::*;
     sr.packages.push(Package::new());
@@ -99,9 +103,14 @@ pub fn syno(synorequest: LenientForm<SynoRequest>) -> Json<SynoResponse> {
 pub fn list_packages(conn: DbConn) -> Json<Vec<(DbPackage, Vec<DbVersion>)>> {
     use crate::schema::package::dsl::*;
 
-    let p = package.load::<DbPackage>(&conn.0).expect("Error loading package");
+    let p = package
+        .load::<DbPackage>(&conn.0)
+        .expect("Error loading package");
     // let p = package.find(1).get_result::<DbPackage>(&conn.0).expect("Error loading package");
-    let versions = DbVersion::belonging_to(&p).load::<DbVersion>(&conn.0).expect("Error loading version").grouped_by(&p);
+    let versions = DbVersion::belonging_to(&p)
+        .load::<DbVersion>(&conn.0)
+        .expect("Error loading version")
+        .grouped_by(&p);
     let data = p.into_iter().zip(versions).collect::<Vec<_>>();
     Json(data)
 }
@@ -109,5 +118,10 @@ pub fn list_packages(conn: DbConn) -> Json<Vec<(DbPackage, Vec<DbVersion>)>> {
 #[get("/package/<num>")]
 pub fn get_package_version(conn: DbConn, num: u64) -> Json<Vec<DbVersion>> {
     use crate::schema::version::dsl::*;
-    Json(version.filter(package_id.eq(num)).load(&*conn.0).expect("Error loading version"))
+    Json(
+        version
+            .filter(package_id.eq(num))
+            .load(&*conn.0)
+            .expect("Error loading version"),
+    )
 }
