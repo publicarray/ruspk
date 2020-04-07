@@ -212,6 +212,11 @@ pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoRes
 //     Ok(format!("Inserted {} row(s).", inserted_rows))
 // }
 
+pub fn int_to_float(a:u32, b:u32) -> f32{
+    let after_decimal_place:f32 = a as f32 /100.0;
+    b as f32 + after_decimal_place
+}
+
 #[get("/package")]
 pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
     let query_package_update_channel = "beta";
@@ -221,6 +226,7 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
     let query_arch = "apollolake";
     let query_minor = 2;
     let query_build = 24922;
+    let query_firmware_version = int_to_float(query_major,query_minor);
     let query_version = format!(
         "{}.{}.{}-{}",
         query_major, query_micro, query_minor, query_build
@@ -230,6 +236,8 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
     use crate::schema::description;
     use crate::schema::language;
     use crate::schema::displayname;
+    use crate::schema::firmware;
+    use crate::schema::build;
     use crate::schema::package;
     use crate::schema::version;
 
@@ -237,15 +245,22 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
         .select(language::id)
         .filter(language::code.eq(query_language))
         .load::<u64>(&connection.0)
-        .expect("Error loading language");
-    println!("{:?}", lang_id[0]);
+        .expect("Error loading lang_id");
+    println!("lang_id:{:?}", lang_id[0]);
 
     let arch_id = architecture::table
         .select(architecture::id)
         .filter(architecture::code.eq(query_arch))
         .load::<u64>(&connection.0)
-        .expect("Error loading architecture");
-    println!("{:?}", arch_id[0]);
+        .expect("Error loading arch_id");
+    println!("arch_id:{:?}", arch_id[0]);
+
+    let firmware_ids = firmware::table // minimum build
+        // .filter(firmware::version.gt(query_firmware_version))
+        .filter(firmware::build.gt(query_build))
+        .load::<DbFirmware>(&connection.0)
+        .expect("Error loading firmware_id");
+    println!("firmware_ids:{:?}", firmware_ids);
 
     let descriptions = description::table
         .filter(description::language_id.eq(lang_id[0]))
@@ -258,6 +273,13 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
         .load::<DbDisplayName>(&connection.0)
         .expect("Error loading displayname");
     println!("{:?}", displaynames);
+
+    let builds = build::table
+        // .filter(build::firmware_id.eq(firmware_id[0]))
+        .load::<DbBuild>(&connection.0)
+        .expect("Error loading builds");
+    println!("{:?}", builds);
+
 
     let versions = version::table
         .load::<DbVersion>(&connection.0)

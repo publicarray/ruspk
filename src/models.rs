@@ -16,13 +16,13 @@ pub struct DbBuild {
     pub id: u64,
     pub package_id: u64,
     pub firmware_id: u64,
-    pub publisher_user_id: u64,
-    pub checksum: String,
-    pub exec_size: u64,
+    pub publisher_user_id: Option<u64>,
+    pub checksum: Option<String>,
+    pub exec_size: i32,
     pub path: String,
     pub md5: String,
-    pub insert_date: Option<NaiveDateTime>,
-    pub active: bool,
+    pub insert_date: NaiveDateTime,
+    pub active: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
@@ -72,7 +72,7 @@ pub struct DbDownload {
 #[table_name = "firmware"]
 pub struct DbFirmware {
     pub id: u64,
-    pub version: f32,
+    pub version: String,
     pub build: u64,
 }
 

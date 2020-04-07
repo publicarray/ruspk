@@ -61,7 +61,7 @@ table! {
     firmware (id) {
         id -> Unsigned<Bigint>,
         version -> Varchar,
-        build -> Integer,
+        build -> Unsigned<Bigint>,
     }
 }
 
