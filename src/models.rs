@@ -54,11 +54,11 @@ pub struct DbVersion {
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbLanguage, foreign_key = "language_id")]
+#[primary_key(language_id, version_id)]
 #[table_name = "description"]
 pub struct DbDescription {
-    pub id: u64,
+    pub version_id: u64,
     pub language_id: u64,
-    pub version: u32,
     pub desc: String,
 }
 

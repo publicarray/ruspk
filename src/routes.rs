@@ -99,9 +99,6 @@ pub fn get_packages_for_device_lang(
     micro: u8,
     minor: u8,
 ) -> SynoResponse {
-    use crate::schema::package::dsl::*;
-    use crate::schema::version::dsl::*;
-
     let beta = false;
     if let Some(package_update_channel) = package_update_channel {
         if (package_update_channel == "beta") {
@@ -110,13 +107,18 @@ pub fn get_packages_for_device_lang(
     }
 
     ////
+    use crate::schema::description::dsl::*;
     use crate::schema::displayname::dsl::*;
     use crate::schema::language::dsl::*;
     use crate::schema::package::dsl::*;
+    use crate::schema::package::dsl::*;
+    use crate::schema::version::dsl::*;
 
     let packages = package
         .load::<DbPackage>(&conn.0)
         .expect("Error loading package");
+    println!("{:?}", packages);
+
     // let p = package.find(1).get_result::<DbPackage>(&conn.0).expect("Error loading package");
     let versions = DbVersion::belonging_to(&packages)
         .load::<DbVersion>(&conn.0)
@@ -127,12 +129,21 @@ pub fn get_packages_for_device_lang(
         .load::<DbLanguage>(&conn.0)
         .expect("Error loading languages");
 
+    let descriptions = description
+        .load::<DbDescription>(&conn.0)
+        .expect("Error loading description");
+
+    // let description = DbDescription::belonging_to(&languages)
+    //     .load::<DbDescription>(&conn.0)
+    //     .expect("Error loading description");
+
     // let displayName = DbDisplayName::belonging_to(&versions, &languages)
     // // let displayName = DbDisplayName::belonging_to(&versions, &languages)
     //     .load::<DbDisplayName>(&conn.0)
     //     .expect("Error loading displayname");
 
     let data = packages.into_iter().zip(versions).collect::<Vec<_>>();
+    // let data = packages.into_iter().zip(displayName).collect::<Vec<_>>();
     println!("{:?}", data);
     let mut sr = SynoResponse {
         packages: Vec::new(),
@@ -144,6 +155,7 @@ pub fn get_packages_for_device_lang(
     return sr;
 }
 
+// For old Synology devices
 #[post("/", data = "<synorequest>")]
 pub fn syno_post(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoResponse> {
     Json(get_packages_for_device_lang(
