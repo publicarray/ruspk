@@ -1,7 +1,7 @@
 CREATE TABLE language (
   id SERIAL PRIMARY KEY,
   code VARCHAR(3) NOT NULL UNIQUE,
-  name VARCHAR(50)
+  name VARCHAR(50) NOT NULL
 );
 
 INSERT INTO language (code, name) VALUES

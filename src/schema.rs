@@ -78,7 +78,7 @@ table! {
     language (id) {
         id -> Unsigned<Bigint>,
         code -> Varchar,
-        name -> Nullable<Varchar>,
+        name -> Varchar,
     }
 }
 

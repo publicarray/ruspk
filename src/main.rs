@@ -31,6 +31,7 @@ fn main() {
             routes![
                 routes::index,
                 routes::syno,
+                routes::syno_post,
                 routes::get_package_version,
                 routes::list_packages,
             ],

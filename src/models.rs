@@ -2,22 +2,23 @@ use chrono::NaiveDateTime;
 
 use crate::schema::*;
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
 #[table_name = "language"]
 pub struct DbLanguage {
     pub id: u64,
-    pub code: [char;3],
+    pub code: String,
+    // pub code: [char;3],
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
 #[table_name = "architecture"]
 pub struct DbArchitecture {
     pub id: u64,
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
 #[table_name = "package"]
 pub struct DbPackage {
     pub id: u64,
@@ -26,7 +27,7 @@ pub struct DbPackage {
     pub insert_date: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
 #[table_name = "version"]
 pub struct DbVersion {
@@ -51,7 +52,7 @@ pub struct DbVersion {
     pub insert_date: NaiveDateTime,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbLanguage, foreign_key = "language_id")]
 #[table_name = "description"]
 pub struct DbDescription {
@@ -61,9 +62,10 @@ pub struct DbDescription {
     pub desc: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbLanguage, foreign_key = "language_id")]
 #[belongs_to(DbVersion, foreign_key = "version_id")]
+#[primary_key(language_id, version_id)]
 #[table_name = "displayname"]
 pub struct DbDisplayName {
     pub version_id: u64,
@@ -71,7 +73,7 @@ pub struct DbDisplayName {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[table_name = "firmware"]
 pub struct DbFirmware {
     pub id: u64,
@@ -79,7 +81,7 @@ pub struct DbFirmware {
     pub build: u64,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbVersion, foreign_key = "version_id")]
 #[table_name = "icon"]
 pub struct DbIcon {
@@ -89,8 +91,7 @@ pub struct DbIcon {
     pub path: String,
 }
 
-
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
 #[belongs_to(DbFirmware, foreign_key = "firmware_id")]
 #[table_name = "build"]
@@ -107,7 +108,7 @@ pub struct DbBuild {
     pub active: bool,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Debug)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]
 #[belongs_to(DbArchitecture, foreign_key = "architecture_id")]
 #[table_name = "build_architecture"]

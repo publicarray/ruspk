@@ -5,7 +5,7 @@ use diesel::{self, prelude::*};
 use rocket::request::LenientForm;
 use rocket_contrib::json::Json;
 
-use crate::models::{DbPackage, DbVersion};
+use crate::models::*;
 // use crate::schema;
 use crate::DbConn;
 
@@ -89,16 +89,116 @@ pub struct SynoResponse {
     packages: Vec<Package>,
 }
 
-#[get("/?<synorequest..>")]
-pub fn syno(synorequest: LenientForm<SynoRequest>) -> Json<SynoResponse> {
+pub fn get_packages_for_device_lang(
+    conn: DbConn,
+    lang: &String,
+    arch: &String,
+    build: usize,
+    package_update_channel: &Option<String>,
+    major: u8,
+    micro: u8,
+    minor: u8,
+) -> SynoResponse {
+    use crate::schema::package::dsl::*;
+    use crate::schema::version::dsl::*;
+
+    let beta = false;
+    if let Some(package_update_channel) = package_update_channel {
+        if (package_update_channel == "beta") {
+            let beta = true;
+        }
+    }
+
+    ////
+    use crate::schema::displayname::dsl::*;
+    use crate::schema::language::dsl::*;
+    use crate::schema::package::dsl::*;
+
+    let packages = package
+        .load::<DbPackage>(&conn.0)
+        .expect("Error loading package");
+    // let p = package.find(1).get_result::<DbPackage>(&conn.0).expect("Error loading package");
+    let versions = DbVersion::belonging_to(&packages)
+        .load::<DbVersion>(&conn.0)
+        .expect("Error loading version")
+        .grouped_by(&packages);
+
+    let languages = language
+        .load::<DbLanguage>(&conn.0)
+        .expect("Error loading languages");
+
+    // let displayName = DbDisplayName::belonging_to(&versions, &languages)
+    // // let displayName = DbDisplayName::belonging_to(&versions, &languages)
+    //     .load::<DbDisplayName>(&conn.0)
+    //     .expect("Error loading displayname");
+
+    let data = packages.into_iter().zip(versions).collect::<Vec<_>>();
+    println!("{:?}", data);
     let mut sr = SynoResponse {
         packages: Vec::new(),
         ..Default::default()
     };
-    use crate::schema::package::dsl::*;
-    use crate::schema::version::dsl::*;
+
     sr.packages.push(Package::new());
-    Json(sr)
+    // sr.packages.push(Package::new(..Default::default()));
+    return sr;
+}
+
+#[post("/", data = "<synorequest>")]
+pub fn syno_post(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoResponse> {
+    Json(get_packages_for_device_lang(
+        conn,
+        &synorequest.language,
+        &synorequest.arch,
+        synorequest.build,
+        &synorequest.package_update_channel,
+        synorequest.major,
+        synorequest.micro,
+        synorequest.minor,
+    ))
+}
+
+#[get("/?<synorequest..>")]
+pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoResponse> {
+    Json(get_packages_for_device_lang(
+        conn,
+        &synorequest.language,
+        &synorequest.arch,
+        synorequest.build,
+        &synorequest.package_update_channel,
+        synorequest.major,
+        synorequest.micro,
+        synorequest.minor,
+    ))
+}
+
+// ?package_update_channel=beta&unique=synology_apollolake_418play&build=24922&language=enu&major=6&micro=2&arch=apollolake&minor=2&timezone=London&nano=4
+// #[get("/?package_update_channel&<package_update_channel>")]
+// fn hello(package_update_channel: Option<bool>) -> bool {
+//     format!("Hello, {}!", package_update_channel.as_str())
+// }
+
+// #[post("/", data = "<form_data>")]
+// fn login(form_data: Form<UserLogin>) -> String {
+//    format!("Hello, {}!", form_data.name)
+// }
+
+// #[post("/Package", data = "<page_view>")]
+// pub fn create_page_view(
+//     conn: DbConn,
+//     page_view: Json<InsertablePageView>,
+// ) -> Result<String, String> {
+//     let inserted_rows = diesel::insert_into(schema::pageviews::table)
+//         .values(&page_view.0)
+//         .execute(&conn.0)
+//         .map_err(|err| -> String {
+//             println!("Error inserting row: {:?}", err);
+//             "Error inserting row into database".into()
+//         })?;
+
+//     Ok(format!("Inserted {} row(s).", inserted_rows))
+// }
+
 #[get("/package")]
 pub fn list_packages(conn: DbConn) -> Json<Vec<(DbPackage, Vec<DbVersion>)>> {
     use crate::schema::package::dsl::*;
@@ -113,6 +213,13 @@ pub fn list_packages(conn: DbConn) -> Json<Vec<(DbPackage, Vec<DbVersion>)>> {
         .grouped_by(&p);
     let data = p.into_iter().zip(versions).collect::<Vec<_>>();
     Json(data)
+    // Json(package.load(&conn.0).expect("Error loading package"))
+
+    // println!("p: {:?}, version: {:?}", p, version);
+    // package.load(&conn.0).map_err(|err| -> String {
+    //     println!("Error querying package: {:?}", err);
+    //     "Error querying package from the database".into()
+    // }).map(Json)
 }
 
 #[get("/package/<num>")]
