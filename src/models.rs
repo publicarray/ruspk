@@ -1,5 +1,5 @@
-use chrono::NaiveDateTime;
 use crate::schema::*;
+use chrono::NaiveDateTime;
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
 #[table_name = "architecture"]
