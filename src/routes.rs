@@ -9,6 +9,8 @@ use crate::models::*;
 // use crate::schema;
 use crate::DbConn;
 
+const KEYRING: &str = "-----BEGIN PGP PUBLIC KEY BLOCK-----\nVersion: GnuPG v1\n\nmQENBFRhPdoBCADMWckT2GJRrRcuNXuCBNp3oSC7tlQxa1EN81HhlX2Tqs7tKezC\nvgGCB69jWQmfB5BKdWcznS98bLZB4Iy2RjU8vtkI0/6AceovCytMXW0d6HE8frlf\n6gkWKylRbD3fBE+qpHOEwpV5MTEgF8UTM9cPzupY6ggm/6fSDxXqYRZQHfnAFoLE\nXSzMtdUyY0w4a1CapfVRa060XRNLvacu6+1XVksJVZbuChg3/zDhtYZuvbuXxwfA\n/sZem9OW85roUgsYE3cL8m4iexZHMIbWBO5mj7LoYgb33vF7T15yGUjWADMbBkQx\nYFBg6q48Nc81taFHRWpIIXe1s1ZTxyBQL0hjABEBAAG0NFN5bm9Db21tdW5pdHkg\nKE9mZmljaWFsKSA8Y29udGFjdEBzeW5vY29tbXVuaXR5LmNvbT6JATgEEwECACIF\nAlRhPdoCGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJENDC8YaUoLiOtJkI\nAKpGpoKrmkzSFEhSj+tbTx/EdsrQu+9Q32H51EZlM0gSn1rzjPBsg20Uh3JoK2gO\nDrWtcL6wSgd6Vp9ScwcjH/GQ6fh5/AIcXl1oW/Z31ZiqGxJmdT1EwdqYZdN+bv8K\nF4rezHKwlUAsq4jHvwnmOfjqJzn4Gpbf0diajLBNMmZY0uOe8Q0s1IqNkrtw0zWD\nimZqYTrktnpm8YFDUe1xo6qRNdqVXn5lddfrO4hPDP2/hzgZ6l0Gnl4P0ZFYAGo9\nQITV2BqBbBpMYff/yF0yxbSQgCu93J3FtMe3qK6mu2lclSDEFs+abX0NIbUOTv4l\nAus7c0ZXjYOZNLAYY+RAXsO5AQ0EVGE92gEIAJw1AdFZ1MXlU+JeCLqes8LV3Grv\nhTvTRWTd7Pi3W+qoaGkeTCfc9Jxf5PgFr0s5ZJrXD6f/JF73JSFwuHrGacSAR28/\nnPcLZPN5JYDipWmSdoa672lEeDJ+Zr2f2jtFs0CTXbyTyVSZnoDtL5j7a3BtlJ6N\nw2FaGVeqto7qfkudizEnoNcokmeAD0EpajCq2L0ZO6QxTP8q3gVoffQK6UTOublJ\nHj1T5A1ZH+hgVmjAsQ7AOh3ElRml+lkd3j0luYiuMiz8ol3GHjTQ0C5GnbWka3LH\nnrgU75kJduGtngEnmR6dBZPR47ImjsX5cQ7JWrJLSrWc907+7vcb6cAwYcUAEQEA\nAYkBHwQYAQIACQUCVGE92gIbDAAKCRDQwvGGlKC4jgEUB/9jwTxRbVGKjVyO9ZdP\nYR5seJU0R3ZUKZa5+Qv7BXPSaBS6nCHejxOd9Jg8zYafVTDdCYdvDfNrKnhhKOC9\n637WGNd/T7LfPH0fp7KHKv+QJ15LhleMpcsKVt8+32px7jepAltD6drNTATkDyST\nQz5PMrVZLkhZo2zu/I8sfj/SAd0mtoBBpRfA3Xt9AWCMqaWcSM9nmz3awzJopVY3\nUXnX9p13B4op2wyPnoW0j1GdBRv/Ky2kOYE++AczGwhbPos2fD3Ulg4aIKspgZ5f\nsvlMBaG/AAd69IVvWQYqlUvyB1v6i1Trl6Ti2sNd6eAphNAJeQGCTcU3w6ibvAq5\nyshz\n=pO8s\n-----END PGP PUBLIC KEY BLOCK-----";
+
 #[get("/")]
 pub fn index() -> &'static str {
     "Hello, world!"
@@ -23,7 +25,7 @@ pub struct SynoRequest {
     micro: u8,                              // 2
     minor: u8,                              // 2
     nano: Option<u8>,                       // 4
-    package_update_channel: Option<String>, // beta
+    package_update_channel: Option<String>, // beta/stable
     timezone: Option<String>,               // London
     unique: Option<String>,                 // synology_apollolake_418play
 }
@@ -40,7 +42,7 @@ pub struct Package {
     dname: Option<String>,
     download_count: usize,
     link: Option<String>,
-    maintainer: String,
+    maintainer: &'static str,
     package: Option<String>,
     qinst: bool,
     qstart: bool,
@@ -70,7 +72,7 @@ impl Default for Package {
             dname: None,
             download_count: 0,
             link: None,
-            maintainer: String::from("Syno Community"),
+            maintainer: "Syno Community",
             package: None,
             qinst: false,
             qstart: false,
@@ -106,6 +108,9 @@ pub fn get_packages_for_device_lang(
         }
     }
 
+    let p = DbPackage::get_packages(&conn);
+    println!("{}", serde_json::to_string_pretty(&p).unwrap());
+
     ////
     use crate::schema::description::dsl::*;
     use crate::schema::displayname::dsl::*;
@@ -114,18 +119,14 @@ pub fn get_packages_for_device_lang(
     use crate::schema::package::dsl::*;
     use crate::schema::version::dsl::*;
 
-    let languages = language
-        .load::<DbLanguage>(&conn.0)
-        .expect("Error loading languages");
+    let languages = language.load::<DbLanguage>(&conn.0).expect("Error loading languages");
 
     let descriptions = description
         .load::<DbDescription>(&conn.0)
         // .inner_join(language)
         .expect("Error loading description");
 
-    let packages = package
-        .load::<DbPackage>(&conn.0)
-        .expect("Error loading package");
+    let packages = package.load::<DbPackage>(&conn.0).expect("Error loading package");
     // println!("{:?}", packages);
 
     // let p = package.find(1).get_result::<DbPackage>(&conn.0).expect("Error loading package");
@@ -145,7 +146,9 @@ pub fn get_packages_for_device_lang(
 
     let data = packages.into_iter().zip(versions).collect::<Vec<_>>();
     // let data = packages.into_iter().zip(displayName).collect::<Vec<_>>();
-    println!("{:?}", data);
+
+    // println!("{}", serde_json::to_string_pretty(&data).unwrap());
+
     let mut sr = SynoResponse {
         packages: Vec::new(),
         ..Default::default()
@@ -212,10 +215,19 @@ pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoRes
 //     Ok(format!("Inserted {} row(s).", inserted_rows))
 // }
 
-pub fn int_to_float(a:u32, b:u32) -> f32{
-    let after_decimal_place:f32 = a as f32 /100.0;
+pub fn int_to_float(a: u32, b: u32) -> f32 {
+    let after_decimal_place: f32 = a as f32 / 100.0;
     b as f32 + after_decimal_place
 }
+
+// pub fn collect_db(
+//     ver: &Vec<Vec<DbVersion>>,
+//     pack: &Vec<DbPackage>,
+//     desc: &Vec<DbDescription>,
+// ) -> Vec<((Vec<DbVersion>, DbPackage), DbDescription)> {
+//     let v = ver.into_iter().zip(pack).collect::<Vec<_>>();
+//     v.into_iter().zip(desc).collect::<Vec<_>>()
+// }
 
 #[get("/package")]
 pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
@@ -226,34 +238,33 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
     let query_arch = "apollolake";
     let query_minor = 2;
     let query_build = 24922;
-    let query_firmware_version = int_to_float(query_major,query_minor);
-    let query_version = format!(
-        "{}.{}.{}-{}",
-        query_major, query_micro, query_minor, query_build
-    );
+    let query_firmware_version = int_to_float(query_major, query_minor);
+    let query_version = format!("{}.{}.{}-{}", query_major, query_micro, query_minor, query_build);
 
     use crate::schema::architecture;
+    use crate::schema::build;
     use crate::schema::description;
-    use crate::schema::language;
     use crate::schema::displayname;
     use crate::schema::firmware;
-    use crate::schema::build;
+    use crate::schema::language;
     use crate::schema::package;
     use crate::schema::version;
+
+    println!("keyrings:{:?}", [KEYRING]);
 
     let lang_id = language::table
         .select(language::id)
         .filter(language::code.eq(query_language))
-        .load::<u64>(&connection.0)
+        .first::<u64>(&connection.0)
         .expect("Error loading lang_id");
-    println!("lang_id:{:?}", lang_id[0]);
+    println!("lang_id:{:?}", lang_id);
 
     let arch_id = architecture::table
         .select(architecture::id)
         .filter(architecture::code.eq(query_arch))
-        .load::<u64>(&connection.0)
+        .first::<u64>(&connection.0)
         .expect("Error loading arch_id");
-    println!("arch_id:{:?}", arch_id[0]);
+    println!("arch_id:{:?}", arch_id);
 
     let firmware_ids = firmware::table // minimum build
         // .filter(firmware::version.gt(query_firmware_version))
@@ -263,13 +274,13 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
     println!("firmware_ids:{:?}", firmware_ids);
 
     let descriptions = description::table
-        .filter(description::language_id.eq(lang_id[0]))
+        .filter(description::language_id.eq(lang_id))
         .load::<DbDescription>(&connection.0)
         .expect("Error loading description");
     println!("{:?}", descriptions);
 
     let displaynames = displayname::table
-        .filter(displayname::language_id.eq(lang_id[0]))
+        .filter(displayname::language_id.eq(lang_id))
         .load::<DbDisplayName>(&connection.0)
         .expect("Error loading displayname");
     println!("{:?}", displaynames);
@@ -278,13 +289,38 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
         // .filter(build::firmware_id.eq(firmware_id[0]))
         .load::<DbBuild>(&connection.0)
         .expect("Error loading builds");
-    println!("{:?}", builds);
+    println!("builds:{:?}", builds);
 
+    // for build
+    // get latest version of ever package- include displayname and description
+    // filter architecture and build
 
-    let versions = version::table
+    // let versions = version::table
+    //     .load::<DbVersion>(&connection.0)
+    //     .expect("Error loading versions");
+    // println!("{:?}", versions);
+
+    let packages = package::table
+        // .filter(package::name.eq("dnscrypt-proxy"))
+        .load::<DbPackage>(&connection.0)
+        .expect("Error loading package");
+
+    let versions = DbVersion::belonging_to(&packages)
         .load::<DbVersion>(&connection.0)
-        .expect("Error loading versions");
-    println!("{:?}", versions);
+        // .filter(version::ver)
+        .expect("Error loading packages_with_versions")
+        .grouped_by(&packages);
+
+    let ver = versions
+        .into_iter()
+        // .zip(packages)
+        .zip(descriptions)
+        .collect::<Vec<_>>();
+    // .into_iter()
+    // .collect::<Vec<_>>();
+    let pack = packages.into_iter().zip(ver).collect::<Vec<_>>();
+    // let packages_with_versions = collect_db(&versions, &packages, &descriptions);
+    println!("packages_with_versions:{:?}", pack);
 
     // let version = DbDescription::belonging_to(&versions)
     //     .load::<DbDescription>(&connection.0);
@@ -298,11 +334,26 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
     //     println!("----------\n");
     //     println!("{:#?}", p.insert_date);
     // }
-    let results = package::table
+    // let packages = package::table
+    //     // .filter(package::name.eq("dnscrypt-proxy"))
+    //     .load::<DbPackage>(&connection.0)
+    //     .expect("Error loading package");
+
+    // for i in &packages {
+    //     for j in &versions {
+    //         if &packages[i] {
+    //             unimplemented!();
+    //         }
+    //     }
+    // }
+
+    // let data = packages.into_iter().zip(versions).collect::<Vec<_>>();
+
+    let packages0 = package::table
         .filter(package::name.eq("dnscrypt-proxy"))
         .load::<DbPackage>(&connection.0)
         .expect("Error loading package");
-    Json(results)
+    Json(packages0)
     // let packages = package::table
     //     .load::<DbPackage>(&connection.0)
     //     .expect("Error loading package");

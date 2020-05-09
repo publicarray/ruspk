@@ -1,14 +1,17 @@
 use crate::schema::*;
+use crate::DbConn;
 use chrono::NaiveDateTime;
+use diesel::prelude::*;
+// use crate::routes::{Package};
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "architecture"]
 pub struct DbArchitecture {
     pub id: u64,
     pub code: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
 #[belongs_to(DbFirmware, foreign_key = "firmware_id")]
 #[table_name = "build"]
@@ -25,7 +28,7 @@ pub struct DbBuild {
     pub active: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]
 #[belongs_to(DbArchitecture, foreign_key = "architecture_id")]
 #[primary_key(build_id, architecture_id)]
@@ -35,7 +38,7 @@ pub struct DbBuildArchitecture {
     pub architecture_id: u64,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbLanguage, foreign_key = "language_id")]
 #[belongs_to(DbVersion, foreign_key = "version_id")]
 #[primary_key(language_id, version_id)]
@@ -46,7 +49,7 @@ pub struct DbDisplayName {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "language"]
 pub struct DbLanguage {
     pub id: u64,
@@ -54,7 +57,7 @@ pub struct DbLanguage {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]
 #[belongs_to(DbArchitecture, foreign_key = "architecture_id")]
 #[table_name = "download"]
@@ -68,7 +71,7 @@ pub struct DbDownload {
     pub date: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[table_name = "firmware"]
 pub struct DbFirmware {
     pub id: u64,
@@ -76,7 +79,7 @@ pub struct DbFirmware {
     pub build: u64,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbVersion, foreign_key = "version_id")]
 #[table_name = "icon"]
 pub struct DbIcon {
@@ -86,7 +89,7 @@ pub struct DbIcon {
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbLanguage, foreign_key = "language_id")]
 #[primary_key(language_id, version_id)]
 #[table_name = "description"]
@@ -96,7 +99,7 @@ pub struct DbDescription {
     pub desc: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "package"]
 pub struct DbPackage {
     pub id: u64,
@@ -105,7 +108,7 @@ pub struct DbPackage {
     pub insert_date: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[primary_key(package_id, user_id)]
 #[table_name = "package_user_maintainer"]
 pub struct DbPackageUserMaintainer {
@@ -113,7 +116,7 @@ pub struct DbPackageUserMaintainer {
     pub user_id: u64,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "role"]
 pub struct DbRole {
     pub id: u64,
@@ -121,7 +124,7 @@ pub struct DbRole {
     pub description: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "screenshot"]
 pub struct DbScreenshot {
     pub id: u64,
@@ -129,14 +132,14 @@ pub struct DbScreenshot {
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "service"]
 pub struct DbService {
     pub id: u64,
     pub code: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "user"]
 pub struct DbUser {
     pub id: u64,
@@ -149,7 +152,7 @@ pub struct DbUser {
     pub confirmed_at: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[primary_key(user_id, role_id)]
 #[table_name = "user_role"]
 pub struct DbUserRole {
@@ -157,7 +160,7 @@ pub struct DbUserRole {
     pub role_id: u64,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
 #[table_name = "version"]
 pub struct DbVersion {
@@ -182,10 +185,87 @@ pub struct DbVersion {
     pub insert_date: NaiveDateTime,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug)]
+#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[primary_key(version_id, package_id)]
 #[table_name = "version_service_dependency"]
 pub struct DbVersionServiceDependency {
     pub version_id: u64,
     pub package_id: u64,
+}
+
+// #[derive(Serialize)]
+// pub struct Package {
+//     beta: Option<bool>,
+//     changelog: Option<String>,
+//     conflictpkgs: Option<String>,
+//     deppkgs: Option<String>,
+//     desc: Option<String>,
+//     distributor: String,
+//     distributor_url: String,
+//     dname: Option<String>,
+//     download_count: usize,
+//     link: Option<String>,
+//     maintainer: &'static str,
+//     package: Option<String>,
+//     qinst: bool,
+//     qstart: bool,
+//     qupgrade: bool,
+//     recent_download_count: usize,
+//     thumbnail: Vec<String>,
+//     thumbnail_retina: Vec<String>,
+//     version: Option<String>,
+// }
+#[derive(Serialize, Queryable, Debug)]
+pub struct MyPackage {
+    changelog: Option<String>,
+    package: String,
+    link: Option<String>,
+    desc: Option<String>,
+    distributor: Option<String>,
+    distributor_url: Option<String>,
+    dname: Option<String>,
+    // download_count: u64,
+}
+
+impl DbPackage {
+    // pub fn to_json(&self) -> Value {
+    //     json!({
+    //         "Id": self.uuid,
+    //         "OrganizationId": self.org_uuid,
+    //         "Name": self.name,
+    //         "Object": "collection",
+    //     })
+    // }
+    pub fn get_packages(conn: &DbConn) -> Vec<MyPackage> {
+        let language_id = language::table
+            .filter(language::code.eq("enu"))
+            .select(language::id)
+            .first::<u64>(&**conn)
+            .expect("Error loading language");
+
+        package::table
+            .inner_join(
+                version::table
+                    .left_join(description::table)
+                    .left_join(displayname::table),
+            )
+            .left_join(build::table)
+            // .left_join(build::table.on(
+            //     build::package_id.eq(package::id)
+            // ))
+            .filter(build::active.eq(true))
+            .filter(description::language_id.eq(language_id))
+            .filter(displayname::language_id.eq(language_id))
+            .select((
+                version::changelog,
+                package::name,
+                build::path.nullable(),
+                description::desc.nullable(),
+                version::distributor,
+                version::distributor_url,
+                displayname::name.nullable(),
+            ))
+            .load::<MyPackage>(&**conn)
+            .expect("Error loading packages")
+    }
 }
