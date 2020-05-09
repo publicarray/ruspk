@@ -217,14 +217,27 @@ pub struct DbVersionServiceDependency {
 // }
 #[derive(Serialize, Queryable, Debug)]
 pub struct MyPackage {
+    // beta: Option<bool>,
+    //     conflictpkgs: Option<String>,
+    //     deppkgs: Option<String>,
     changelog: Option<String>,
-    package: String,
-    link: Option<String>,
     desc: Option<String>,
     distributor: Option<String>,
     distributor_url: Option<String>,
     dname: Option<String>,
     // download_count: u64,
+    link: Option<String>,
+    maintainer: Option<String>,
+    maintainer_url: Option<String>,
+    package: String,
+    qinst: Option<bool>,
+    qstart: Option<bool>,
+    qupgrade: Option<bool>,
+    // recent_download_count: u64,
+    // thumbnail: Vec<String>,
+    // thumbnail: Option<String>,
+    upstream_version: String,
+    revision: u32,
 }
 
 impl DbPackage {
@@ -243,27 +256,62 @@ impl DbPackage {
             .first::<u64>(&**conn)
             .expect("Error loading language");
 
+        let _firmware_id = firmware::table
+            .filter(firmware::version.eq("6.1"))
+            .filter(firmware::build.gt(3776))
+            .select(firmware::id)
+            .first::<u64>(&**conn)
+            .expect("Error loading firmware");
+
+        let architecture_id = architecture::table
+            .filter(architecture::code.eq("x64"))
+            .select(architecture::id)
+            .first::<u64>(&**conn)
+            .expect("Error loading architecture");
+
+        let _icons = icon::table
+            .filter(icon::version_id.eq(1))
+            .select((icon::path, icon::size))
+            .load::<(String, String)>(&**conn)
+            .expect("Error loading icons");
+
+        // sql("group_concat(icon::path) as images")
+
         package::table
             .inner_join(
                 version::table
                     .left_join(description::table)
-                    .left_join(displayname::table),
+                    .left_join(displayname::table), // .left_join(icon::table),
             )
-            .left_join(build::table)
-            // .left_join(build::table.on(
-            //     build::package_id.eq(package::id)
-            // ))
+            .inner_join(
+                build::table.inner_join(firmware::table).inner_join(
+                    build_architecture::table.on(build_architecture::build_id
+                        .eq(build::id)
+                        .and(build_architecture::architecture_id.eq(architecture_id))),
+                ),
+            )
             .filter(build::active.eq(true))
+            // .filter(build::firmware_id.eq(firmware_id))
+            .filter(firmware::version.eq("6.1"))
+            .filter(firmware::build.gt(3776))
             .filter(description::language_id.eq(language_id))
             .filter(displayname::language_id.eq(language_id))
             .select((
                 version::changelog,
-                package::name,
-                build::path.nullable(),
                 description::desc.nullable(),
                 version::distributor,
                 version::distributor_url,
                 displayname::name.nullable(),
+                build::path.nullable(),
+                version::maintainer,
+                version::maintainer_url,
+                package::name,
+                version::install_wizard,
+                version::startable,
+                version::upgrade_wizard,
+                // icon::path.nullable(),
+                version::upstream_version,
+                version::ver,
             ))
             .load::<MyPackage>(&**conn)
             .expect("Error loading packages")
