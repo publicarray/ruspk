@@ -225,7 +225,7 @@ pub struct MyPackage {
     pub distributor: Option<String>,
     pub distributor_url: Option<String>,
     pub dname: Option<String>,
-     // download_count: u64,
+    // download_count: u64,
     pub link: Option<String>,
     pub maintainer: Option<String>,
     pub maintainer_url: Option<String>,
