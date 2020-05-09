@@ -30,32 +30,82 @@ pub struct SynoRequest {
     unique: Option<String>,                 // synology_apollolake_418play
 }
 
+
+extern crate serde_with;
+#[serde_with::skip_serializing_none]
 #[derive(Serialize)]
 pub struct Package {
-    beta: Option<bool>,
-    changelog: Option<String>,
-    conflictpkgs: Option<String>,
-    deppkgs: Option<String>,
-    desc: Option<String>,
-    distributor: String,
-    distributor_url: String,
-    dname: Option<String>,
-    download_count: usize,
-    link: Option<String>,
-    maintainer: &'static str,
-    package: Option<String>,
-    qinst: bool,
-    qstart: bool,
-    qupgrade: bool,
-    recent_download_count: usize,
-    thumbnail: Vec<String>,
-    thumbnail_retina: Vec<String>,
-    version: Option<String>,
+    pub beta: Option<bool>,
+    pub changelog: Option<String>,
+    pub conflictpkgs: Option<String>,
+    pub deppkgs: Option<String>,
+    pub desc: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub snapshot: Vec<String>,
+    pub distributor: String,
+    pub distributor_url: String,
+    pub dname: Option<String>,
+    pub download_count: usize,
+    pub link: String,
+    pub maintainer: String,
+    pub maintainer_url: String,
+    pub package: String,
+    pub qinst: bool,
+    pub qstart: bool,
+    pub qupgrade: bool,
+    pub recent_download_count: usize,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub thumbnail: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub thumbnail_retina: Vec<String>,
+    pub version: String,
+    pub md5: Option<String>,
+    pub size: Option<i32>,
+
 }
 
 impl Package {
-    fn new() -> Self {
-        Default::default()
+    fn new(changelog:Option<String>,
+            desc:Option<String>,
+            distributor:String,
+            distributor_url:String,
+            dname:Option<String>,
+            link:String,
+            maintainer:String,
+            maintainer_url:String,
+            package:String,
+            qinst:bool,
+            qstart:bool,
+            qupgrade:bool,
+            version:String,
+            md5:Option<String>,
+            size:Option<i32>,
+            ) -> Self {
+        Package{
+            beta:Some(false),
+            changelog,
+            conflictpkgs: None,
+            deppkgs: None,
+            desc,
+            snapshot: Vec::new(),
+            distributor,
+            distributor_url,
+            dname,
+            download_count: 0,
+            link,
+            maintainer,
+            maintainer_url,
+            package,
+            qinst,
+            qstart,
+            qupgrade,
+            recent_download_count: 0,
+            thumbnail: Vec::new(),
+            thumbnail_retina: Vec::new(),
+            version,
+            md5,
+            size,
+        }
     }
 }
 
@@ -67,20 +117,24 @@ impl Default for Package {
             conflictpkgs: None,
             deppkgs: None,
             desc: None,
-            distributor: String::from("Syno Community"),
-            distributor_url: String::from("https://synocommunity.com/"),
+            snapshot: Vec::new(),
+            distributor: "Syno Community".to_string(),
+            distributor_url: "https://synocommunity.com/".to_string(),
             dname: None,
             download_count: 0,
-            link: None,
-            maintainer: "Syno Community",
-            package: None,
+            link: String::new(),
+            maintainer: "Syno Community".to_string(),
+            maintainer_url: "https://synocommunity.com/".to_string(),
+            package: String::new(),
             qinst: false,
             qstart: false,
             qupgrade: true,
             recent_download_count: 0,
             thumbnail: Vec::new(),
             thumbnail_retina: Vec::new(),
-            version: None,
+            version: String::new(),
+            md5: None,
+            size: None,
         }
     }
 }
@@ -90,7 +144,14 @@ pub struct SynoResponse {
     keyrings: Option<Vec<String>>,
     packages: Vec<Package>,
 }
-
+impl SynoResponse {
+    fn set_key(&mut self, key: String) -> &Self {
+        let mut k = self.keyrings.clone().unwrap_or(Vec::new());
+        k.push(key);
+        self.keyrings = Some(k);
+        self
+    }
+}
 pub fn get_packages_for_device_lang(
     conn: DbConn,
     lang: &String,
@@ -108,54 +169,38 @@ pub fn get_packages_for_device_lang(
         }
     }
 
-    let p = DbPackage::get_packages(&conn);
-    println!("{}", serde_json::to_string_pretty(&p).unwrap());
-
-    ////
-    use crate::schema::description::dsl::*;
-    use crate::schema::displayname::dsl::*;
-    use crate::schema::language::dsl::*;
-    use crate::schema::package::dsl::*;
-    use crate::schema::package::dsl::*;
-    use crate::schema::version::dsl::*;
-
-    let languages = language.load::<DbLanguage>(&conn.0).expect("Error loading languages");
-
-    let descriptions = description
-        .load::<DbDescription>(&conn.0)
-        // .inner_join(language)
-        .expect("Error loading description");
-
-    let packages = package.load::<DbPackage>(&conn.0).expect("Error loading package");
-    // println!("{:?}", packages);
-
-    // let p = package.find(1).get_result::<DbPackage>(&conn.0).expect("Error loading package");
-    let versions = DbVersion::belonging_to(&packages)
-        .load::<DbVersion>(&conn.0)
-        .expect("Error loading version")
-        .grouped_by(&packages);
-
-    // let description = DbDescription::belonging_to(&languages)
-    //     .load::<DbDescription>(&conn.0)
-    //     .expect("Error loading description");
-
-    // let displayName = DbDisplayName::belonging_to(&versions, &languages)
-    // // let displayName = DbDisplayName::belonging_to(&versions, &languages)
-    //     .load::<DbDisplayName>(&conn.0)
-    //     .expect("Error loading displayname");
-
-    let data = packages.into_iter().zip(versions).collect::<Vec<_>>();
-    // let data = packages.into_iter().zip(displayName).collect::<Vec<_>>();
-
-    // println!("{}", serde_json::to_string_pretty(&data).unwrap());
-
     let mut sr = SynoResponse {
         packages: Vec::new(),
         ..Default::default()
     };
+    sr.set_key(KEYRING.to_string());
 
-    sr.packages.push(Package::new());
-    // sr.packages.push(Package::new(..Default::default()));
+    // let packages = DbPackage::get_packages(&lang,&arch,&build,package_update_channel,major,micro,minor,&conn);
+    let packages = DbPackage::get_packages(&conn);
+    // println!("{}", serde_json::to_string_pretty(&packages).unwrap());
+
+    for package in packages.iter() {
+        let p = Package::new(
+            package.changelog.clone(),
+            package.desc.clone(),
+            package.distributor.clone().unwrap_or(String::new()),
+            package.distributor_url.clone().unwrap_or(String::new()),
+            package.dname.clone(),
+            package.link.clone().unwrap_or(String::new()),
+            package.maintainer.clone().unwrap_or(String::new()),
+            package.maintainer_url.clone().unwrap_or(String::new()),
+            package.package.clone(),
+            package.qinst.unwrap_or(false),
+            package.qstart.unwrap_or(false),
+            package.qupgrade.unwrap_or(false),
+            format!("{}-{}", package.upstream_version, package.revision),
+            Some(package.md5.clone()),
+            Some(package.size),
+
+        );
+        sr.packages.push(p);
+    }
+    // sr.packages.push(Package::default());
     return sr;
 }
 

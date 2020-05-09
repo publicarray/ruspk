@@ -215,29 +215,31 @@ pub struct DbVersionServiceDependency {
 //     thumbnail_retina: Vec<String>,
 //     version: Option<String>,
 // }
-#[derive(Serialize, Queryable, Debug)]
+#[derive(Serialize, Queryable, Debug, Clone)]
 pub struct MyPackage {
     // beta: Option<bool>,
     //     conflictpkgs: Option<String>,
     //     deppkgs: Option<String>,
-    changelog: Option<String>,
-    desc: Option<String>,
-    distributor: Option<String>,
-    distributor_url: Option<String>,
-    dname: Option<String>,
-    // download_count: u64,
-    link: Option<String>,
-    maintainer: Option<String>,
-    maintainer_url: Option<String>,
-    package: String,
-    qinst: Option<bool>,
-    qstart: Option<bool>,
-    qupgrade: Option<bool>,
+    pub changelog: Option<String>,
+    pub desc: Option<String>,
+    pub distributor: Option<String>,
+    pub distributor_url: Option<String>,
+    pub dname: Option<String>,
+     // download_count: u64,
+    pub link: Option<String>,
+    pub maintainer: Option<String>,
+    pub maintainer_url: Option<String>,
+    pub package: String,
+    pub qinst: Option<bool>,
+    pub qstart: Option<bool>,
+    pub qupgrade: Option<bool>,
     // recent_download_count: u64,
     // thumbnail: Vec<String>,
     // thumbnail: Option<String>,
-    upstream_version: String,
-    revision: u32,
+    pub upstream_version: String,
+    pub revision: u32,
+    pub md5: String,
+    pub size: i32,
 }
 
 impl DbPackage {
@@ -250,21 +252,19 @@ impl DbPackage {
     //     })
     // }
     pub fn get_packages(conn: &DbConn) -> Vec<MyPackage> {
+        let lanuage = "enu";
+        let arch = "x64";
+        let build = 3776;
+        let firmware = "6.1";
+
         let language_id = language::table
-            .filter(language::code.eq("enu"))
+            .filter(language::code.eq(lanuage))
             .select(language::id)
             .first::<u64>(&**conn)
             .expect("Error loading language");
 
-        let _firmware_id = firmware::table
-            .filter(firmware::version.eq("6.1"))
-            .filter(firmware::build.gt(3776))
-            .select(firmware::id)
-            .first::<u64>(&**conn)
-            .expect("Error loading firmware");
-
         let architecture_id = architecture::table
-            .filter(architecture::code.eq("x64"))
+            .filter(architecture::code.eq(arch))
             .select(architecture::id)
             .first::<u64>(&**conn)
             .expect("Error loading architecture");
@@ -291,9 +291,8 @@ impl DbPackage {
                 ),
             )
             .filter(build::active.eq(true))
-            // .filter(build::firmware_id.eq(firmware_id))
-            .filter(firmware::version.eq("6.1"))
-            .filter(firmware::build.gt(3776))
+            .filter(firmware::version.eq(firmware))
+            .filter(firmware::build.gt(build))
             .filter(description::language_id.eq(language_id))
             .filter(displayname::language_id.eq(language_id))
             .select((
@@ -312,6 +311,8 @@ impl DbPackage {
                 // icon::path.nullable(),
                 version::upstream_version,
                 version::ver,
+                build::md5,
+                build::extract_size,
             ))
             .load::<MyPackage>(&**conn)
             .expect("Error loading packages")
