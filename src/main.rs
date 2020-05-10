@@ -21,6 +21,8 @@ pub mod schema;
 // pub mod schema;
 // pub mod models;
 
+const URL: &str = "http://packages.synocommunity.com";
+
 #[database("mysql")]
 pub struct DbConn(diesel::MysqlConnection);
 

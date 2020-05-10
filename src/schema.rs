@@ -69,7 +69,7 @@ table! {
     icon (id) {
         id -> Unsigned<Bigint>,
         version_id -> Unsigned<Bigint>,
-        size -> Varchar,
+        size -> Integer,
         path -> Varchar,
     }
 }

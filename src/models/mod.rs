@@ -1,8 +1,14 @@
 use crate::schema::*;
 use crate::DbConn;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-// use crate::routes::{Package};
+
+mod icon;
+mod screenshot;
+
+pub use self::icon::DbIcon;
+pub use self::screenshot::DbScreenshot;
+
+use chrono::NaiveDateTime;
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "architecture"]
@@ -79,16 +85,7 @@ pub struct DbFirmware {
     pub build: u64,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
-#[belongs_to(DbVersion, foreign_key = "version_id")]
-#[table_name = "icon"]
-pub struct DbIcon {
-    pub id: u64,
-    pub version_id: u64,
-    pub size: u16,
-    pub path: String,
-}
-
+//
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbLanguage, foreign_key = "language_id")]
 #[primary_key(language_id, version_id)]
@@ -122,14 +119,6 @@ pub struct DbRole {
     pub id: u64,
     pub name: String,
     pub description: String,
-}
-
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
-#[table_name = "screenshot"]
-pub struct DbScreenshot {
-    pub id: u64,
-    pub package_id: u64,
-    pub path: String,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
@@ -217,7 +206,9 @@ pub struct DbVersionServiceDependency {
 // }
 #[derive(Serialize, Queryable, Debug, Clone)]
 pub struct MyPackage {
-    // beta: Option<bool>,
+    pub package_id: u64,
+    pub version_id: u64,
+    pub beta: bool,
     //     conflictpkgs: Option<String>,
     //     deppkgs: Option<String>,
     pub changelog: Option<String>,
@@ -269,11 +260,11 @@ impl DbPackage {
             .first::<u64>(&**conn)
             .expect("Error loading architecture");
 
-        let _icons = icon::table
-            .filter(icon::version_id.eq(1))
-            .select((icon::path, icon::size))
-            .load::<(String, String)>(&**conn)
-            .expect("Error loading icons");
+        // let _icons = icon::table
+        //     .filter(icon::version_id.eq(1))
+        //     .select((icon::path, icon::size))
+        //     .load::<(String, String)>(&**conn)
+        //     .expect("Error loading icons");
 
         // sql("group_concat(icon::path) as images")
 
@@ -281,7 +272,7 @@ impl DbPackage {
             .inner_join(
                 version::table
                     .left_join(description::table)
-                    .left_join(displayname::table), // .left_join(icon::table),
+                    .left_join(displayname::table)
             )
             .inner_join(
                 build::table.inner_join(firmware::table).inner_join(
@@ -296,6 +287,9 @@ impl DbPackage {
             .filter(description::language_id.eq(language_id))
             .filter(displayname::language_id.eq(language_id))
             .select((
+                package::id,
+                version::id,
+                version::report_url.is_not_null(), // beta
                 version::changelog,
                 description::desc.nullable(),
                 version::distributor,
