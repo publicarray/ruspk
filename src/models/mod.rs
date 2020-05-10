@@ -182,28 +182,6 @@ pub struct DbVersionServiceDependency {
     pub package_id: u64,
 }
 
-// #[derive(Serialize)]
-// pub struct Package {
-//     beta: Option<bool>,
-//     changelog: Option<String>,
-//     conflictpkgs: Option<String>,
-//     deppkgs: Option<String>,
-//     desc: Option<String>,
-//     distributor: String,
-//     distributor_url: String,
-//     dname: Option<String>,
-//     download_count: usize,
-//     link: Option<String>,
-//     maintainer: &'static str,
-//     package: Option<String>,
-//     qinst: bool,
-//     qstart: bool,
-//     qupgrade: bool,
-//     recent_download_count: usize,
-//     thumbnail: Vec<String>,
-//     thumbnail_retina: Vec<String>,
-//     version: Option<String>,
-// }
 #[derive(Serialize, Queryable, Debug, Clone)]
 pub struct MyPackage {
     pub package_id: u64,
@@ -225,8 +203,6 @@ pub struct MyPackage {
     pub qstart: Option<bool>,
     pub qupgrade: Option<bool>,
     // recent_download_count: u64,
-    // thumbnail: Vec<String>,
-    // thumbnail: Option<String>,
     pub upstream_version: String,
     pub revision: u32,
     pub md5: String,
@@ -256,14 +232,6 @@ impl DbPackage {
             .select(architecture::id)
             .first::<u64>(&**conn)
             .expect("Error loading architecture");
-
-        // let _icons = icon::table
-        //     .filter(icon::version_id.eq(1))
-        //     .select((icon::path, icon::size))
-        //     .load::<(String, String)>(&**conn)
-        //     .expect("Error loading icons");
-
-        // sql("group_concat(icon::path) as images")
 
         let mut q = package::table
             .inner_join(
@@ -305,7 +273,6 @@ impl DbPackage {
                 version::install_wizard,
                 version::startable,
                 version::upgrade_wizard,
-                // icon::path.nullable(),
                 version::upstream_version,
                 version::ver,
                 build::md5,

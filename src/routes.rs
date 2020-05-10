@@ -280,102 +280,13 @@ pub fn int_to_float(a: u32, b: u32) -> f32 {
 
 #[get("/package")]
 pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
-    let query_package_update_channel = "beta";
-    let query_language = "enu";
-    let query_major = 6;
-    let query_micro = 2;
-    let query_arch = "apollolake";
-    let query_minor = 2;
-    let query_build = 24922;
-    let query_firmware_version = int_to_float(query_major, query_minor);
-    let query_version = format!("{}.{}.{}-{}", query_major, query_micro, query_minor, query_build);
-
-    use crate::schema::architecture;
-    use crate::schema::build;
-    use crate::schema::description;
-    use crate::schema::displayname;
-    use crate::schema::firmware;
-    use crate::schema::language;
     use crate::schema::package;
-    use crate::schema::version;
-
-    println!("keyrings:{:?}", [KEYRING]);
-
-    let lang_id = language::table
-        .select(language::id)
-        .filter(language::code.eq(query_language))
-        .first::<u64>(&connection.0)
-        .expect("Error loading lang_id");
-    println!("lang_id:{:?}", lang_id);
-
-    let arch_id = architecture::table
-        .select(architecture::id)
-        .filter(architecture::code.eq(query_arch))
-        .first::<u64>(&connection.0)
-        .expect("Error loading arch_id");
-    println!("arch_id:{:?}", arch_id);
-
-    let firmware_ids = firmware::table // minimum build
-        // .filter(firmware::version.gt(query_firmware_version))
-        .filter(firmware::build.gt(query_build))
-        .load::<DbFirmware>(&connection.0)
-        .expect("Error loading firmware_id");
-    println!("firmware_ids:{:?}", firmware_ids);
-
-    let descriptions = description::table
-        .filter(description::language_id.eq(lang_id))
-        .load::<DbDescription>(&connection.0)
-        .expect("Error loading description");
-    println!("{:?}", descriptions);
-
-    let displaynames = displayname::table
-        .filter(displayname::language_id.eq(lang_id))
-        .load::<DbDisplayName>(&connection.0)
-        .expect("Error loading displayname");
-    println!("{:?}", displaynames);
-
-    let builds = build::table
-        // .filter(build::firmware_id.eq(firmware_id[0]))
-        .load::<DbBuild>(&connection.0)
-        .expect("Error loading builds");
-    println!("builds:{:?}", builds);
-
-    // for build
-    // get latest version of ever package- include displayname and description
-    // filter architecture and build
-
-    // let versions = version::table
-    //     .load::<DbVersion>(&connection.0)
-    //     .expect("Error loading versions");
-    // println!("{:?}", versions);
 
     let packages = package::table
         // .filter(package::name.eq("dnscrypt-proxy"))
         .load::<DbPackage>(&connection.0)
         .expect("Error loading package");
-
-    let versions = DbVersion::belonging_to(&packages)
-        .load::<DbVersion>(&connection.0)
-        // .filter(version::ver)
-        .expect("Error loading packages_with_versions")
-        .grouped_by(&packages);
-
-    let ver = versions
-        .into_iter()
-        // .zip(packages)
-        .zip(descriptions)
-        .collect::<Vec<_>>();
-    // .into_iter()
-    // .collect::<Vec<_>>();
-    let pack = packages.into_iter().zip(ver).collect::<Vec<_>>();
-    // let packages_with_versions = collect_db(&versions, &packages, &descriptions);
-    println!("packages_with_versions:{:?}", pack);
-
-    let packages0 = package::table
-        .filter(package::name.eq("dnscrypt-proxy"))
-        .load::<DbPackage>(&connection.0)
-        .expect("Error loading package");
-    Json(packages0)
+    Json(packages)
 
 }
 
