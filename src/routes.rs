@@ -165,10 +165,10 @@ pub fn get_packages_for_device_lang(
     micro: u8,
     minor: u8,
 ) -> SynoResponse {
-    let beta = false;
+    let mut beta = false;
     if let Some(package_update_channel) = package_update_channel {
         if (package_update_channel == "beta") {
-            let beta = true;
+            beta = true;
         }
     }
 
