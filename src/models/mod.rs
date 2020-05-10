@@ -242,14 +242,11 @@ impl DbPackage {
     //         "Object": "collection",
     //     })
     // }
-    pub fn get_packages(conn: &DbConn) -> Vec<MyPackage> {
-        let lanuage = "enu";
-        let arch = "x64";
-        let build = 3776;
-        let firmware = "6.1";
+    pub fn get_packages(lang: &String, arch: &String, build: u64, beta: bool, major: u8, _micro: u8, minor: u8, conn: &DbConn) -> Vec<MyPackage> {
+        let firmware = format!("{}.{}", major, minor);
 
         let language_id = language::table
-            .filter(language::code.eq(lanuage))
+            .filter(language::code.eq(lang))
             .select(language::id)
             .first::<u64>(&**conn)
             .expect("Error loading language");
@@ -268,9 +265,11 @@ impl DbPackage {
 
         // sql("group_concat(icon::path) as images")
 
-        package::table
+        let mut q = package::table
             .inner_join(
                 version::table
+            //         .left_outer_join(version::table.on(version::id.eq(version::id).and(version::ver.gt(version::ver))))
+            //         // .filter(version::id.is_null())
                     .left_join(description::table)
                     .left_join(displayname::table)
             )
@@ -283,10 +282,14 @@ impl DbPackage {
             )
             .filter(build::active.eq(true))
             .filter(firmware::version.eq(firmware))
-            .filter(firmware::build.gt(build))
+            .filter(firmware::build.ge(build))
             .filter(description::language_id.eq(language_id))
             .filter(displayname::language_id.eq(language_id))
-            .select((
+            .into_boxed(); // http://docs.diesel.rs/diesel/query_dsl/trait.QueryDsl.html#method.into_boxed
+            if !beta {
+                q=q.filter(version::report_url.is_not_null());
+            }
+            q.select((
                 package::id,
                 version::id,
                 version::report_url.is_not_null(), // beta
