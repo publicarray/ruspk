@@ -69,6 +69,8 @@ impl Package {
     fn new(
         beta: bool,
         changelog: Option<String>,
+        conflictpkgs: Option<String>,
+        deppkgs: Option<String>,
         desc: Option<String>,
         distributor: String,
         distributor_url: String,
@@ -87,8 +89,8 @@ impl Package {
         Package {
             beta: false,
             changelog,
-            conflictpkgs: None,
-            deppkgs: None,
+            conflictpkgs,
+            deppkgs,
             desc,
             snapshot: Vec::new(),
             distributor,
@@ -185,6 +187,8 @@ pub fn get_packages_for_device_lang(
         let mut p = Package::new(
             package.beta,
             package.changelog.clone(),
+            package.conflictpkgs.clone(),
+            package.deppkgs.clone(),
             package.desc.clone(),
             package.distributor.clone().unwrap_or(String::new()),
             package.distributor_url.clone().unwrap_or(String::new()),
