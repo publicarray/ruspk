@@ -1,7 +1,8 @@
 use crate::schema::*;
 use crate::DbConn;
 use diesel::prelude::*;
-
+use diesel::dsl::sql;
+use diesel::sql_types::{Unsigned,Bigint};
 mod icon;
 mod screenshot;
 
@@ -221,11 +222,12 @@ impl DbPackage {
     pub fn get_packages(lang: &String, arch: &String, build: u64, beta: bool, major: u8, _micro: u8, minor: u8, conn: &DbConn) -> Vec<MyPackage> {
         let firmware = format!("{}.{}", major, minor);
 
+        let language_id_fallback_eng:u64 = 1;
         let language_id = language::table
             .filter(language::code.eq(lang))
             .select(language::id)
             .first::<u64>(&**conn)
-            .expect("Error loading language");
+            .unwrap_or(language_id_fallback_eng);
 
         let architecture_id = architecture::table
             .filter(architecture::code.eq(arch))
@@ -238,25 +240,36 @@ impl DbPackage {
                 version::table
             //         .left_outer_join(version::table.on(version::id.eq(version::id).and(version::ver.gt(version::ver))))
             //         // .filter(version::id.is_null())
-                    .left_join(description::table)
-                    .left_join(displayname::table)
+                    .left_join(description::table.on(description::version_id.eq(version::id)
+                        .and(sql("`description`.`language_id` = CASE WHEN EXISTS (SELECT 1 FROM `description` WHERE `description`.`language_id`= ")
+                        .bind::< diesel::sql_types::Unsigned<Bigint>,_>(language_id)
+                        .sql(" ) THEN ")
+                        .bind::< diesel::sql_types::Unsigned<Bigint>,_>(language_id)
+                        .sql(" ELSE 1 END"))
+
+                    ))
+                    .left_join(displayname::table.on(displayname::version_id.eq(version::id)
+                        .and(sql("`displayname`.`language_id` = CASE WHEN EXISTS (SELECT 1 FROM `displayname` WHERE `displayname`.`language_id`= ")
+                        .bind::< Unsigned<Bigint>,_>(language_id)
+                        .sql(" ) THEN ")
+                        .bind::< Unsigned<Bigint>,_>(language_id)
+                        .sql(" ELSE 1 END"))
+                    ))
             )
             .inner_join(
-                build::table.inner_join(firmware::table).inner_join(
-                    build_architecture::table.on(build_architecture::build_id
-                        .eq(build::id)
-                        .and(build_architecture::architecture_id.eq(architecture_id))),
-                ),
+                build::table
+                    .inner_join(firmware::table.on(firmware::id.eq(build::firmware_id).and(firmware::version.eq(firmware))))
+                    .inner_join(build_architecture::table.on(build_architecture::build_id.eq(build::id)
+                        .and(build_architecture::architecture_id.eq(architecture_id)))
+                )
             )
             .filter(build::active.eq(true))
-            .filter(firmware::version.eq(firmware))
             .filter(firmware::build.ge(build))
-            .filter(description::language_id.eq(language_id))
-            .filter(displayname::language_id.eq(language_id))
             .into_boxed(); // http://docs.diesel.rs/diesel/query_dsl/trait.QueryDsl.html#method.into_boxed
             if !beta {
                 q=q.filter(version::report_url.is_not_null());
             }
+
             q.select((
                 package::id,
                 version::id,
@@ -282,5 +295,13 @@ impl DbPackage {
             ))
             .load::<MyPackage>(&**conn)
             .expect("Error loading packages")
+
+            // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
+            // let s = String::new();
+            // let os = Some(String::new());
+            // let mut v = Vec::new();
+            // let ob = Some(false);
+            // v.push(MyPackage{package_id:1,version_id:1,beta:false,conflictpkgs:None,deppkgs:None,changelog:os.clone(),desc:os.clone(),distributor:os.clone(),distributor_url:os.clone(),dname:os.clone(),link:os.clone(),maintainer:os.clone(),maintainer_url:os.clone(),package:s.clone(),qinst:ob,qstart:ob,qupgrade:ob,upstream_version:s.clone(),revision:1,md5:s.clone(),size:300});
+            // v
     }
 }
