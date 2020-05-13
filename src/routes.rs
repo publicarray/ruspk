@@ -1,11 +1,13 @@
 #![allow(unused)]
 
-use crate::URL;
-use diesel::{self, prelude::*};
-use rocket::request::LenientForm;
-use rocket_contrib::json::Json;
 use crate::models::*;
 use crate::DbConn;
+use crate::URL;
+use anyhow::Result;
+use diesel::{self, prelude::*};
+use rocket::http::Status;
+use rocket::request::LenientForm;
+use rocket_contrib::json::Json;
 
 const KEYRING: &str = "-----BEGIN PGP PUBLIC KEY BLOCK-----\nVersion: GnuPG v1\n\nmQENBFRhPdoBCADMWckT2GJRrRcuNXuCBNp3oSC7tlQxa1EN81HhlX2Tqs7tKezC\nvgGCB69jWQmfB5BKdWcznS98bLZB4Iy2RjU8vtkI0/6AceovCytMXW0d6HE8frlf\n6gkWKylRbD3fBE+qpHOEwpV5MTEgF8UTM9cPzupY6ggm/6fSDxXqYRZQHfnAFoLE\nXSzMtdUyY0w4a1CapfVRa060XRNLvacu6+1XVksJVZbuChg3/zDhtYZuvbuXxwfA\n/sZem9OW85roUgsYE3cL8m4iexZHMIbWBO5mj7LoYgb33vF7T15yGUjWADMbBkQx\nYFBg6q48Nc81taFHRWpIIXe1s1ZTxyBQL0hjABEBAAG0NFN5bm9Db21tdW5pdHkg\nKE9mZmljaWFsKSA8Y29udGFjdEBzeW5vY29tbXVuaXR5LmNvbT6JATgEEwECACIF\nAlRhPdoCGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJENDC8YaUoLiOtJkI\nAKpGpoKrmkzSFEhSj+tbTx/EdsrQu+9Q32H51EZlM0gSn1rzjPBsg20Uh3JoK2gO\nDrWtcL6wSgd6Vp9ScwcjH/GQ6fh5/AIcXl1oW/Z31ZiqGxJmdT1EwdqYZdN+bv8K\nF4rezHKwlUAsq4jHvwnmOfjqJzn4Gpbf0diajLBNMmZY0uOe8Q0s1IqNkrtw0zWD\nimZqYTrktnpm8YFDUe1xo6qRNdqVXn5lddfrO4hPDP2/hzgZ6l0Gnl4P0ZFYAGo9\nQITV2BqBbBpMYff/yF0yxbSQgCu93J3FtMe3qK6mu2lclSDEFs+abX0NIbUOTv4l\nAus7c0ZXjYOZNLAYY+RAXsO5AQ0EVGE92gEIAJw1AdFZ1MXlU+JeCLqes8LV3Grv\nhTvTRWTd7Pi3W+qoaGkeTCfc9Jxf5PgFr0s5ZJrXD6f/JF73JSFwuHrGacSAR28/\nnPcLZPN5JYDipWmSdoa672lEeDJ+Zr2f2jtFs0CTXbyTyVSZnoDtL5j7a3BtlJ6N\nw2FaGVeqto7qfkudizEnoNcokmeAD0EpajCq2L0ZO6QxTP8q3gVoffQK6UTOublJ\nHj1T5A1ZH+hgVmjAsQ7AOh3ElRml+lkd3j0luYiuMiz8ol3GHjTQ0C5GnbWka3LH\nnrgU75kJduGtngEnmR6dBZPR47ImjsX5cQ7JWrJLSrWc907+7vcb6cAwYcUAEQEA\nAYkBHwQYAQIACQUCVGE92gIbDAAKCRDQwvGGlKC4jgEUB/9jwTxRbVGKjVyO9ZdP\nYR5seJU0R3ZUKZa5+Qv7BXPSaBS6nCHejxOd9Jg8zYafVTDdCYdvDfNrKnhhKOC9\n637WGNd/T7LfPH0fp7KHKv+QJ15LhleMpcsKVt8+32px7jepAltD6drNTATkDyST\nQz5PMrVZLkhZo2zu/I8sfj/SAd0mtoBBpRfA3Xt9AWCMqaWcSM9nmz3awzJopVY3\nUXnX9p13B4op2wyPnoW0j1GdBRv/Ky2kOYE++AczGwhbPos2fD3Ulg4aIKspgZ5f\nsvlMBaG/AAd69IVvWQYqlUvyB1v6i1Trl6Ti2sNd6eAphNAJeQGCTcU3w6ibvAq5\nyshz\n=pO8s\n-----END PGP PUBLIC KEY BLOCK-----";
 
@@ -17,7 +19,7 @@ pub fn index() -> &'static str {
 #[derive(FromForm)]
 pub struct SynoRequest {
     arch: String,                           // apollolake
-    build: u64,                           // 24922
+    build: u64,                             // 24922
     language: String,                       // enu
     major: u8,                              // 6
     micro: u8,                              // 2
@@ -166,7 +168,7 @@ pub fn get_packages_for_device_lang(
     major: u8,
     micro: u8,
     minor: u8,
-) -> SynoResponse {
+) -> Result<SynoResponse> {
     let mut beta = false;
     if let Some(package_update_channel) = package_update_channel {
         if (package_update_channel == "beta") {
@@ -180,7 +182,7 @@ pub fn get_packages_for_device_lang(
     };
     sr.set_key(KEYRING.to_string());
 
-    let packages = DbPackage::get_packages(&lang, &arch, build, beta, major, micro, minor, &conn);
+    let packages = DbPackage::get_packages(&lang, &arch, build, beta, major, micro, minor, &conn)?;
     // println!("{}", serde_json::to_string_pretty(&packages).unwrap());
 
     for package in packages.iter() {
@@ -245,13 +247,13 @@ pub fn get_packages_for_device_lang(
         sr.packages.push(p);
     }
     // sr.packages.push(Package::default());
-    return sr;
+    Ok(sr)
 }
 
 // For old Synology devices
 #[post("/", data = "<synorequest>")]
 pub fn syno_post(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoResponse> {
-    Json(get_packages_for_device_lang(
+    let response = get_packages_for_device_lang(
         conn,
         &synorequest.language,
         &synorequest.arch,
@@ -260,12 +262,14 @@ pub fn syno_post(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<Sy
         synorequest.major,
         synorequest.micro,
         synorequest.minor,
-    ))
+    )
+    .unwrap();
+    Json(response)
 }
 
 #[get("/?<synorequest..>")]
 pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoResponse> {
-    Json(get_packages_for_device_lang(
+    let response = get_packages_for_device_lang(
         conn,
         &synorequest.language,
         &synorequest.arch,
@@ -274,7 +278,9 @@ pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Json<SynoRes
         synorequest.major,
         synorequest.micro,
         synorequest.minor,
-    ))
+    )
+    .unwrap();
+    Json(response)
 }
 
 pub fn int_to_float(a: u32, b: u32) -> f32 {
@@ -291,7 +297,6 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
         .load::<DbPackage>(&connection.0)
         .expect("Error loading package");
     Json(packages)
-
 }
 
 #[get("/package/<num>")]

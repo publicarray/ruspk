@@ -8,6 +8,8 @@ edition = "2018"
 
 [dependencies]
 
+# Erros
+anyhow = "1.0"
 # Connect with the database
 diesel = { version = "1.4", features = ["chrono"] }
 # grap environemt vars

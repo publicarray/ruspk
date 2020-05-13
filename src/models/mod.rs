@@ -1,8 +1,9 @@
 use crate::schema::*;
 use crate::DbConn;
-use diesel::prelude::*;
+use anyhow::{Context, Result};
 use diesel::dsl::sql;
-use diesel::sql_types::{Unsigned,Bigint};
+use diesel::prelude::*;
+use diesel::sql_types::{Bigint, Unsigned};
 mod icon;
 mod screenshot;
 
@@ -219,10 +220,19 @@ impl DbPackage {
     //         "Object": "collection",
     //     })
     // }
-    pub fn get_packages(lang: &String, arch: &String, build: u64, beta: bool, major: u8, _micro: u8, minor: u8, conn: &DbConn) -> Vec<MyPackage> {
+    pub fn get_packages(
+        lang: &String,
+        arch: &String,
+        build: u64,
+        beta: bool,
+        major: u8,
+        _micro: u8,
+        minor: u8,
+        conn: &DbConn,
+    ) -> Result<Vec<MyPackage>> {
         let firmware = format!("{}.{}", major, minor);
 
-        let language_id_fallback_eng:u64 = 1;
+        let language_id_fallback_eng: u64 = 1;
         let language_id = language::table
             .filter(language::code.eq(lang))
             .select(language::id)
@@ -233,7 +243,7 @@ impl DbPackage {
             .filter(architecture::code.eq(arch))
             .select(architecture::id)
             .first::<u64>(&**conn)
-            .expect("Error loading architecture");
+            .context("Error loading architecture")?;
 
         let mut q = package::table
             .inner_join(
@@ -266,11 +276,12 @@ impl DbPackage {
             .filter(build::active.eq(true))
             .filter(firmware::build.ge(build))
             .into_boxed(); // http://docs.diesel.rs/diesel/query_dsl/trait.QueryDsl.html#method.into_boxed
-            if !beta {
-                q=q.filter(version::report_url.is_not_null());
-            }
+        if !beta {
+            q = q.filter(version::report_url.is_not_null());
+        }
 
-            q.select((
+        let packages = q
+            .select((
                 package::id,
                 version::id,
                 version::report_url.is_not_null(), // beta
@@ -294,14 +305,14 @@ impl DbPackage {
                 build::extract_size,
             ))
             .load::<MyPackage>(&**conn)
-            .expect("Error loading packages")
-
-            // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
-            // let s = String::new();
-            // let os = Some(String::new());
-            // let mut v = Vec::new();
-            // let ob = Some(false);
-            // v.push(MyPackage{package_id:1,version_id:1,beta:false,conflictpkgs:None,deppkgs:None,changelog:os.clone(),desc:os.clone(),distributor:os.clone(),distributor_url:os.clone(),dname:os.clone(),link:os.clone(),maintainer:os.clone(),maintainer_url:os.clone(),package:s.clone(),qinst:ob,qstart:ob,qupgrade:ob,upstream_version:s.clone(),revision:1,md5:s.clone(),size:300});
-            // v
+            .context("Error loading packages")?;
+        Ok(packages)
+        // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
+        // let s = String::new();
+        // let os = Some(String::new());
+        // let mut v = Vec::new();
+        // let ob = Some(false);
+        // v.push(MyPackage{package_id:1,version_id:1,beta:false,conflictpkgs:None,deppkgs:None,changelog:os.clone(),desc:os.clone(),distributor:os.clone(),distributor_url:os.clone(),dname:os.clone(),link:os.clone(),maintainer:os.clone(),maintainer_url:os.clone(),package:s.clone(),qinst:ob,qstart:ob,qupgrade:ob,upstream_version:s.clone(),revision:1,md5:s.clone(),size:300});
+        // v
     }
 }
