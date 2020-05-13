@@ -241,21 +241,19 @@ impl DbPackage {
             //         .left_outer_join(version::table.on(version::id.eq(version::id).and(version::ver.gt(version::ver))))
             //         // .filter(version::id.is_null())
                     .left_join(description::table.on(description::version_id.eq(version::id)
-                        .and(
-                            sql("`description`.`language_id` = ")
-                            .bind::< Unsigned<Bigint>,_>(language_id)
-                            .sql(" OR (`description`.`language_id` = 1 AND NOT EXISTS (SELECT 1 FROM `description` WHERE `description`.`language_id` = ")
-                            .bind::< Unsigned<Bigint>,_>(language_id).sql(" ))")
-                        )
+                        .and(sql("`description`.`language_id` = CASE WHEN EXISTS (SELECT 1 FROM `description` WHERE `description`.`language_id`= ")
+                        .bind::< diesel::sql_types::Unsigned<Bigint>,_>(language_id)
+                        .sql(" ) THEN ")
+                        .bind::< diesel::sql_types::Unsigned<Bigint>,_>(language_id)
+                        .sql(" ELSE 1 END"))
 
                     ))
                     .left_join(displayname::table.on(displayname::version_id.eq(version::id)
-                        .and(
-                            sql("`displayname`.`language_id` = ")
-                            .bind::< Unsigned<Bigint>,_>(language_id)
-                            .sql(" OR (`displayname`.`language_id` = 1 AND NOT EXISTS (SELECT 1 FROM `displayname` WHERE `displayname`.`language_id` = ")
-                            .bind::< Unsigned<Bigint>,_>(language_id).sql(" ))")
-                        )
+                        .and(sql("`displayname`.`language_id` = CASE WHEN EXISTS (SELECT 1 FROM `displayname` WHERE `displayname`.`language_id`= ")
+                        .bind::< Unsigned<Bigint>,_>(language_id)
+                        .sql(" ) THEN ")
+                        .bind::< Unsigned<Bigint>,_>(language_id)
+                        .sql(" ELSE 1 END"))
                     ))
             )
             .inner_join(
@@ -298,7 +296,7 @@ impl DbPackage {
             .load::<MyPackage>(&**conn)
             .expect("Error loading packages")
 
-            // println!("{}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q).to_string());
+            // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
             // let s = String::new();
             // let os = Some(String::new());
             // let mut v = Vec::new();
