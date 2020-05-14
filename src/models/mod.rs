@@ -243,7 +243,7 @@ impl DbPackage {
             .filter(architecture::code.eq(arch))
             .select(architecture::id)
             .first::<u64>(&**conn)
-            .context("Error loading architecture")?;
+            .context("Error loading architecture from DB")?;
 
         let mut q = package::table
             .inner_join(
@@ -305,7 +305,7 @@ impl DbPackage {
                 build::extract_size,
             ))
             .load::<MyPackage>(&**conn)
-            .context("Error loading packages")?;
+            .context("Error loading packages from DB")?;
         Ok(packages)
         // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
         // let s = String::new();
