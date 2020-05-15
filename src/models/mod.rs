@@ -1,9 +1,12 @@
 use crate::schema::*;
 use crate::DbConn;
 use anyhow::{Context, Result};
-use diesel::dsl::sql;
 use diesel::prelude::*;
-use diesel::sql_types::{Bigint, Unsigned};
+use diesel::{sql_query};
+use diesel::sql_types::{
+    BigInt, Bool, Integer, Text, Nullable
+};
+// use rocket::http::Status;
 mod icon;
 mod screenshot;
 
@@ -184,42 +187,55 @@ pub struct DbVersionServiceDependency {
     pub package_id: u64,
 }
 
-#[derive(Serialize, Queryable, Debug, Clone)]
+#[derive(Serialize, QueryableByName, Debug, Clone)]
 pub struct MyPackage {
+    #[sql_type="diesel::mysql::types::Unsigned<BigInt>"]
     pub package_id: u64,
+    #[sql_type="diesel::mysql::types::Unsigned<BigInt>"]
     pub version_id: u64,
+    #[sql_type = "Bool"]
     pub beta: bool,
+    #[sql_type = "Nullable<Text>"]
     pub conflictpkgs: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub deppkgs: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub changelog: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub desc: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub distributor: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub distributor_url: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub dname: Option<String>,
     // download_count: u64,
+    #[sql_type = "Nullable<Text>"]
     pub link: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub maintainer: Option<String>,
+    #[sql_type = "Nullable<Text>"]
     pub maintainer_url: Option<String>,
+    #[sql_type = "Text"]
     pub package: String,
+    #[sql_type = "Nullable<Bool>"]
     pub qinst: Option<bool>,
+    #[sql_type = "Nullable<Bool>"]
     pub qstart: Option<bool>,
+    #[sql_type = "Nullable<Bool>"]
     pub qupgrade: Option<bool>,
     // recent_download_count: u64,
+    #[sql_type = "Text"]
     pub upstream_version: String,
+    #[sql_type = "diesel::mysql::types::Unsigned<Integer>"]
     pub revision: u32,
+    #[sql_type = "Text"]
     pub md5: String,
+    #[sql_type = "Integer"]
     pub size: i32,
 }
 
 impl DbPackage {
-    // pub fn to_json(&self) -> Value {
-    //     json!({
-    //         "Id": self.uuid,
-    //         "OrganizationId": self.org_uuid,
-    //         "Name": self.name,
-    //         "Object": "collection",
-    //     })
-    // }
     pub fn get_packages(
         lang: &String,
         arch: &String,
@@ -243,68 +259,93 @@ impl DbPackage {
             .filter(architecture::code.eq(arch))
             .select(architecture::id)
             .first::<u64>(&**conn)
-            .context("Error loading architecture from DB")?;
+            .context("Error loading architecture from DB")?; // todo return 404
+        // .unwrap_or(0);
+        // if architecture_id == 0 {
+        //     Err(Status::NotFound)
+        // }
 
-        let mut q = package::table
-            .inner_join(
-                version::table
-            //         .left_outer_join(version::table.on(version::id.eq(version::id).and(version::ver.gt(version::ver))))
-            //         // .filter(version::id.is_null())
-                    .left_join(description::table.on(description::version_id.eq(version::id)
-                        .and(sql("`description`.`language_id` = CASE WHEN EXISTS (SELECT 1 FROM `description` WHERE `description`.`language_id`= ")
-                        .bind::< diesel::sql_types::Unsigned<Bigint>,_>(language_id)
-                        .sql(" ) THEN ")
-                        .bind::< diesel::sql_types::Unsigned<Bigint>,_>(language_id)
-                        .sql(" ELSE 1 END"))
+        let query = sql_query(r#"
+                SELECT
+                `package`.`id` AS package_id,
+                `version`.`id` AS version_id,
+                (CASE WHEN `version`.`report_url` <> '' THEN true ELSE false END) AS beta,
+                `version`.`conflicts` AS conflictpkgs,
+                `version`.`dependencies` AS deppkgs,
+                `version`.`changelog`,
+                `description`.`description` AS "desc",
+                `version`.`distributor`,
+                `version`.`distributor_url`,
+                `displayname`.`displayname` AS dname,
+                `build`.`path` AS link,
+                `version`.`maintainer`,
+                `version`.`maintainer_url`,
+                `package`.`name` AS package,
+                `version`.`install_wizard` AS qinst,
+                `version`.`startable` AS qstart,
+                `version`.`upgrade_wizard` AS qupgrade,
+                `version`.`upstream_version`,
+                `version`.`version` AS revision,
+                `build`.`md5`,
+                `build`.`extract_size` AS size
 
-                    ))
-                    .left_join(displayname::table.on(displayname::version_id.eq(version::id)
-                        .and(sql("`displayname`.`language_id` = CASE WHEN EXISTS (SELECT 1 FROM `displayname` WHERE `displayname`.`language_id`= ")
-                        .bind::< Unsigned<Bigint>,_>(language_id)
-                        .sql(" ) THEN ")
-                        .bind::< Unsigned<Bigint>,_>(language_id)
-                        .sql(" ELSE 1 END"))
-                    ))
-            )
-            .inner_join(
-                build::table
-                    .inner_join(firmware::table.on(firmware::id.eq(build::firmware_id).and(firmware::version.eq(firmware))))
-                    .inner_join(build_architecture::table.on(build_architecture::build_id.eq(build::id)
-                        .and(build_architecture::architecture_id.eq(architecture_id)))
+                FROM
+                (
+                    (
+                    `package`
+                    INNER JOIN (
+                        (
+                        (
+                            `version`
+                            LEFT OUTER JOIN `description` ON `description`.`version_id` = `version`.`id`
+                            AND `description`.`language_id` = CASE WHEN EXISTS (
+                            SELECT 1
+                            FROM `description`
+                            WHERE `description`.`language_id` = ?
+                            ) THEN ? ELSE 1 END
+                        )
+                        LEFT OUTER JOIN `displayname` ON `displayname`.`version_id` = `version`.`id`
+                        AND `displayname`.`language_id` = CASE WHEN EXISTS (
+                            SELECT  1
+                            FROM  `displayname`
+                            WHERE  `displayname`.`language_id` = ?
+                        ) THEN ? ELSE 1 END
+                        )
+                        INNER JOIN (
+                        SELECT `version`.`id`, MAX(`version`.`version`) `version`, `package_id`
+                        FROM `version`
+                        GROUP BY `version`.`package_id`
+                        ) ver ON `version`.`package_id` = `ver`.`package_id`
+                        AND `version`.`version` = `ver`.`version`
+                    ) ON `version`.`package_id` = `package`.`id`
+                    )
+                    INNER JOIN (
+                    (
+                        `build`
+                        INNER JOIN `firmware` ON `firmware`.`id` = `build`.`firmware_id`
+                        AND `firmware`.`version` = ?
+                    )
+                    INNER JOIN `build_architecture` ON `build_architecture`.`build_id` = `build`.`id`
+                    AND `build_architecture`.`architecture_id` = ?
+                    ) ON `build`.`package_id` = `package`.`id`
                 )
-            )
-            .filter(build::active.eq(true))
-            .filter(firmware::build.ge(build))
-            .into_boxed(); // http://docs.diesel.rs/diesel/query_dsl/trait.QueryDsl.html#method.into_boxed
-        if !beta {
-            q = q.filter(version::report_url.is_not_null());
-        }
+                WHERE `build`.`active` = true
+                AND `firmware`.`build` >= ?
+                AND (? OR `version`.`report_url` = '')
+            "#);
 
-        let packages = q
-            .select((
-                package::id,
-                version::id,
-                version::report_url.is_not_null(), // beta
-                version::conflicts,
-                version::dependencies,
-                version::changelog,
-                description::desc.nullable(),
-                version::distributor,
-                version::distributor_url,
-                displayname::name.nullable(),
-                build::path.nullable(),
-                version::maintainer,
-                version::maintainer_url,
-                package::name,
-                version::install_wizard,
-                version::startable,
-                version::upgrade_wizard,
-                version::upstream_version,
-                version::ver,
-                build::md5,
-                build::extract_size,
-            ))
-            .load::<MyPackage>(&**conn)
+        let packages = query
+        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+        .bind::<Text, _>(firmware)
+        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(architecture_id)
+        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(build)
+        .bind::<Bool, _>(beta)
+        // .bind::<Bool, _>(beta)
+        .load::<MyPackage>(&**conn)
+        // let packages = query.load::<MyPackage>(&**conn)
             .context("Error loading packages from DB")?;
         Ok(packages)
         // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));

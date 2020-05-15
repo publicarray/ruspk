@@ -90,7 +90,7 @@ impl Package {
         size: Option<i32>,
     ) -> Self {
         Package {
-            beta: false,
+            beta,
             changelog,
             conflictpkgs,
             deppkgs,
