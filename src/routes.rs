@@ -256,7 +256,9 @@ pub fn get_packages_for_device_lang(
 pub fn syno_post(
     synorequest: LenientForm<SynoRequest>,
     conn: DbConn,
-) -> Result<Json<SynoResponse>, Debug<anyhow::Error>> {
+    // ) -> Result<Json<SynoResponse>, Debug<anyhow::Error>> {
+) -> Result<Json<SynoResponse>, Status> {
+    // return Err(Status::NotFound);
     let response = get_packages_for_device_lang(
         conn,
         &synorequest.language,
@@ -266,12 +268,34 @@ pub fn syno_post(
         synorequest.major,
         synorequest.micro,
         synorequest.minor,
-    )?;
-    Ok(Json(response))
+    );
+    // .unwrap_or(Err(Status::NotFound));
+    // .unwrap();
+    match response {
+        Ok(response) => Ok(Json(response)),
+        Err(err) => {
+            println!("{:?}", err);
+            Err(Status::NotFound)
+        }
+    }
+
+    // Ok(Json(response))
 }
 
 #[get("/?<synorequest..>")]
-pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<SynoResponse>, Debug<anyhow::Error>> {
+// pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<SynoResponse>, Debug<anyhow::Error>> {
+pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<SynoResponse>, Status> {
+    // let response = get_packages_for_device_lang(
+    //     conn,
+    //     &synorequest.language,
+    //     &synorequest.arch,
+    //     synorequest.build,
+    //     &synorequest.package_update_channel,
+    //     synorequest.major,
+    //     synorequest.micro,
+    //     synorequest.minor,
+    // )?;
+    // Ok(Json(response))
     let response = get_packages_for_device_lang(
         conn,
         &synorequest.language,
@@ -281,8 +305,16 @@ pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<
         synorequest.major,
         synorequest.micro,
         synorequest.minor,
-    )?;
-    Ok(Json(response))
+    );
+    // .unwrap_or(Err(Status::NotFound));
+    // .unwrap();
+    match response {
+        Ok(response) => Ok(Json(response)),
+        Err(err) => {
+            println!("{:?}", err);
+            Err(Status::NotFound)
+        }
+    }
 }
 
 pub fn int_to_float(a: u32, b: u32) -> f32 {
