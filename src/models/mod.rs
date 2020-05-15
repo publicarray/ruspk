@@ -1,5 +1,4 @@
 use crate::schema::*;
-use crate::DbConn;
 use anyhow::{Context, Result};
 use diesel::prelude::*;
 use diesel::{sql_query};
@@ -244,7 +243,7 @@ impl DbPackage {
         major: u8,
         _micro: u8,
         minor: u8,
-        conn: &DbConn,
+        conn: &MysqlConnection,
     ) -> Result<Vec<MyPackage>> {
         let firmware = format!("{}.{}", major, minor);
 
@@ -252,13 +251,13 @@ impl DbPackage {
         let language_id = language::table
             .filter(language::code.eq(lang))
             .select(language::id)
-            .first::<u64>(&**conn)
+            .first::<u64>(conn)
             .unwrap_or(language_id_fallback_eng);
 
         let architecture_id = architecture::table
             .filter(architecture::code.eq(arch))
             .select(architecture::id)
-            .first::<u64>(&**conn)
+            .first::<u64>(conn)
             .context("Error loading architecture from DB")?; // todo return 404
 
         let query = sql_query(r#"
@@ -339,7 +338,7 @@ impl DbPackage {
         .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(architecture_id)
         .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(build)
         .bind::<Bool, _>(beta)
-        .load::<MyPackage>(&**conn)
+        .load::<MyPackage>(conn)
             .context("Error loading packages from DB")?;
         Ok(packages)
         // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));

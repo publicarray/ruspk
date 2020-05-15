@@ -27,7 +27,7 @@ Transfer/sec:    233.72KB
 
 ### ruspk
 
-with [rocket.rs](https://rocket.rs)
+with [rocket.rs](https://rocket.rs) & mariadb
 
 ```sh
 $ wrk --latency -H 'Connection: Close' -c 5k -t 10 -d 30 'http://localhost:80/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
@@ -67,4 +67,113 @@ Running 30s test @ http://localhost:8080/nas/?package_update_channel=beta&build=
   Non-2xx or 3xx responses: 2054
 Requests/sec:     68.27
 Transfer/sec:     30.00KB
+```
+
+# ruspk
+
+## warp
+
+```
+wrk --latency -c 100 -t 8 -d 30 'http://localhost:3030/hello/warp'
+Running 30s test @ http://localhost:3030/hello/warp
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     2.51ms  406.62us  14.93ms   80.26%
+    Req/Sec     4.81k   223.82     5.55k    78.83%
+  Latency Distribution
+     50%    2.41ms
+     75%    2.67ms
+     90%    3.01ms
+     99%    3.79ms
+  1147851 requests in 30.01s, 141.21MB read
+Requests/sec:  38248.11
+Transfer/sec:      4.71MB
+
+ruspk on  actix-web 📝is 📦 v0.1.0 via 🦀 v1.45.0-nightly
+❯ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:3030/hello/warp'
+Running 30s test @ http://localhost:3030/hello/warp
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    24.72ms   23.94ms 316.10ms   97.87%
+    Req/Sec   249.92    144.73   848.00     82.76%
+  Latency Distribution
+     50%   20.73ms
+     75%   29.65ms
+     90%   37.00ms
+     99%  118.98ms
+  16450 requests in 30.04s, 2.02MB read
+  Socket errors: connect 0, read 16450, write 0, timeout 0
+Requests/sec:    547.66
+Transfer/sec:     68.99KB
+```
+
+## actix-web
+
+```
+ruspk on  actix-web 📝is 📦 v0.1.0 via 🦀 v1.45.0-nightly
+❯ wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/hello/warp'
+Running 30s test @ http://localhost:8080/hello/warp
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     2.13ms  283.56us  11.68ms   82.09%
+    Req/Sec     5.65k   444.00     7.68k    76.08%
+  Latency Distribution
+     50%    2.09ms
+     75%    2.26ms
+     90%    2.42ms
+     99%    2.79ms
+  1348809 requests in 30.01s, 164.65MB read
+Requests/sec:  44947.09
+Transfer/sec:      5.49MB
+
+ruspk on  actix-web 📝is 📦 v0.1.0 via 🦀 v1.45.0-nightly
+❯ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/hello/warp'
+Running 30s test @ http://localhost:8080/hello/warp
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    15.89ms   14.56ms 168.47ms   91.69%
+    Req/Sec   233.46    148.06   848.00     79.31%
+  Latency Distribution
+     50%   12.17ms
+     75%   19.36ms
+     90%   28.47ms
+     99%   68.91ms
+  16447 requests in 30.02s, 2.31MB read
+Requests/sec:    547.87
+Transfer/sec:     78.65KB
+```
+
+## [actix-web](http://actix.rs/) & mariadb
+
+```
+wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    85.29ms   33.48ms 472.11ms   76.82%
+    Req/Sec   142.31     38.58   260.00     68.31%
+  Latency Distribution
+     50%   76.54ms
+     75%   99.66ms
+     90%  129.91ms
+     99%  197.62ms
+  34044 requests in 30.10s, 99.74MB read
+Requests/sec:   1131.11
+Transfer/sec:      3.31MB
+
+
+wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   100.40ms   42.18ms 455.16ms   80.01%
+    Req/Sec    75.67     36.31   203.00     69.04%
+  Latency Distribution
+     50%   94.31ms
+     75%  117.53ms
+     90%  143.95ms
+     99%  252.30ms
+  16466 requests in 30.09s, 48.54MB read
+Requests/sec:    547.23
+Transfer/sec:      1.61MB
 ```

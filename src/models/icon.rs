@@ -1,6 +1,5 @@
 use crate::models::DbVersion;
 use crate::schema::*;
-use crate::DbConn;
 use crate::URL;
 use diesel::prelude::*;
 
@@ -15,17 +14,17 @@ pub struct DbIcon {
 }
 
 impl DbIcon {
-    pub fn from_version(version_id: u64, conn: &DbConn) -> Vec<Self> {
+    pub fn from_version(version_id: u64, conn: &MysqlConnection) -> Vec<Self> {
         icon::table
             .filter(icon::version_id.eq(version_id))
-            .load::<Self>(&**conn)
+            .load::<Self>(conn)
             .expect("Error loading icons")
     }
-    pub fn retina_from_version(version_id: u64, conn: &DbConn) -> Vec<Self> {
+    pub fn retina_from_version(version_id: u64, conn: &MysqlConnection) -> Vec<Self> {
         icon::table
             .filter(icon::version_id.eq(version_id))
             .filter(icon::size.gt(256))
-            .load::<Self>(&**conn)
+            .load::<Self>(conn)
             .expect("Error loading icons")
     }
     pub fn full_path(&self, package: &String) -> String {
