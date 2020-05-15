@@ -31,10 +31,6 @@ pub struct SynoRequest {
     unique: Option<String>,                 // synology_apollolake_418play
 }
 
-// fn is_false (b: bool) -> bool {
-//     !b
-// }
-
 extern crate serde_with;
 #[serde_with::skip_serializing_none]
 #[derive(Serialize)]
@@ -253,12 +249,7 @@ pub fn get_packages_for_device_lang(
 
 // For old Synology devices
 #[post("/", data = "<synorequest>")]
-pub fn syno_post(
-    synorequest: LenientForm<SynoRequest>,
-    conn: DbConn,
-    // ) -> Result<Json<SynoResponse>, Debug<anyhow::Error>> {
-) -> Result<Json<SynoResponse>, Status> {
-    // return Err(Status::NotFound);
+pub fn syno_post(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<SynoResponse>, Status> {
     let response = get_packages_for_device_lang(
         conn,
         &synorequest.language,
@@ -269,8 +260,6 @@ pub fn syno_post(
         synorequest.micro,
         synorequest.minor,
     );
-    // .unwrap_or(Err(Status::NotFound));
-    // .unwrap();
     match response {
         Ok(response) => Ok(Json(response)),
         Err(err) => {
@@ -278,24 +267,10 @@ pub fn syno_post(
             Err(Status::NotFound)
         }
     }
-
-    // Ok(Json(response))
 }
 
 #[get("/?<synorequest..>")]
-// pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<SynoResponse>, Debug<anyhow::Error>> {
 pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<SynoResponse>, Status> {
-    // let response = get_packages_for_device_lang(
-    //     conn,
-    //     &synorequest.language,
-    //     &synorequest.arch,
-    //     synorequest.build,
-    //     &synorequest.package_update_channel,
-    //     synorequest.major,
-    //     synorequest.micro,
-    //     synorequest.minor,
-    // )?;
-    // Ok(Json(response))
     let response = get_packages_for_device_lang(
         conn,
         &synorequest.language,
@@ -306,8 +281,6 @@ pub fn syno(synorequest: LenientForm<SynoRequest>, conn: DbConn) -> Result<Json<
         synorequest.micro,
         synorequest.minor,
     );
-    // .unwrap_or(Err(Status::NotFound));
-    // .unwrap();
     match response {
         Ok(response) => Ok(Json(response)),
         Err(err) => {
@@ -327,7 +300,6 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
     use crate::schema::package;
 
     let packages = package::table
-        // .filter(package::name.eq("dnscrypt-proxy"))
         .load::<DbPackage>(&connection.0)
         .expect("Error loading package from DB");
     Json(packages)
@@ -336,10 +308,9 @@ pub fn list_packages(connection: DbConn) -> Json<Vec<DbPackage>> {
 #[get("/package/<num>")]
 pub fn get_package_version(conn: DbConn, num: u64) -> Json<Vec<DbVersion>> {
     use crate::schema::version::dsl::*;
-    Json(
-        version
-            .filter(package_id.eq(num))
-            .load(&*conn.0)
-            .expect("Error loading version from DB"),
+    Json(version
+        .filter(package_id.eq(num))
+        .load(&*conn.0)
+        .expect("Error loading version from DB"),
     )
 }

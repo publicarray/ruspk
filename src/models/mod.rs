@@ -6,7 +6,7 @@ use diesel::{sql_query};
 use diesel::sql_types::{
     BigInt, Bool, Integer, Text, Nullable
 };
-// use rocket::http::Status;
+
 mod icon;
 mod screenshot;
 
@@ -260,10 +260,6 @@ impl DbPackage {
             .select(architecture::id)
             .first::<u64>(&**conn)
             .context("Error loading architecture from DB")?; // todo return 404
-        // .unwrap_or(0);
-        // if architecture_id == 0 {
-        //     Err(Status::NotFound)
-        // }
 
         let query = sql_query(r#"
                 SELECT
@@ -343,9 +339,7 @@ impl DbPackage {
         .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(architecture_id)
         .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(build)
         .bind::<Bool, _>(beta)
-        // .bind::<Bool, _>(beta)
         .load::<MyPackage>(&**conn)
-        // let packages = query.load::<MyPackage>(&**conn)
             .context("Error loading packages from DB")?;
         Ok(packages)
         // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
