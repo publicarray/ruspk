@@ -16,6 +16,7 @@ mod package;
 #[path = "package_sqlite.rs"]
 mod package;
 #[cfg(feature = "mysql")]
+#[path = "package_mysql.rs"]
 mod package;
 mod role;
 mod screenshot;
