@@ -1,13 +1,28 @@
-## Preliminary Benchmark
+## Unsientific Benchmark
 
 Not an entirely fair benchmark
+
+Requests/sec: on a 2012 Macbook Pro
+
+|name| with `Connection: Close` | without `Connection: Close`|
+|-|-|-|
+|nginx|514.68||
+|rocket & mariadb|529.57||
+|docker + spkrepo||68.27|
+|warp (hello world)|547.66|38248.11|
+|actix-web (hello world) |547.87|44947.09|
+|actix-web & mariadb|547.23|1131.11|
+|actix-web & sqlite|548.21|646.12|
+|actix-web & postgres|404.96|435.94|
+
+So postgress uses more CPU than any other DB tested here (the queries are probably not optimised for it, I tried to limit DBMS specific code)
 
 ### nginx
 
 `Connection: Close` because ruspk and spkrepo do not have keep-alive
 
 ```sh
-wrk --latency -H 'Connection: Close' -c 5k -t 10 -d 30 'http://localhost:80/'
+$ wrk --latency -H 'Connection: Close' -c 5k -t 10 -d 30 'http://localhost:80/'
 Running 30s test @ http://localhost:80/
   10 threads and 5000 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -74,7 +89,7 @@ Transfer/sec:     30.00KB
 ## warp
 
 ```
-wrk --latency -c 100 -t 8 -d 30 'http://localhost:3030/hello/warp'
+$ wrk --latency -c 100 -t 8 -d 30 'http://localhost:3030/hello/warp'
 Running 30s test @ http://localhost:3030/hello/warp
   8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -89,8 +104,7 @@ Running 30s test @ http://localhost:3030/hello/warp
 Requests/sec:  38248.11
 Transfer/sec:      4.71MB
 
-ruspk on  actix-web 📝is 📦 v0.1.0 via 🦀 v1.45.0-nightly
-❯ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:3030/hello/warp'
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:3030/hello/warp'
 Running 30s test @ http://localhost:3030/hello/warp
   8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -110,8 +124,7 @@ Transfer/sec:     68.99KB
 ## actix-web
 
 ```
-ruspk on  actix-web 📝is 📦 v0.1.0 via 🦀 v1.45.0-nightly
-❯ wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/hello/warp'
+$ wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/hello/warp'
 Running 30s test @ http://localhost:8080/hello/warp
   8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -126,8 +139,7 @@ Running 30s test @ http://localhost:8080/hello/warp
 Requests/sec:  44947.09
 Transfer/sec:      5.49MB
 
-ruspk on  actix-web 📝is 📦 v0.1.0 via 🦀 v1.45.0-nightly
-❯ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/hello/warp'
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/hello/warp'
 Running 30s test @ http://localhost:8080/hello/warp
   8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -146,7 +158,7 @@ Transfer/sec:     78.65KB
 ## [actix-web](http://actix.rs/) & mariadb
 
 ```
-wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+$ wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
 Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
   8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -162,7 +174,7 @@ Requests/sec:   1131.11
 Transfer/sec:      3.31MB
 
 
-wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
 Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
   8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -176,4 +188,75 @@ Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=2492
   16466 requests in 30.09s, 48.54MB read
 Requests/sec:    547.23
 Transfer/sec:      1.61MB
+```
+
+## [actix-web](http://actix.rs/) & sqlite
+
+
+```
+$ wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   147.93ms   50.56ms 375.47ms   57.32%
+    Req/Sec    81.15     17.82   150.00     62.56%
+  Latency Distribution
+     50%  118.08ms
+     75%  198.78ms
+     90%  211.68ms
+     99%  235.00ms
+  19452 requests in 30.11s, 35.19MB read
+Requests/sec:    646.12
+Transfer/sec:      1.17MB
+
+
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   142.01ms   47.36ms 591.72ms   73.95%
+    Req/Sec    82.32     21.65   161.00     66.87%
+  Latency Distribution
+     50%  137.11ms
+     75%  166.50ms
+     90%  199.70ms
+     99%  286.28ms
+  16490 requests in 30.08s, 30.13MB read
+Requests/sec:    548.21
+Transfer/sec:      1.00MB
+```
+
+## [actix-web](http://actix.rs/) & postgres
+
+```
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   232.94ms   84.16ms 708.77ms   68.28%
+    Req/Sec    51.20     20.42   120.00     64.74%
+  Latency Distribution
+     50%  223.42ms
+     75%  285.45ms
+     90%  345.05ms
+     99%  461.14ms
+  12189 requests in 30.10s, 22.27MB read
+Requests/sec:    404.96
+Transfer/sec:    757.72KB
+
+
+$ wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   218.80ms   76.45ms 440.09ms   60.75%
+    Req/Sec    54.82     21.21   120.00     64.56%
+  Latency Distribution
+     50%  178.93ms
+     75%  293.18ms
+     90%  318.73ms
+     99%  368.03ms
+  13122 requests in 30.10s, 23.74MB read
+Requests/sec:    435.94
+Transfer/sec:    807.60KB
 ```
