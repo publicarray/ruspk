@@ -7,9 +7,9 @@ Only the GET API for the synology devices is supported. You have to update the d
 
 ```sh
 cargo install diesel_cli
-cargo install --feature postgres
-diesel migration --migration-dir migrations/postgres/ run
+cargo install ruspk --features postgres
 echo 'export DATABASE_URL=postgresql://user:pass@localhost/dbname' > .env
+diesel migration --migration-dir migrations/postgres/ run
 ruspk
 ```
 
