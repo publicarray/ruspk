@@ -1,5 +1,10 @@
 # Install
 
+```sh
+cargo install --feature postgres
+ruspk
+```
+
 ## Development
 
 ```sh
@@ -26,10 +31,13 @@ cargo run --release --feature mysql
 
 ## Configuration `.env`
 
-```toml
-DATABASE_URL="mysql://user:pass@localhost/dbname"
-DATABASE_URL="postgresql://user:pass@localhost/dbname"
-DATABASE_URL="/tmp/database_file.db"
+```env
+RUST_LOG="actix_web=warn,diesel=warn"
+DATABASE_URL=file:db/database.sqlite
+DATABASE_URL=mysql://user:pass@localhost/dbname
+DATABASE_URL=postgresql://user:pass@localhost/dbname
+LISTEN=127.0.0.1
+PORT=80
 ```
 
 # Guides
