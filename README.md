@@ -1,41 +1,34 @@
-# Install
+# ruspk
+ruspk is a simple and fast synology reposetory server. It uses the existing database structure from [spkrepo](https://github.com/SynoCommunity/spkrepo)
+
+Only the GET API for the synology devices is supported. You have to update the database your self.
+
+## Install
 
 ```sh
-cargo install --feature postgres
-ruspk
-```
-
-## Development
-
-```sh
-echo 'export DATABASE_URL=mysql://user:pass@localhost/dbname' > .env
 cargo install diesel_cli
-diesel migration --migration-dir migrations/mysql/ run
-cargo run --feature mysql
+cargo install --feature postgres
+diesel migration --migration-dir migrations/postgres/ run
+echo 'export DATABASE_URL=postgresql://user:pass@localhost/dbname' > .env
+ruspk
 ```
 
 Avaliable Features: `mysql`, `postgres` and `sqlite`
 
-## Production
+### Test the API
 
 ```sh
-echo 'export DATABASE_URL=mysql://user:pass@localhost/dbname' > .env
-cargo install diesel_cli
-diesel migration --migration-dir migrations/mysql/ run
+curl -sv 'http://127.0.0.1:8080/?build=24922&language=enu&major=6&micro=2&arch=x86&minor=2' | jq
 
-cargo build --release --feature mysql
-target/release/ruspk
-#or
-cargo run --release --feature mysql
 ```
 
-## Configuration `.env`
+## Configuration (`.env` file)
 
 ```env
 RUST_LOG="actix_web=warn,diesel=warn"
 DATABASE_URL=file:db/database.sqlite
-DATABASE_URL=mysql://user:pass@localhost/dbname
-DATABASE_URL=postgresql://user:pass@localhost/dbname
+# DATABASE_URL=mysql://user:pass@localhost/dbname
+# DATABASE_URL=postgresql://user:pass@localhost/dbname
 LISTEN=127.0.0.1
 PORT=80
 ```
