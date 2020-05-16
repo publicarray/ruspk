@@ -15,6 +15,7 @@ use actix_web::{middleware, web, App, HttpServer};
 pub mod models;
 pub mod routes;
 pub mod schema;
+pub mod synopackagelist;
 
 // use diesel::PgConnection;
 use diesel::MysqlConnection;
@@ -48,7 +49,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/hello/").route(web::get().to(routes::index)))
             .service(web::resource("/hello/{name}").route(web::get().to(routes::index)))
             .service(web::resource("/").route(web::get().to(routes::syno)))
-            .service(web::resource("/").route(web::post().to(routes::syno_post)))
+            .service(web::resource("/").route(web::post().to(routes::syno)))
             .service(web::resource("/package").route(web::get().to(routes::list_packages)))
     })
     .bind(&bind)?
