@@ -17,6 +17,23 @@
 
 So postgress uses more CPU than any other DB tested here (the queries are probably not optimised for it, as I've tried to limit DBMS specific code)
 
+https://www.postgresql.org/docs/12/pgbench.htm
+```sh
+$ pgbench -i ruspk
+$ pgbench -c 8 -j 10 -T 30 -f db/pg-bench.sql ruspk
+starting vacuum...end.
+transaction type: pq.sql
+scaling factor: 1
+query mode: simple
+number of clients: 8
+number of threads: 8
+duration: 30 s
+number of transactions actually processed: 15075
+latency average = 15.931 ms
+tps = 502.154301 (including connections establishing)
+tps = 502.403372 (excluding connections establishing)
+```
+
 ### nginx
 
 `Connection: Close` because ruspk and spkrepo do not have keep-alive
