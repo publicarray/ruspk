@@ -117,7 +117,6 @@ pub fn bind_and_load(
     build: i64,
     beta: bool,
 ) -> Result<Vec<DBQueryResultPackage>> {
-    println!("postgres");
     let result = query
         .bind::<BigInt, _>(language_id)
         .bind::<Text, _>(firmware)

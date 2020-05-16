@@ -4,7 +4,6 @@ use crate::schema::*;
 use crate::Connection;
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
-use diesel::mysql::types::Unsigned;
 use diesel::prelude::*;
 use diesel::query_builder::SqlQuery;
 use diesel::sql_query;
@@ -12,8 +11,8 @@ use diesel::sql_types::{BigInt, Bool, Integer, Nullable, Text};
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "package"]
 pub struct DbPackage {
-    pub id: u64,
-    pub author_user_id: Option<u64>,
+    pub id: i64,
+    pub author_user_id: Option<i64>,
     pub name: String,
     pub insert_date: Option<NaiveDateTime>,
 }
@@ -22,11 +21,11 @@ impl DbPackage {
     pub fn get_packages(
         lang: &String,
         arch: &String,
-        build: u64,
+        build: i64,
         beta: bool,
-        major: u8,
-        _micro: u8,
-        minor: u8,
+        major: i8,
+        _micro: i8,
+        minor: i8,
         conn: &Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
         let firmware = format!("{}.{}", major, minor);
@@ -118,20 +117,20 @@ impl DbPackage {
 pub fn bind_and_load(
     conn: &Connection,
     query: SqlQuery,
-    language_id: u64,
+    language_id: i64,
     firmware: &String,
-    architecture_id: u64,
-    build: u64,
+    architecture_id: i64,
+    build: i64,
     beta: bool,
 ) -> Result<Vec<DBQueryResultPackage>> {
     let result = query
-        .bind::<Unsigned<BigInt>, _>(language_id)
-        .bind::<Unsigned<BigInt>, _>(language_id)
-        .bind::<Unsigned<BigInt>, _>(language_id)
-        .bind::<Unsigned<BigInt>, _>(language_id)
+        .bind::<BigInt, _>(language_id)
+        .bind::<BigInt, _>(language_id)
+        .bind::<BigInt, _>(language_id)
+        .bind::<BigInt, _>(language_id)
         .bind::<Text, _>(firmware)
-        .bind::<Unsigned<BigInt>, _>(architecture_id)
-        .bind::<Unsigned<BigInt>, _>(build)
+        .bind::<BigInt, _>(architecture_id)
+        .bind::<BigInt, _>(build)
         .bind::<Bool, _>(beta)
         .load::<DBQueryResultPackage>(conn)
         .context("Error loading packages from DB")?;
@@ -140,10 +139,10 @@ pub fn bind_and_load(
 
 #[derive(Serialize, QueryableByName, Debug, Clone)]
 pub struct DBQueryResultPackage {
-    #[sql_type = "Unsigned<BigInt>"]
-    pub package_id: u64,
-    #[sql_type = "Unsigned<BigInt>"]
-    pub version_id: u64,
+    #[sql_type = "BigInt"]
+    pub package_id: i64,
+    #[sql_type = "BigInt"]
+    pub version_id: i64,
     #[sql_type = "Bool"]
     pub beta: bool,
     #[sql_type = "Nullable<Text>"]
@@ -178,8 +177,8 @@ pub struct DBQueryResultPackage {
     // recent_download_count: u64,
     #[sql_type = "Text"]
     pub upstream_version: String,
-    #[sql_type = "Unsigned<Integer>"]
-    pub revision: u32,
+    #[sql_type = "Integer"]
+    pub revision: i32,
     #[sql_type = "Text"]
     pub md5: String,
     #[sql_type = "Integer"]

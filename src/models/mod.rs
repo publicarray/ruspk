@@ -12,6 +12,9 @@ mod language;
 #[cfg(feature = "postgres")]
 #[path = "package_pg.rs"]
 mod package;
+#[cfg(feature = "sqlite")]
+#[path = "package_sqlite.rs"]
+mod package;
 #[cfg(feature = "mysql")]
 mod package;
 mod role;

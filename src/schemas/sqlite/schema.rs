@@ -1,13 +1,13 @@
 table! {
     architecture (id) {
-        id -> Integer,
+        id -> BigInt,
         code -> Text,
     }
 }
 
 table! {
     build (id) {
-        id -> Integer,
+        id -> BigInt,
         package_id -> BigInt,
         firmware_id -> BigInt,
         publisher_user_id -> Nullable<BigInt>,
@@ -31,7 +31,8 @@ table! {
     description (version_id, language_id) {
         version_id -> BigInt,
         language_id -> BigInt,
-        description -> Text,
+        #[sql_name = "description"]
+        desc -> Text,
     }
 }
 
@@ -39,13 +40,14 @@ table! {
     displayname (version_id, language_id) {
         version_id -> BigInt,
         language_id -> BigInt,
-        displayname -> Text,
+        #[sql_name = "displayname"]
+        name -> Text,
     }
 }
 
 table! {
     download (id) {
-        id -> Integer,
+        id -> BigInt,
         build_id -> BigInt,
         architecture_id -> BigInt,
         firmware_build -> Integer,
@@ -57,7 +59,7 @@ table! {
 
 table! {
     firmware (id) {
-        id -> Integer,
+        id -> BigInt,
         version -> Text,
         build -> Integer,
     }
@@ -65,7 +67,7 @@ table! {
 
 table! {
     icon (id) {
-        id -> Integer,
+        id -> BigInt,
         version_id -> BigInt,
         size -> Integer,
         path -> Text,
@@ -74,7 +76,7 @@ table! {
 
 table! {
     language (id) {
-        id -> Integer,
+        id -> BigInt,
         code -> Text,
         name -> Text,
     }
@@ -82,7 +84,7 @@ table! {
 
 table! {
     package (id) {
-        id -> Integer,
+        id -> BigInt,
         author_user_id -> Nullable<BigInt>,
         name -> Text,
         insert_date -> Nullable<Timestamp>,
@@ -98,7 +100,7 @@ table! {
 
 table! {
     role (id) {
-        id -> Integer,
+        id -> BigInt,
         name -> Text,
         description -> Text,
     }
@@ -106,7 +108,7 @@ table! {
 
 table! {
     screenshot (id) {
-        id -> Integer,
+        id -> BigInt,
         package_id -> BigInt,
         path -> Text,
     }
@@ -114,14 +116,14 @@ table! {
 
 table! {
     service (id) {
-        id -> Integer,
+        id -> BigInt,
         code -> Text,
     }
 }
 
 table! {
     user (id) {
-        id -> Integer,
+        id -> BigInt,
         username -> Text,
         email -> Text,
         password -> Text,
@@ -141,9 +143,10 @@ table! {
 
 table! {
     version (id) {
-        id -> Integer,
+        id -> BigInt,
         package_id -> BigInt,
-        version -> Integer,
+        #[sql_name = "version"]
+        ver -> Integer,
         upstream_version -> Text,
         changelog -> Nullable<Text>,
         report_url -> Nullable<Text>,
