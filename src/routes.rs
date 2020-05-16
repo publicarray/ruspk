@@ -6,7 +6,7 @@ use actix_web::{get, middleware, post, web, App, Error, HttpRequest, HttpRespons
 use crate::synopackagelist::*;
 use crate::DbConn;
 use crate::DbPool;
-use crate::URL;
+use crate::{Db64, Db8, URL};
 use anyhow::Result;
 use diesel::{self, prelude::*};
 
@@ -20,12 +20,12 @@ pub async fn index(req: HttpRequest) -> impl Responder {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SynoRequest {
     arch: String,                           // apollolake
-    build: u64,                             // 24922
+    build: Db64,                            // 24922
     language: String,                       // enu
-    major: u8,                              // 6
-    micro: u8,                              // 2
-    minor: u8,                              // 2
-    nano: Option<u8>,                       // 4
+    major: Db8,                             // 6
+    micro: Db8,                             // 2
+    minor: Db8,                             // 2
+    nano: Option<Db8>,                      // 4
     package_update_channel: Option<String>, // beta/stable
     timezone: Option<String>,               // London
     unique: Option<String>,                 // synology_apollolake_418play
@@ -54,11 +54,6 @@ pub async fn syno(pool: web::Data<DbPool>, synorequest: web::Query<SynoRequest>)
     Ok(HttpResponse::Ok().json(response))
 }
 
-pub fn int_to_float(a: u32, b: u32) -> f32 {
-    let after_decimal_place: f32 = a as f32 / 100.0;
-    b as f32 + after_decimal_place
-}
-
 fn get_package(conn: &DbConn) -> Result<Vec<DbPackage>> {
     use crate::schema::package;
     let p = package::table
@@ -77,7 +72,7 @@ pub async fn list_packages(pool: web::Data<DbPool>) -> Result<HttpResponse, Erro
     Ok(HttpResponse::Ok().json(response))
 }
 
-fn get_version(conn: &DbConn, num: u64) -> Result<Vec<DbVersion>> {
+fn get_version(conn: &DbConn, num: Db64) -> Result<Vec<DbVersion>> {
     use crate::schema::version::dsl::*;
     let v = version
         .filter(package_id.eq(num))
@@ -86,7 +81,7 @@ fn get_version(conn: &DbConn, num: u64) -> Result<Vec<DbVersion>> {
     Ok(v)
 }
 
-pub async fn get_package_version(pool: DbPool, id: web::Path<(u64)>) -> Result<HttpResponse, Error> {
+pub async fn get_package_version(pool: DbPool, id: web::Path<(Db64)>) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || get_version(&conn, *id)).await.map_err(|e| {
         eprintln!("{}", e);

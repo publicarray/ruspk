@@ -1,4 +1,5 @@
 use crate::schema::*;
+use crate::Db64;
 
 mod architecture;
 mod build;
@@ -8,6 +9,10 @@ mod download;
 mod firmware;
 mod icon;
 mod language;
+#[cfg(feature = "postgres")]
+#[path = "package_pg.rs"]
+mod package;
+#[cfg(feature = "mysql")]
 mod package;
 mod role;
 mod screenshot;
@@ -36,30 +41,30 @@ pub use self::version::DbVersion;
 #[primary_key(build_id, architecture_id)]
 #[table_name = "build_architecture"]
 pub struct DbBuildArchitecture {
-    pub build_id: u64,
-    pub architecture_id: u64,
+    pub build_id: Db64,
+    pub architecture_id: Db64,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[primary_key(package_id, user_id)]
 #[table_name = "package_user_maintainer"]
 pub struct DbPackageUserMaintainer {
-    pub package_id: u64,
-    pub user_id: u64,
+    pub package_id: Db64,
+    pub user_id: Db64,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[primary_key(user_id, role_id)]
 #[table_name = "user_role"]
 pub struct DbUserRole {
-    pub user_id: u64,
-    pub role_id: u64,
+    pub user_id: Db64,
+    pub role_id: Db64,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[primary_key(version_id, package_id)]
 #[table_name = "version_service_dependency"]
 pub struct DbVersionServiceDependency {
-    pub version_id: u64,
-    pub package_id: u64,
+    pub version_id: Db64,
+    pub package_id: Db64,
 }

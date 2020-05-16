@@ -1,5 +1,5 @@
 CREATE TABLE "user" (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   username VARCHAR(50) NOT NULL,
   email VARCHAR(254) NOT NULL,
   password VARCHAR(255) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE "user" (
   confirmed_at timestamp
 );
 CREATE TABLE role (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   name VARCHAR(50) NOT NULL UNIQUE,
   description VARCHAR(255) NOT NULL
 );
@@ -19,7 +19,7 @@ VALUES
   ('package_admin', 'Package Administrator'),
   ('developer', 'Developer');
 CREATE TABLE architecture (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(20) NOT NULL UNIQUE
   );
 INSERT INTO architecture (code)
@@ -40,7 +40,7 @@ VALUES
   ('avoton'),
   ('armada375');
 CREATE TABLE language (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(3) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL
   );
@@ -67,7 +67,7 @@ VALUES
   ('trk', 'Turkish'),
   ('csy', 'Czech');
 CREATE TABLE firmware (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     version VARCHAR(3) NOT NULL UNIQUE,
     build INT NOT NULL
   );
@@ -87,7 +87,7 @@ VALUES
   ('5.0', 4458),
   ('5.1', 5004);
 CREATE TABLE service (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(30) NOT NULL UNIQUE
   );
 INSERT INTO service (code)
@@ -97,7 +97,7 @@ VALUES
   ('php_disable_safe_exec_dir'),
   ('ssh');
 CREATE TABLE package (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     author_user_id BIGINT DEFAULT NULL,
     name VARCHAR(50) NOT NULL UNIQUE,
     insert_date timestamp,
@@ -113,13 +113,13 @@ CREATE TABLE user_role (
     PRIMARY KEY (user_id, role_id)
   );
 CREATE TABLE screenshot (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     package_id BIGINT NOT NULL,
     path VARCHAR(100) NOT NULL,
     FOREIGN KEY (package_id) REFERENCES package(id)
   );
 CREATE TABLE version (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     package_id BIGINT NOT NULL,
     version INT NOT NULL UNIQUE,
     upstream_version VARCHAR(20) NOT NULL,
@@ -156,7 +156,7 @@ CREATE TABLE version_service_dependency (
     PRIMARY KEY (version_id, package_id)
   );
 CREATE TABLE build (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     package_id BIGINT NOT NULL,
     firmware_id BIGINT NOT NULL,
     publisher_user_id BIGINT,
@@ -171,7 +171,7 @@ CREATE TABLE build (
   );
 CREATE TYPE img_size AS ENUM ('72', '120', '256');
 CREATE TABLE icon (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     version_id BIGINT NOT NULL,
     size img_size NOT NULL,
     path VARCHAR(100) NOT NULL,
@@ -201,7 +201,7 @@ CREATE TABLE build_architecture (
     PRIMARY KEY (build_id, architecture_id)
   );
 CREATE TABLE download (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     build_id BIGINT NOT NULL,
     architecture_id BIGINT NOT NULL,
     firmware_build INT NOT NULL,

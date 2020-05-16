@@ -1,17 +1,14 @@
 use crate::models::DbArchitecture;
 use crate::models::DbLanguage;
 use crate::schema::*;
+use crate::Connection;
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
+use diesel::mysql::types::Unsigned;
 use diesel::prelude::*;
+use diesel::query_builder::SqlQuery;
 use diesel::sql_query;
 use diesel::sql_types::{BigInt, Bool, Integer, Nullable, Text};
-
-#[cfg(feature = "mysql")]
-use diesel::mysql::types::Unsigned;
-// use diesel::pq::types::Unsigned;
-// use diesel::pg::types::
-
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "package"]
 pub struct DbPackage {
@@ -30,7 +27,7 @@ impl DbPackage {
         major: u8,
         _micro: u8,
         minor: u8,
-        conn: &MysqlConnection,
+        conn: &Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
         let firmware = format!("{}.{}", major, minor);
         let language_id = DbLanguage::get_language_id(conn, &lang);
@@ -106,18 +103,7 @@ impl DbPackage {
                 AND (? OR `version`.`report_url` = '')
             "#,
         );
-
-        let packages = query
-            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-            .bind::<Unsigned<BigInt>, _>(language_id)
-            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-            .bind::<Text, _>(firmware)
-            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(architecture_id)
-            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(build)
-            .bind::<Bool, _>(beta)
-            .load::<DBQueryResultPackage>(conn)
-            .context("Error loading packages from DB")?;
+        let packages = bind_and_load(conn, query, language_id, &firmware, architecture_id, build, beta)?;
         Ok(packages)
         // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
         // let s = String::new();
@@ -127,6 +113,30 @@ impl DbPackage {
         // v.push(DBQueryResultPackage{package_id:1,version_id:1,beta:false,conflictpkgs:None,deppkgs:None,changelog:os.clone(),desc:os.clone(),distributor:os.clone(),distributor_url:os.clone(),dname:os.clone(),link:os.clone(),maintainer:os.clone(),maintainer_url:os.clone(),package:s.clone(),qinst:ob,qstart:ob,qupgrade:ob,upstream_version:s.clone(),revision:1,md5:s.clone(),size:300});
         // v
     }
+}
+
+pub fn bind_and_load(
+    conn: &Connection,
+    query: SqlQuery,
+    language_id: u64,
+    firmware: &String,
+    architecture_id: u64,
+    build: u64,
+    beta: bool,
+) -> Result<Vec<DBQueryResultPackage>> {
+    println!("mysql");
+    let result = query
+        .bind::<Unsigned<BigInt>, _>(language_id)
+        .bind::<Unsigned<BigInt>, _>(language_id)
+        .bind::<Unsigned<BigInt>, _>(language_id)
+        .bind::<Unsigned<BigInt>, _>(language_id)
+        .bind::<Text, _>(firmware)
+        .bind::<Unsigned<BigInt>, _>(architecture_id)
+        .bind::<Unsigned<BigInt>, _>(build)
+        .bind::<Bool, _>(beta)
+        .load::<DBQueryResultPackage>(conn)
+        .context("Error loading packages from DB")?;
+    Ok(result)
 }
 
 #[derive(Serialize, QueryableByName, Debug, Clone)]

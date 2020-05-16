@@ -1,16 +1,16 @@
 table! {
     architecture (id) {
-        id -> Int4,
+        id -> BigInt,
         code -> Varchar,
     }
 }
 
 table! {
     build (id) {
-        id -> Int4,
-        package_id -> Int8,
-        firmware_id -> Int8,
-        publisher_user_id -> Nullable<Int8>,
+        id -> BigInt,
+        package_id -> BigInt,
+        firmware_id -> BigInt,
+        publisher_user_id -> Nullable<BigInt>,
         checksum -> Nullable<Varchar>,
         extract_size -> Int4,
         path -> Varchar,
@@ -22,33 +22,35 @@ table! {
 
 table! {
     build_architecture (build_id, architecture_id) {
-        build_id -> Int8,
-        architecture_id -> Int8,
+        build_id -> BigInt,
+        architecture_id -> BigInt,
     }
 }
 
 table! {
     description (version_id, language_id) {
-        version_id -> Int8,
-        language_id -> Int8,
-        description -> Text,
+        version_id -> BigInt,
+        language_id -> BigInt,
+        #[sql_name = "description"]
+        desc -> Text,
     }
 }
 
 table! {
     displayname (version_id, language_id) {
-        version_id -> Int8,
-        language_id -> Int8,
-        displayname -> Varchar,
+        version_id -> BigInt,
+        language_id -> BigInt,
+        #[sql_name = "displayname"]
+        name -> Varchar,
     }
 }
 
 table! {
     download (id) {
-        id -> Int4,
-        build_id -> Int8,
-        architecture_id -> Int8,
-        firmware_build -> Int4,
+        id -> BigInt,
+        build_id -> BigInt,
+        architecture_id -> BigInt,
+        firmware_build -> BigInt,
         ip_address -> Varchar,
         user_agent -> Nullable<Varchar>,
         date -> Timestamp,
@@ -57,24 +59,24 @@ table! {
 
 table! {
     firmware (id) {
-        id -> Int4,
+        id -> BigInt,
         version -> Varchar,
-        build -> Int4,
+        build -> BigInt,
     }
 }
 
 table! {
     icon (id) {
-        id -> Int4,
-        version_id -> Int8,
-        size -> Img_size,
+        id -> BigInt,
+        version_id -> BigInt,
+        size -> Int4,
         path -> Varchar,
     }
 }
 
 table! {
     language (id) {
-        id -> Int4,
+        id -> BigInt,
         code -> Varchar,
         name -> Varchar,
     }
@@ -82,8 +84,8 @@ table! {
 
 table! {
     package (id) {
-        id -> Int4,
-        author_user_id -> Nullable<Int8>,
+        id -> BigInt,
+        author_user_id -> Nullable<BigInt>,
         name -> Varchar,
         insert_date -> Nullable<Timestamp>,
     }
@@ -91,14 +93,14 @@ table! {
 
 table! {
     package_user_maintainer (package_id, user_id) {
-        package_id -> Int8,
-        user_id -> Int8,
+        package_id -> BigInt,
+        user_id -> BigInt,
     }
 }
 
 table! {
     role (id) {
-        id -> Int4,
+        id -> BigInt,
         name -> Varchar,
         description -> Varchar,
     }
@@ -106,22 +108,22 @@ table! {
 
 table! {
     screenshot (id) {
-        id -> Int4,
-        package_id -> Int8,
+        id -> BigInt,
+        package_id -> BigInt,
         path -> Varchar,
     }
 }
 
 table! {
     service (id) {
-        id -> Int4,
+        id -> BigInt,
         code -> Varchar,
     }
 }
 
 table! {
     user (id) {
-        id -> Int4,
+        id -> BigInt,
         username -> Varchar,
         email -> Varchar,
         password -> Varchar,
@@ -134,16 +136,17 @@ table! {
 
 table! {
     user_role (user_id, role_id) {
-        user_id -> Int8,
-        role_id -> Int8,
+        user_id -> BigInt,
+        role_id -> BigInt,
     }
 }
 
 table! {
     version (id) {
-        id -> Int4,
-        package_id -> Int8,
-        version -> Int4,
+        id -> BigInt,
+        package_id -> BigInt,
+        #[sql_name = "version"]
+        ver -> Int4,
         upstream_version -> Varchar,
         changelog -> Nullable<Text>,
         report_url -> Nullable<Varchar>,
@@ -165,8 +168,8 @@ table! {
 
 table! {
     version_service_dependency (version_id, package_id) {
-        version_id -> Int8,
-        package_id -> Int8,
+        version_id -> BigInt,
+        package_id -> BigInt,
     }
 }
 

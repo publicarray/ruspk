@@ -1,26 +1,27 @@
 use crate::models::DbVersion;
 use crate::schema::*;
-use crate::URL;
+use crate::Connection;
+use crate::{Db64, URL};
 use diesel::prelude::*;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbVersion, foreign_key = "version_id")]
 #[table_name = "icon"]
 pub struct DbIcon {
-    pub id: u64,
-    pub version_id: u64,
+    pub id: Db64,
+    pub version_id: Db64,
     pub size: i32,
     pub path: String,
 }
 
 impl DbIcon {
-    pub fn from_version(version_id: u64, conn: &MysqlConnection) -> Vec<Self> {
+    pub fn from_version(version_id: Db64, conn: &Connection) -> Vec<Self> {
         icon::table
             .filter(icon::version_id.eq(version_id))
             .load::<Self>(conn)
             .expect("Error loading icons")
     }
-    pub fn retina_from_version(version_id: u64, conn: &MysqlConnection) -> Vec<Self> {
+    pub fn retina_from_version(version_id: Db64, conn: &Connection) -> Vec<Self> {
         icon::table
             .filter(icon::version_id.eq(version_id))
             .filter(icon::size.gt(256))

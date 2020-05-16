@@ -2,7 +2,7 @@ extern crate serde_with;
 use crate::models::*;
 use crate::routes::KEYRING;
 use crate::DbConn;
-use crate::URL;
+use crate::{Db64, Db8, URL};
 use anyhow::Result;
 
 #[derive(Serialize, Default)]
@@ -134,11 +134,11 @@ pub fn get_packages_for_device_lang(
     conn: &DbConn,
     lang: &String,
     arch: &String,
-    build: u64,
+    build: Db64,
     package_update_channel: &Option<String>,
-    major: u8,
-    micro: u8,
-    minor: u8,
+    major: Db8,
+    micro: Db8,
+    minor: Db8,
 ) -> Result<SynoResponse> {
     let mut beta = false;
     if let Some(package_update_channel) = package_update_channel {

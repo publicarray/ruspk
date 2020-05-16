@@ -32,6 +32,19 @@ type Connection = diesel::mysql::MysqlConnection;
 #[cfg(feature = "postgres")]
 type Connection = diesel::pg::PgConnection;
 
+#[cfg(feature = "mysql")]
+type Db64 = u64;
+#[cfg(feature = "postgres")]
+type Db64 = i64;
+#[cfg(feature = "mysql")]
+type Db32 = u32;
+#[cfg(feature = "postgres")]
+type Db32 = i32;
+#[cfg(feature = "mysql")]
+type Db8 = u8;
+#[cfg(feature = "postgres")]
+type Db8 = i8;
+
 type DbPool = r2d2::Pool<ConnectionManager<Connection>>;
 type DbConn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Connection>>;
 

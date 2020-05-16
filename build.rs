@@ -1,4 +1,3 @@
-
 fn main() {
     #[cfg(all(feature = "sqlite", feature = "mysql"))]
     compile_error!("Can't enable both sqlite and mysql at the same time");
