@@ -3,7 +3,7 @@ name = "ruspk"
 version = "0.1.0"
 authors = ["Sebastian Schmidt <publicarray@users.noreply.github.com>"]
 edition = "2018"
-
+description= "Rust rewrite of spkrepo's / GET API https://github.com/SynoCommunity/spkrepo"
 repository = "https://github.com/publicarray/ruspk"
 readme = "README.md"
 license = "GPL-3.0-only"
