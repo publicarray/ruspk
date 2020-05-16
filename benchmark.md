@@ -1,21 +1,21 @@
 ## Unsientific Benchmark
 
-Not an entirely fair benchmark
-
-Requests/sec: on a 2012 Macbook Pro
+* Not an entirely fair benchmark
+* Benchmarked on a 2012 Macbook Pro
+* Results are in requests/sec
 
 |name| with `Connection: Close` | without `Connection: Close`|
 |-|-|-|
 |nginx|514.68||
-|rocket & mariadb|529.57||
 |docker + spkrepo||68.27|
 |warp (hello world)|547.66|38248.11|
 |actix-web (hello world) |547.87|44947.09|
-|actix-web & mariadb|547.23|1131.11|
-|actix-web & sqlite|548.21|646.12|
-|actix-web & postgres|404.96|435.94|
+|rocket & mariadb (diesel)|529.57||
+|actix-web & mariadb (diesel)|547.23|1131.11|
+|actix-web & sqlite (diesel)|548.21|646.12|
+|actix-web & postgres (diesel)|404.96|435.94|
 
-So postgress uses more CPU than any other DB tested here (the queries are probably not optimised for it, I tried to limit DBMS specific code)
+So postgress uses more CPU than any other DB tested here (the queries are probably not optimised for it, as I've tried to limit DBMS specific code)
 
 ### nginx
 
