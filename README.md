@@ -3,24 +3,37 @@
 ## Development
 
 ```sh
+echo 'export DATABASE_URL=mysql://user:pass@localhost/dbname' > .env
 cargo install diesel_cli
-cargo run
+diesel migration --migration-dir migrations/mysql/ run
+cargo run --feature mysql
 ```
+
+Avaliable Features: `mysql`, `postgres` and `sqlite`
 
 ## Production
 
 ```sh
-# export DATABASE_URL=mysql://user:pass@localhost/dbname
-diesel migration run
+echo 'export DATABASE_URL=mysql://user:pass@localhost/dbname' > .env
+cargo install diesel_cli
+diesel migration --migration-dir migrations/mysql/ run
 
-cargo build --release
-ROCKET_ENV=prod target/release/ruspk
-#or 
-ROCKET_ENV=prod cargo run --release
+cargo build --release --feature mysql
+target/release/ruspk
+#or
+cargo run --release --feature mysql
+```
+
+## Configuration `.env`
+
+```toml
+DATABASE_URL="mysql://user:pass@localhost/dbname"
+DATABASE_URL="postgresql://user:pass@localhost/dbname"
+DATABASE_URL="/tmp/database_file.db"
 ```
 
 # Guides
 
 https://diesel.rs/
 
-https://rocket.rs/
+https://actix.rs/

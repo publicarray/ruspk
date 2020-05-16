@@ -1,82 +1,80 @@
 table! {
     architecture (id) {
-        id -> Unsigned<Bigint>,
+        id -> Int4,
         code -> Varchar,
     }
 }
 
 table! {
     build (id) {
-        id -> Unsigned<Bigint>,
-        package_id -> Unsigned<Bigint>,
-        firmware_id -> Unsigned<Bigint>,
-        publisher_user_id -> Nullable<Unsigned<Bigint>>,
+        id -> Int4,
+        package_id -> Int8,
+        firmware_id -> Int8,
+        publisher_user_id -> Nullable<Int8>,
         checksum -> Nullable<Varchar>,
-        extract_size -> Integer,
+        extract_size -> Int4,
         path -> Varchar,
         md5 -> Varchar,
-        insert_date -> Datetime,
+        insert_date -> Timestamp,
         active -> Nullable<Bool>,
     }
 }
 
 table! {
     build_architecture (build_id, architecture_id) {
-        build_id -> Unsigned<Bigint>,
-        architecture_id -> Unsigned<Bigint>,
+        build_id -> Int8,
+        architecture_id -> Int8,
     }
 }
 
 table! {
     description (version_id, language_id) {
-        version_id -> Unsigned<Bigint>,
-        language_id -> Unsigned<Bigint>,
-        #[sql_name = "description"]
-        desc -> Text,
+        version_id -> Int8,
+        language_id -> Int8,
+        description -> Text,
     }
 }
 
 table! {
     displayname (version_id, language_id) {
-        version_id -> Unsigned<Bigint>,
-        language_id -> Unsigned<Bigint>,
-        #[sql_name = "displayname"]
-        name -> Varchar,
+        version_id -> Int8,
+        language_id -> Int8,
+        displayname -> Varchar,
     }
 }
 
 table! {
     download (id) {
-        id -> Unsigned<Bigint>,
-        build_id -> Unsigned<Bigint>,
-        architecture_id -> Unsigned<Bigint>,
-        firmware_build -> Integer,
+        id -> Int4,
+        build_id -> Int8,
+        architecture_id -> Int8,
+        firmware_build -> Int4,
         ip_address -> Varchar,
         user_agent -> Nullable<Varchar>,
-        date -> Datetime,
+        date -> Timestamp,
     }
 }
 
 table! {
     firmware (id) {
-        id -> Unsigned<Bigint>,
+        id -> Int4,
         version -> Varchar,
-        build -> Unsigned<Bigint>,
+        build -> Int4,
     }
 }
 
 table! {
     icon (id) {
-        id -> Unsigned<Bigint>,
-        version_id -> Unsigned<Bigint>,
-        size -> Integer,
+        id -> Int4,
+        version_id -> Int8,
+        size -> Img_size,
         path -> Varchar,
     }
 }
 
 table! {
     language (id) {
-        id -> Unsigned<Bigint>,
+        id -> Int4,
         code -> Varchar,
         name -> Varchar,
     }
@@ -84,23 +82,23 @@ table! {
 
 table! {
     package (id) {
-        id -> Unsigned<Bigint>,
-        author_user_id -> Nullable<Unsigned<Bigint>>,
+        id -> Int4,
+        author_user_id -> Nullable<Int8>,
         name -> Varchar,
-        insert_date -> Nullable<Datetime>,
+        insert_date -> Nullable<Timestamp>,
     }
 }
 
 table! {
     package_user_maintainer (package_id, user_id) {
-        package_id -> Unsigned<Bigint>,
-        user_id -> Unsigned<Bigint>,
+        package_id -> Int8,
+        user_id -> Int8,
     }
 }
 
 table! {
     role (id) {
-        id -> Unsigned<Bigint>,
+        id -> Int4,
         name -> Varchar,
         description -> Varchar,
     }
@@ -108,45 +106,44 @@ table! {
 
 table! {
     screenshot (id) {
-        id -> Unsigned<Bigint>,
-        package_id -> Unsigned<Bigint>,
+        id -> Int4,
+        package_id -> Int8,
         path -> Varchar,
     }
 }
 
 table! {
     service (id) {
-        id -> Unsigned<Bigint>,
+        id -> Int4,
         code -> Varchar,
     }
 }
 
 table! {
     user (id) {
-        id -> Unsigned<Bigint>,
+        id -> Int4,
         username -> Varchar,
         email -> Varchar,
         password -> Varchar,
         api_key -> Nullable<Varchar>,
         github_access_token -> Nullable<Varchar>,
         active -> Bool,
-        confirmed_at -> Nullable<Datetime>,
+        confirmed_at -> Nullable<Timestamp>,
     }
 }
 
 table! {
     user_role (user_id, role_id) {
-        user_id -> Unsigned<Bigint>,
-        role_id -> Unsigned<Bigint>,
+        user_id -> Int8,
+        role_id -> Int8,
     }
 }
 
 table! {
     version (id) {
-        id -> Unsigned<Bigint>,
-        package_id -> Unsigned<Bigint>,
-        #[sql_name = "version"]
-        ver -> Unsigned<Integer>,
+        id -> Int4,
+        package_id -> Int8,
+        version -> Int4,
         upstream_version -> Varchar,
         changelog -> Nullable<Text>,
         report_url -> Nullable<Varchar>,
@@ -162,14 +159,14 @@ table! {
         upgrade_wizard -> Nullable<Bool>,
         startable -> Nullable<Bool>,
         license -> Nullable<Text>,
-        insert_date -> Datetime,
+        insert_date -> Timestamp,
     }
 }
 
 table! {
     version_service_dependency (version_id, package_id) {
-        version_id -> Unsigned<Bigint>,
-        package_id -> Unsigned<Bigint>,
+        version_id -> Int8,
+        package_id -> Int8,
     }
 }
 
