@@ -1,4 +1,4 @@
-## Unsientific Benchmark
+## Unscientific Benchmark
 
 * Not an entirely fair benchmark
 * Benchmarked on a 2012 Macbook Pro
