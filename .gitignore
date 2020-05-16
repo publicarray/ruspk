@@ -4,3 +4,4 @@ db
 .vscode
 *.json
 src/schema.rs
+.env
