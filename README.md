@@ -1,5 +1,5 @@
 # ruspk
-ruspk is a simple and fast synology reposetory server. It uses the existing database structure from [spkrepo](https://github.com/SynoCommunity/spkrepo)
+ruspk is a simple and fast synology repository server. It uses the existing database structure from [spkrepo](https://github.com/SynoCommunity/spkrepo)
 
 Only the GET API for the synology devices is supported. You have to update the database your self.
 
