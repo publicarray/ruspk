@@ -10,7 +10,7 @@ build = "build.rs"
 [features]
 # default = ["mysql"]
 mysql = ["diesel/mysql"]
-postgresql = ["diesel/postgres"]
+postgres = ["diesel/postgres"]
 sqlite = ["diesel/sqlite", "libsqlite3-sys"]
 # mysql = ["diesel/mysql", "diesel_migrations/mysql"]
 # postgresql = ["diesel/postgres", "diesel_migrations/postgres"]
