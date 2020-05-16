@@ -12,12 +12,10 @@ pub struct DbLanguage {
 impl DbLanguage {
     pub fn get_language_id(conn: &MysqlConnection, lang: &String) -> u64 {
         let language_id_fallback_eng: u64 = 1;
-        let language_id = language::table
+        language::table
             .filter(language::code.eq(lang))
             .select(language::id)
             .first::<u64>(conn)
-            .unwrap_or(language_id_fallback_eng);
-
-        language_id
+            .unwrap_or(language_id_fallback_eng)
     }
 }

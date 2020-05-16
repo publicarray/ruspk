@@ -9,19 +9,31 @@ extern crate serde_derive;
 extern crate chrono;
 
 use actix_web::{middleware, web, App, HttpServer};
+use diesel::r2d2::{self, ConnectionManager};
 
-// pub mod cors;
 pub mod models;
 pub mod routes;
-pub mod schema;
 pub mod synopackagelist;
 
-// use diesel::PgConnection;
-use diesel::r2d2::{self, ConnectionManager};
-use diesel::MysqlConnection;
+#[cfg(feature = "sqlite")]
+#[path = "schemas/sqlite/schema.rs"]
+pub mod schema;
+#[cfg(feature = "mysql")]
+#[path = "schemas/mysql/schema.rs"]
+pub mod schema;
+#[cfg(feature = "postgres")]
+#[path = "schemas/postgres/schema.rs"]
+pub mod schema;
 
-type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
-type DbConn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::MysqlConnection>>;
+#[cfg(feature = "sqlite")]
+type Connection = diesel::sqlite::SqliteConnection;
+#[cfg(feature = "mysql")]
+type Connection = diesel::mysql::MysqlConnection;
+#[cfg(feature = "postgres")]
+type Connection = diesel::pg::PgConnection;
+
+type DbPool = r2d2::Pool<ConnectionManager<Connection>>;
+type DbConn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Connection>>;
 
 const URL: &str = "http://packages.synocommunity.com";
 
@@ -31,7 +43,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     dotenv::dotenv().ok();
     let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL");
-    let manager = ConnectionManager::<MysqlConnection>::new(db_url);
+    let manager = ConnectionManager::<Connection>::new(db_url);
     let pool = r2d2::Pool::builder().build(manager).expect("Failed to create pool.");
     let bind = "127.0.0.1:8080";
     println!("Starting server at: {}", &bind);

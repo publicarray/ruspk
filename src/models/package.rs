@@ -7,6 +7,11 @@ use diesel::prelude::*;
 use diesel::sql_query;
 use diesel::sql_types::{BigInt, Bool, Integer, Nullable, Text};
 
+#[cfg(feature = "mysql")]
+use diesel::mysql::types::Unsigned;
+// use diesel::pq::types::Unsigned;
+// use diesel::pg::types::
+
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "package"]
 pub struct DbPackage {
@@ -105,7 +110,7 @@ impl DbPackage {
         let packages = query
             .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
             .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+            .bind::<Unsigned<BigInt>, _>(language_id)
             .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
             .bind::<Text, _>(firmware)
             .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(architecture_id)
@@ -126,9 +131,9 @@ impl DbPackage {
 
 #[derive(Serialize, QueryableByName, Debug, Clone)]
 pub struct DBQueryResultPackage {
-    #[sql_type = "diesel::mysql::types::Unsigned<BigInt>"]
+    #[sql_type = "Unsigned<BigInt>"]
     pub package_id: u64,
-    #[sql_type = "diesel::mysql::types::Unsigned<BigInt>"]
+    #[sql_type = "Unsigned<BigInt>"]
     pub version_id: u64,
     #[sql_type = "Bool"]
     pub beta: bool,
@@ -164,7 +169,7 @@ pub struct DBQueryResultPackage {
     // recent_download_count: u64,
     #[sql_type = "Text"]
     pub upstream_version: String,
-    #[sql_type = "diesel::mysql::types::Unsigned<Integer>"]
+    #[sql_type = "Unsigned<Integer>"]
     pub revision: u32,
     #[sql_type = "Text"]
     pub md5: String,
