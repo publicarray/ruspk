@@ -1,12 +1,12 @@
 #![allow(unused)]
 
 use crate::models::*;
-use actix_web::{get, middleware, post, web, App, Error, HttpResponse, HttpRequest, HttpServer, Responder};
+use actix_web::{get, middleware, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder};
 
-use crate::DbPool;
-use crate::DbConn;
-use crate::URL;
 use crate::synopackagelist::*;
+use crate::DbConn;
+use crate::DbPool;
+use crate::URL;
 use anyhow::Result;
 use diesel::{self, prelude::*};
 
@@ -33,8 +33,8 @@ pub struct SynoRequest {
 
 pub async fn syno(pool: web::Data<DbPool>, synorequest: web::Query<SynoRequest>) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(
-        move || get_packages_for_device_lang(
+    let response = web::block(move || {
+        get_packages_for_device_lang(
             &conn,
             &synorequest.language,
             &synorequest.arch,
@@ -42,8 +42,11 @@ pub async fn syno(pool: web::Data<DbPool>, synorequest: web::Query<SynoRequest>)
             &synorequest.package_update_channel,
             synorequest.major,
             synorequest.micro,
-            synorequest.minor
-        )).await.map_err(|e| {
+            synorequest.minor,
+        )
+    })
+    .await
+    .map_err(|e| {
         eprintln!("{}", e);
         HttpResponse::InternalServerError().finish()
     })?;
@@ -65,15 +68,11 @@ fn get_package(conn: &DbConn) -> Result<Vec<DbPackage>> {
 }
 
 pub async fn list_packages(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
-
     let conn = pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(
-        move || get_package(&conn)
-        ).await.map_err(|e| {
-            eprintln!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        }
-    )?;
+    let response = web::block(move || get_package(&conn)).await.map_err(|e| {
+        eprintln!("{}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
 
     Ok(HttpResponse::Ok().json(response))
 }
@@ -89,13 +88,10 @@ fn get_version(conn: &DbConn, num: u64) -> Result<Vec<DbVersion>> {
 
 pub async fn get_package_version(pool: DbPool, id: web::Path<(u64)>) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(
-        move || get_version(&conn, *id)
-        ).await.map_err(|e| {
-            eprintln!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        }
-    )?;
+    let response = web::block(move || get_version(&conn, *id)).await.map_err(|e| {
+        eprintln!("{}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
 
     Ok(HttpResponse::Ok().json(response))
 }

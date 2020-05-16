@@ -8,7 +8,6 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate chrono;
 
-
 use actix_web::{middleware, web, App, HttpServer};
 
 // pub mod cors;
@@ -18,9 +17,8 @@ pub mod schema;
 pub mod synopackagelist;
 
 // use diesel::PgConnection;
-use diesel::MysqlConnection;
 use diesel::r2d2::{self, ConnectionManager};
-
+use diesel::MysqlConnection;
 
 type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
 type DbConn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::MysqlConnection>>;
@@ -34,9 +32,7 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL");
     let manager = ConnectionManager::<MysqlConnection>::new(db_url);
-    let pool = r2d2::Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool.");
+    let pool = r2d2::Pool::builder().build(manager).expect("Failed to create pool.");
     let bind = "127.0.0.1:8080";
     println!("Starting server at: {}", &bind);
 

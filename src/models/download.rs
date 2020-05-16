@@ -1,7 +1,7 @@
+use crate::models::DbArchitecture;
+use crate::models::DbBuild;
 use crate::schema::*;
 use chrono::NaiveDateTime;
-use crate::models::DbBuild;
-use crate::models::DbArchitecture;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]

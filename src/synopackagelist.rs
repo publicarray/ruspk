@@ -1,9 +1,9 @@
 extern crate serde_with;
-use crate::DbConn;
-use anyhow::Result;
 use crate::models::*;
 use crate::routes::KEYRING;
+use crate::DbConn;
 use crate::URL;
+use anyhow::Result;
 
 #[derive(Serialize, Default)]
 pub struct SynoResponse {
@@ -18,7 +18,6 @@ impl SynoResponse {
         self
     }
 }
-
 
 #[serde_with::skip_serializing_none]
 #[derive(Serialize)]

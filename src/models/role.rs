@@ -7,4 +7,3 @@ pub struct DbRole {
     pub name: String,
     pub description: String,
 }
-

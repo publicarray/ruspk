@@ -1,34 +1,34 @@
 use crate::schema::*;
 
-mod icon;
-mod screenshot;
 mod architecture;
-mod language;
 mod build;
-mod firmware;
+mod description;
 mod displayname;
 mod download;
-mod description;
-mod version;
-mod user;
-mod role;
-mod service;
+mod firmware;
+mod icon;
+mod language;
 mod package;
+mod role;
+mod screenshot;
+mod service;
+mod user;
+mod version;
 
-pub use self::icon::DbIcon;
-pub use self::screenshot::DbScreenshot;
 pub use self::architecture::DbArchitecture;
-pub use self::language::DbLanguage;
 pub use self::build::DbBuild;
-pub use self::firmware::DbFirmware;
+pub use self::description::DbDescription;
 pub use self::displayname::DbDisplayName;
 pub use self::download::DbDownload;
-pub use self::description::DbDescription;
-pub use self::version::DbVersion;
-pub use self::user::DbUser;
-pub use self::role::DbRole;
-pub use self::service::DbService;
+pub use self::firmware::DbFirmware;
+pub use self::icon::DbIcon;
+pub use self::language::DbLanguage;
 pub use self::package::DbPackage;
+pub use self::role::DbRole;
+pub use self::screenshot::DbScreenshot;
+pub use self::service::DbService;
+pub use self::user::DbUser;
+pub use self::version::DbVersion;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]

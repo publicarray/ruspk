@@ -1,13 +1,11 @@
+use crate::models::DbArchitecture;
+use crate::models::DbLanguage;
 use crate::schema::*;
+use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::{sql_query};
-use diesel::sql_types::{
-    BigInt, Bool, Integer, Text, Nullable
-};
-use anyhow::{Context, Result};
-use crate::models::DbLanguage;
-use crate::models::DbArchitecture;
+use diesel::sql_query;
+use diesel::sql_types::{BigInt, Bool, Integer, Nullable, Text};
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "package"]
@@ -33,7 +31,8 @@ impl DbPackage {
         let language_id = DbLanguage::get_language_id(conn, &lang);
         let architecture_id = DbArchitecture::get_architecute_id(conn, &arch)?; // todo return 404
 
-        let query = sql_query(r#"
+        let query = sql_query(
+            r#"
                 SELECT
                 `package`.`id` AS package_id,
                 `version`.`id` AS version_id,
@@ -100,18 +99,19 @@ impl DbPackage {
                 WHERE `build`.`active` = true
                 AND `firmware`.`build` >= ?
                 AND (? OR `version`.`report_url` = '')
-            "#);
+            "#,
+        );
 
         let packages = query
-        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
-        .bind::<Text, _>(firmware)
-        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(architecture_id)
-        .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(build)
-        .bind::<Bool, _>(beta)
-        .load::<DBQueryResultPackage>(conn)
+            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(language_id)
+            .bind::<Text, _>(firmware)
+            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(architecture_id)
+            .bind::<diesel::mysql::types::Unsigned<BigInt>, _>(build)
+            .bind::<Bool, _>(beta)
+            .load::<DBQueryResultPackage>(conn)
             .context("Error loading packages from DB")?;
         Ok(packages)
         // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
@@ -126,9 +126,9 @@ impl DbPackage {
 
 #[derive(Serialize, QueryableByName, Debug, Clone)]
 pub struct DBQueryResultPackage {
-    #[sql_type="diesel::mysql::types::Unsigned<BigInt>"]
+    #[sql_type = "diesel::mysql::types::Unsigned<BigInt>"]
     pub package_id: u64,
-    #[sql_type="diesel::mysql::types::Unsigned<BigInt>"]
+    #[sql_type = "diesel::mysql::types::Unsigned<BigInt>"]
     pub version_id: u64,
     #[sql_type = "Bool"]
     pub beta: bool,

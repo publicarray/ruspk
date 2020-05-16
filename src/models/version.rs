@@ -1,6 +1,6 @@
+use crate::models::DbPackage;
 use crate::schema::*;
 use chrono::NaiveDateTime;
-use crate::models::DbPackage;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]

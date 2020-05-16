@@ -1,5 +1,5 @@
-use crate::schema::*;
 use crate::models::DbLanguage;
+use crate::schema::*;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbLanguage, foreign_key = "language_id")]

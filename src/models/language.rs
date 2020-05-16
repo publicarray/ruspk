@@ -20,5 +20,4 @@ impl DbLanguage {
 
         language_id
     }
-
 }
