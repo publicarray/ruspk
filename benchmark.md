@@ -4,16 +4,16 @@
 * Benchmarked on a 2012 Macbook Pro
 * Results are in requests/sec
 
-|name| with `Connection: Close` | without `Connection: Close`|
+|| with `Connection: Close` | without `Connection: Close`|
 |-|-|-|
 |nginx|514.68||
 |docker + spkrepo||68.27|
 |warp (hello world)|547.66|38248.11|
 |actix-web (hello world) |547.87|44947.09|
-|rocket & mariadb (diesel)|529.57||
-|actix-web & mariadb (diesel)|547.23|1131.11|
-|actix-web & sqlite (diesel)|548.21|646.12|
-|actix-web & postgres (diesel)|404.96|435.94|
+|ruspk - rocket & mariadb (diesel)|529.57||
+|ruspk - actix-web & mariadb (diesel)|547.23|1131.11|
+|ruspk - actix-web & sqlite (diesel)|548.21|646.12|
+|ruspk - actix-web & postgres (diesel)|404.96|435.94|
 
 So postgresql uses more CPU than any other DB tested here (the queries are probably not optimised for it)
 
