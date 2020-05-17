@@ -8,7 +8,7 @@ table! {
 table! {
     build (id) {
         id -> BigInt,
-        package_id -> BigInt,
+        version_id -> BigInt,
         firmware_id -> BigInt,
         publisher_user_id -> Nullable<BigInt>,
         checksum -> Nullable<Text>,
@@ -174,7 +174,7 @@ table! {
 }
 
 joinable!(build -> firmware (firmware_id));
-joinable!(build -> package (package_id));
+joinable!(build -> version (version_id));
 joinable!(build_architecture -> architecture (architecture_id));
 joinable!(build_architecture -> build (build_id));
 joinable!(description -> language (language_id));

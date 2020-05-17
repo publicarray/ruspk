@@ -1,18 +1,18 @@
+use crate::models::DbVersion;
 use crate::models::DbFirmware;
-use crate::models::DbPackage;
 use crate::schema::*;
-use crate::Db64;
+use crate::DbId;
 use chrono::NaiveDateTime;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
-#[belongs_to(DbPackage, foreign_key = "package_id")]
+#[belongs_to(DbVersion, foreign_key = "version_id")]
 #[belongs_to(DbFirmware, foreign_key = "firmware_id")]
 #[table_name = "build"]
 pub struct DbBuild {
-    pub id: Db64,
-    pub package_id: Db64,
-    pub firmware_id: Db64,
-    pub publisher_user_id: Option<Db64>,
+    pub id: DbId,
+    pub version_id: DbId,
+    pub firmware_id: DbId,
+    pub publisher_user_id: Option<DbId>,
     pub checksum: Option<String>,
     pub exec_size: i32,
     pub path: String,

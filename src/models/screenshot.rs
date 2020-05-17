@@ -1,17 +1,17 @@
 use crate::schema::*;
 use crate::Connection;
-use crate::Db64;
+use crate::DbId;
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "screenshot"]
 pub struct DbScreenshot {
-    pub id: Db64,
-    pub package_id: Db64,
+    pub id: DbId,
+    pub package_id: DbId,
     pub path: String,
 }
 
 impl DbScreenshot {
-    pub fn from_package(package_id: Db64, conn: &Connection) -> Vec<DbScreenshot> {
+    pub fn from_package(package_id: DbId, conn: &Connection) -> Vec<DbScreenshot> {
         screenshot::table
             .filter(screenshot::package_id.eq(package_id))
             .load::<Self>(conn)

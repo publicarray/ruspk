@@ -12,8 +12,8 @@ use diesel::sql_types::{BigInt, Bool, Integer, Nullable, Text};
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "package"]
 pub struct DbPackage {
-    pub id: i64,
-    pub author_user_id: Option<i64>,
+    pub id: i32,
+    pub author_user_id: Option<i32>,
     pub name: String,
     pub insert_date: Option<NaiveDateTime>,
 }
@@ -30,8 +30,8 @@ impl DbPackage {
         conn: &Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
         let firmware = format!("{}.{}", major, minor);
-        let language_id: i64 = DbLanguage::get_language_id(conn, &lang);
-        let architecture_id: i64 = DbArchitecture::get_architecute_id(conn, &arch)
+        let language_id: i32 = DbLanguage::get_language_id(conn, &lang);
+        let architecture_id: i32 = DbArchitecture::get_architecute_id(conn, &arch)
             .context(format!("Can't find architecute in DB for {}", &arch))?; // todo return 404
 
         let query = sql_query(
@@ -82,9 +82,9 @@ impl DbPackage {
                         ) THEN $1 ELSE 1 END
                         )
                         INNER JOIN (
-                        SELECT version.id, MAX(version.version) AS version, package_id
+                        SELECT MAX(version.version) AS version, package_id
                         FROM version
-                        GROUP BY version.id, version.package_id
+                        GROUP BY version.package_id
                         ) ver ON version.package_id = ver.package_id
                         AND version.version = ver.version
                     ) ON version.package_id = package.id
@@ -97,7 +97,7 @@ impl DbPackage {
                     )
                     INNER JOIN build_architecture ON build_architecture.build_id = build.id
                     AND build_architecture.architecture_id = $3
-                    ) ON build.package_id = package.id
+                    ) ON build.version_id = version.id
                 )
                 WHERE build.active = true
                 AND firmware.build >= $4
@@ -112,16 +112,16 @@ impl DbPackage {
 pub fn bind_and_load(
     conn: &Connection,
     query: SqlQuery,
-    language_id: i64,
+    language_id: i32,
     firmware: &str,
-    architecture_id: i64,
+    architecture_id: i32,
     build: i64,
     beta: bool,
 ) -> Result<Vec<DBQueryResultPackage>> {
     let result = query
-        .bind::<BigInt, _>(language_id)
+        .bind::<Integer, _>(language_id)
         .bind::<Text, _>(firmware)
-        .bind::<BigInt, _>(architecture_id)
+        .bind::<Integer, _>(architecture_id)
         .bind::<BigInt, _>(build)
         .bind::<Bool, _>(beta)
         .load::<DBQueryResultPackage>(conn)
@@ -131,10 +131,10 @@ pub fn bind_and_load(
 
 #[derive(Serialize, QueryableByName, Debug, Clone)]
 pub struct DBQueryResultPackage {
-    #[sql_type = "BigInt"]
-    pub package_id: i64,
-    #[sql_type = "BigInt"]
-    pub version_id: i64,
+    #[sql_type = "Integer"]
+    pub package_id: i32,
+    #[sql_type = "Integer"]
+    pub version_id: i32,
     #[sql_type = "Bool"]
     pub beta: bool,
     #[sql_type = "Nullable<Text>"]
@@ -151,7 +151,7 @@ pub struct DBQueryResultPackage {
     pub distributor_url: Option<String>,
     #[sql_type = "Nullable<Text>"]
     pub dname: Option<String>,
-    // download_count: i64,
+    // download_count: i32,
     #[sql_type = "Nullable<Text>"]
     pub link: Option<String>,
     #[sql_type = "Nullable<Text>"]
@@ -166,13 +166,13 @@ pub struct DBQueryResultPackage {
     pub qstart: Option<bool>,
     #[sql_type = "Nullable<Bool>"]
     pub qupgrade: Option<bool>,
-    // recent_download_count: i64,
+    // recent_download_count: i32,
     #[sql_type = "Text"]
     pub upstream_version: String,
     #[sql_type = "Integer"]
     pub revision: i32,
-    #[sql_type = "Text"]
-    pub md5: String,
-    #[sql_type = "Integer"]
-    pub size: i32,
+    #[sql_type = "Nullable<Text>"]
+    pub md5: Option<String>,
+    #[sql_type = "Nullable<Integer>"]
+    pub size: Option<i32>,
 }

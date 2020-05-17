@@ -8,7 +8,7 @@ table! {
 table! {
     build (id) {
         id -> Unsigned<Bigint>,
-        package_id -> Unsigned<Bigint>,
+        version_id -> Unsigned<Bigint>,
         firmware_id -> Unsigned<Bigint>,
         publisher_user_id -> Nullable<Unsigned<Bigint>>,
         checksum -> Nullable<Varchar>,
@@ -174,7 +174,7 @@ table! {
 }
 
 joinable!(build -> firmware (firmware_id));
-joinable!(build -> package (package_id));
+joinable!(build -> version (version_id));
 joinable!(build_architecture -> architecture (architecture_id));
 joinable!(build_architecture -> build (build_id));
 joinable!(description -> language (language_id));

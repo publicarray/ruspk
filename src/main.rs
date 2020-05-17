@@ -2,7 +2,7 @@
 #[macro_use]
 extern crate log;
 use env_logger::Env;
-
+use lazy_static::lazy_static;
 #[macro_use]
 extern crate diesel;
 extern crate serde;
@@ -35,18 +35,27 @@ type Connection = diesel::mysql::MysqlConnection;
 #[cfg(feature = "postgres")]
 type Connection = diesel::pg::PgConnection;
 
+#[cfg(feature = "sqlite")]
+type DbId = i64;
 #[cfg(feature = "mysql")]
-type Db64 = u64;
+type DbId = u64;
+#[cfg(feature = "postgres")]
+type DbId = i32;
+
 #[cfg(feature = "sqlite")]
 type Db64 = i64;
+#[cfg(feature = "mysql")]
+type Db64 = u64;
 #[cfg(feature = "postgres")]
 type Db64 = i64;
+
 #[cfg(feature = "sqlite")]
 type Db32 = i32;
 #[cfg(feature = "mysql")]
 type Db32 = u32;
 #[cfg(feature = "postgres")]
 type Db32 = i32;
+
 #[cfg(feature = "sqlite")]
 type Db8 = i8;
 #[cfg(feature = "mysql")]
@@ -57,7 +66,10 @@ type Db8 = i8;
 type DbPool = r2d2::Pool<ConnectionManager<Connection>>;
 type DbConn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Connection>>;
 
-const URL: &str = "http://packages.synocommunity.com";
+lazy_static! {
+    #[derive(Copy, Clone, Debug)]
+    pub static ref URL: String = std::env::var("URL").unwrap_or("https://packages.synocommunity.com".to_string());
+}
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {

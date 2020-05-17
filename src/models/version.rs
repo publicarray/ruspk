@@ -1,13 +1,13 @@
 use crate::models::DbPackage;
 use crate::schema::*;
-use crate::{Db32, Db64};
+use crate::{Db32, DbId};
 use chrono::NaiveDateTime;
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
 #[table_name = "version"]
 pub struct DbVersion {
-    pub id: Db64,
-    pub package_id: Db64,
+    pub id: DbId,
+    pub package_id: DbId,
     pub ver: Db32,
     pub upstream_version: String,
     pub changelog: Option<String>,

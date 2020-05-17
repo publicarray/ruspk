@@ -1,9 +1,9 @@
 use crate::schema::*;
-use crate::Db64;
+use crate::DbId;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "role"]
 pub struct DbRole {
-    pub id: Db64,
+    pub id: DbId,
     pub name: String,
     pub description: String,
 }

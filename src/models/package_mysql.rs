@@ -81,7 +81,7 @@ impl DbPackage {
                         ) THEN ? ELSE 1 END
                         )
                         INNER JOIN (
-                        SELECT `version`.`id`, MAX(`version`.`version`) `version`, `package_id`
+                        SELECT MAX(`version`.`version`) `version`, `package_id`
                         FROM `version`
                         GROUP BY `version`.`package_id`
                         ) ver ON `version`.`package_id` = `ver`.`package_id`
@@ -96,7 +96,7 @@ impl DbPackage {
                     )
                     INNER JOIN `build_architecture` ON `build_architecture`.`build_id` = `build`.`id`
                     AND `build_architecture`.`architecture_id` = ?
-                    ) ON `build`.`package_id` = `package`.`id`
+                    ) ON `build`.`version_id` = `version`.`id`
                 )
                 WHERE `build`.`active` = true
                 AND `firmware`.`build` >= ?
@@ -173,8 +173,8 @@ pub struct DBQueryResultPackage {
     pub upstream_version: String,
     #[sql_type = "Unsigned<Integer>"]
     pub revision: u32,
-    #[sql_type = "Text"]
-    pub md5: String,
-    #[sql_type = "Integer"]
-    pub size: i32,
+    #[sql_type = "Nullable<Text>"]
+    pub md5: Option<String>,
+    #[sql_type = "Nullable<Integer>"]
+    pub size: Option<i32>,
 }

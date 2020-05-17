@@ -1,10 +1,10 @@
 use crate::schema::*;
-use crate::Db64;
+use crate::DbId;
 use chrono::NaiveDateTime;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "user"]
 pub struct DbUser {
-    pub id: Db64,
+    pub id: DbId,
     pub username: String,
     pub email: String,
     pub password: String,

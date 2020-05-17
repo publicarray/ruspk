@@ -1,16 +1,16 @@
 table! {
     architecture (id) {
-        id -> BigInt,
+        id -> Int4,
         code -> Varchar,
     }
 }
 
 table! {
     build (id) {
-        id -> BigInt,
-        package_id -> BigInt,
-        firmware_id -> BigInt,
-        publisher_user_id -> Nullable<BigInt>,
+        id -> Int4,
+        version_id -> Int4,
+        firmware_id -> Int4,
+        publisher_user_id -> Nullable<Int4>,
         checksum -> Nullable<Varchar>,
         extract_size -> Int4,
         path -> Varchar,
@@ -22,15 +22,15 @@ table! {
 
 table! {
     build_architecture (build_id, architecture_id) {
-        build_id -> BigInt,
-        architecture_id -> BigInt,
+        build_id -> Int4,
+        architecture_id -> Int4,
     }
 }
 
 table! {
     description (version_id, language_id) {
-        version_id -> BigInt,
-        language_id -> BigInt,
+        version_id -> Int4,
+        language_id -> Int4,
         #[sql_name = "description"]
         desc -> Text,
     }
@@ -38,8 +38,8 @@ table! {
 
 table! {
     displayname (version_id, language_id) {
-        version_id -> BigInt,
-        language_id -> BigInt,
+        version_id -> Int4,
+        language_id -> Int4,
         #[sql_name = "displayname"]
         name -> Varchar,
     }
@@ -47,9 +47,9 @@ table! {
 
 table! {
     download (id) {
-        id -> BigInt,
-        build_id -> BigInt,
-        architecture_id -> BigInt,
+        id -> Int4,
+        build_id -> Int4,
+        architecture_id -> Int4,
         firmware_build -> BigInt,
         ip_address -> Varchar,
         user_agent -> Nullable<Varchar>,
@@ -59,24 +59,26 @@ table! {
 
 table! {
     firmware (id) {
-        id -> BigInt,
+        id -> Int4,
         version -> Varchar,
         build -> BigInt,
     }
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::models::IconSize;
     icon (id) {
-        id -> BigInt,
-        version_id -> BigInt,
-        size -> Int4,
+        id -> Int4,
+        version_id -> Int4,
+        size -> IconSize,
         path -> Varchar,
     }
 }
 
 table! {
     language (id) {
-        id -> BigInt,
+        id -> Int4,
         code -> Varchar,
         name -> Varchar,
     }
@@ -84,8 +86,8 @@ table! {
 
 table! {
     package (id) {
-        id -> BigInt,
-        author_user_id -> Nullable<BigInt>,
+        id -> Int4,
+        author_user_id -> Nullable<Int4>,
         name -> Varchar,
         insert_date -> Nullable<Timestamp>,
     }
@@ -93,14 +95,14 @@ table! {
 
 table! {
     package_user_maintainer (package_id, user_id) {
-        package_id -> BigInt,
-        user_id -> BigInt,
+        package_id -> Int4,
+        user_id -> Int4,
     }
 }
 
 table! {
     role (id) {
-        id -> BigInt,
+        id -> Int4,
         name -> Varchar,
         description -> Varchar,
     }
@@ -108,22 +110,22 @@ table! {
 
 table! {
     screenshot (id) {
-        id -> BigInt,
-        package_id -> BigInt,
+        id -> Int4,
+        package_id -> Int4,
         path -> Varchar,
     }
 }
 
 table! {
     service (id) {
-        id -> BigInt,
+        id -> Int4,
         code -> Varchar,
     }
 }
 
 table! {
     user (id) {
-        id -> BigInt,
+        id -> Int4,
         username -> Varchar,
         email -> Varchar,
         password -> Varchar,
@@ -136,15 +138,15 @@ table! {
 
 table! {
     user_role (user_id, role_id) {
-        user_id -> BigInt,
-        role_id -> BigInt,
+        user_id -> Int4,
+        role_id -> Int4,
     }
 }
 
 table! {
     version (id) {
-        id -> BigInt,
-        package_id -> BigInt,
+        id -> Int4,
+        package_id -> Int4,
         #[sql_name = "version"]
         ver -> Int4,
         upstream_version -> Varchar,
@@ -168,13 +170,13 @@ table! {
 
 table! {
     version_service_dependency (version_id, package_id) {
-        version_id -> BigInt,
-        package_id -> BigInt,
+        version_id -> Int4,
+        package_id -> Int4,
     }
 }
 
 joinable!(build -> firmware (firmware_id));
-joinable!(build -> package (package_id));
+joinable!(build -> version (version_id));
 joinable!(build_architecture -> architecture (architecture_id));
 joinable!(build_architecture -> build (build_id));
 joinable!(description -> language (language_id));

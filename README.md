@@ -25,12 +25,23 @@ curl -sv 'http://127.0.0.1:8080/?build=24922&language=enu&major=6&micro=2&arch=x
 ## Configuration (`.env` file)
 
 ```env
+## Log levels for each component
 RUST_LOG="ruspk=info,actix_web=info,actix_server=info,diesel=info"
-DATABASE_URL=file:db/database.sqlite
-# DATABASE_URL=mysql://user:pass@localhost/dbname
-# DATABASE_URL=postgresql://user:pass@localhost/dbname
+
+## Database connection
+# DATABASE_URL=file:db/database.sqlite
+# DATABASE_URL=mysql://ruspk:ruspk@localhost/ruspk
+# DATABASE_URL=postgresql://ruspk:ruspk@localhost/ruspk
+
+## IP adress to Bind to and listen for connections
 LISTEN=127.0.0.1
+
+## Port to Bind to and listen for connections
 PORT=80
+
+## URL to prepend for spk archive, icon and screenshot files
+URL=https://packages.synocommunity.com
+
 ```
 
 # Dev Guides

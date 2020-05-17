@@ -1,27 +1,34 @@
 use crate::models::DbVersion;
-use crate::schema::*;
 use crate::Connection;
-use crate::{Db64, URL};
+use crate::{DbId, URL};
 use diesel::prelude::*;
+
+#[cfg(feature = "postgres")]
+use crate::models::IconSizeEnum;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(DbVersion, foreign_key = "version_id")]
 #[table_name = "icon"]
 pub struct DbIcon {
-    pub id: Db64,
-    pub version_id: Db64,
+    pub id: DbId,
+    pub version_id: DbId,
+    #[cfg(feature = "postgres")]
+    pub size: IconSizeEnum,
+    #[cfg(feature = "mysql")]
+    pub size: i32,
+    #[cfg(feature = "sqlite")]
     pub size: i32,
     pub path: String,
 }
 
 impl DbIcon {
-    pub fn from_version(version_id: Db64, conn: &Connection) -> Vec<Self> {
+    pub fn from_version(version_id: DbId, conn: &Connection) -> Vec<Self> {
         icon::table
             .filter(icon::version_id.eq(version_id))
             .load::<Self>(conn)
             .expect("Error loading icons")
     }
-    pub fn retina_from_version(version_id: Db64, conn: &Connection) -> Vec<Self> {
+    pub fn retina_from_version(version_id: DbId, conn: &Connection) -> Vec<Self> {
         icon::table
             .filter(icon::version_id.eq(version_id))
             .filter(icon::size.gt(256))

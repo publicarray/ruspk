@@ -1,6 +1,6 @@
 CREATE TABLE build (
     id SERIAL PRIMARY KEY,
-    package_id BIGINT UNSIGNED NOT NULL,
+    version_id BIGINT UNSIGNED NOT NULL,
     firmware_id BIGINT UNSIGNED NOT NULL,
     publisher_user_id BIGINT UNSIGNED,
     checksum VARCHAR(32),
@@ -9,6 +9,6 @@ CREATE TABLE build (
     md5 VARCHAR(32) NOT NULL,
     insert_date DATETIME NOT NULL,
     active BOOLEAN,
-    FOREIGN KEY (package_id) REFERENCES package(id),
+    FOREIGN KEY (version_id) REFERENCES version(id),
     FOREIGN KEY (firmware_id) REFERENCES firmware(id)
 );

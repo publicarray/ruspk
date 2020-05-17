@@ -2,7 +2,7 @@ use crate::models::*;
 use actix_web::{error::BlockingError, web, Error, HttpRequest, HttpResponse, Responder};
 
 use crate::synopackagelist::*;
-use crate::{Db64, Db8, DbConn, DbPool};
+use crate::{DbId, Db64, Db8, DbConn, DbPool};
 use anyhow::Result;
 use diesel::{self, prelude::*};
 
@@ -78,7 +78,7 @@ pub async fn list_packages(pool: web::Data<DbPool>) -> Result<HttpResponse, Erro
     Ok(HttpResponse::Ok().json(response))
 }
 
-fn get_version(conn: &DbConn, num: Db64) -> Result<Vec<DbVersion>> {
+fn get_version(conn: &DbConn, num: DbId) -> Result<Vec<DbVersion>> {
     use crate::schema::version::dsl::*;
     let v = version
         .filter(package_id.eq(num))
@@ -87,7 +87,7 @@ fn get_version(conn: &DbConn, num: Db64) -> Result<Vec<DbVersion>> {
     Ok(v)
 }
 
-pub async fn get_package_version(pool: web::Data<DbPool>, id: web::Path<Db64>) -> Result<HttpResponse, HttpResponse> {
+pub async fn get_package_version(pool: web::Data<DbPool>, id: web::Path<DbId>) -> Result<HttpResponse, HttpResponse> {
     let conn = pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || get_version(&conn, *id)).await.map_err(|e| {
         debug!("{}", e);

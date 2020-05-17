@@ -179,8 +179,8 @@ pub fn get_packages_for_device_lang(
             package.qstart.unwrap_or(false),
             package.qupgrade.unwrap_or(false),
             format!("{}-{}", package.upstream_version, package.revision),
-            Some(package.md5.clone()),
-            Some(package.size),
+            package.md5.clone(),
+            package.size,
         );
         p.thumbnail = DbIcon::paths(
             DbIcon::from_version(package.version_id, &conn),
