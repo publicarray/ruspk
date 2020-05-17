@@ -6,7 +6,7 @@
 
 || with `Connection: Close` | without `Connection: Close`|
 |-|-|-|
-|nginx|514.68||
+|nginx + php-fpm (valet)|545.52|2740.95|
 |docker + spkrepo||68.27|
 |warp (hello world)|547.66|38248.11|
 |actix-web (hello world) |547.87|44947.09|
@@ -40,22 +40,22 @@ tps = 502.403372 (excluding connections establishing)
 `Connection: Close` because ruspk and spkrepo do not have keep-alive
 
 ```sh
-$ wrk --latency -H 'Connection: Close' -c 5k -t 10 -d 30 'http://localhost:80/'
-Running 30s test @ http://localhost:80/
-  10 threads and 5000 connections
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost'
+Running 30s test @ http://localhost
+  8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    55.54ms   33.51ms 386.69ms   81.55%
-    Req/Sec   105.38     90.23   616.00     74.74%
+    Latency    31.92ms   15.40ms 158.45ms   76.39%
+    Req/Sec   189.92     94.70   595.00     81.13%
   Latency Distribution
-     50%   48.76ms
-     75%   67.46ms
-     90%   88.20ms
-     99%  184.35ms
-  15477 requests in 30.07s, 6.86MB read
-  Socket errors: connect 2455, read 2709, write 0, timeout 0
-  Non-2xx or 3xx responses: 15477
-Requests/sec:    514.68
-Transfer/sec:    233.72KB
+     50%   28.76ms
+     75%   39.58ms
+     90%   50.26ms
+     99%   81.64ms
+  16403 requests in 30.07s, 7.27MB read
+  Socket errors: connect 0, read 39, write 0, timeout 0
+  Non-2xx or 3xx responses: 16403
+Requests/sec:    545.52
+Transfer/sec:    247.72KB
 ```
 
 ### ruspk
