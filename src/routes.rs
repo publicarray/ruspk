@@ -71,7 +71,7 @@ fn get_package(conn: &DbConn) -> Result<Vec<DbPackage>> {
 pub async fn list_packages(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || get_package(&conn)).await.map_err(|e| {
-        warn!("{}", e);
+        debug!("{}", e);
         HttpResponse::InternalServerError().finish()
     })?;
 
@@ -87,12 +87,14 @@ fn get_version(conn: &DbConn, num: Db64) -> Result<Vec<DbVersion>> {
     Ok(v)
 }
 
-pub async fn get_package_version(pool: DbPool, id: web::Path<Db64>) -> Result<HttpResponse, Error> {
+pub async fn get_package_version(pool: web::Data<DbPool>, id: web::Path<Db64>) -> Result<HttpResponse, HttpResponse> {
     let conn = pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || get_version(&conn, *id)).await.map_err(|e| {
-        eprintln!("{}", e);
+        debug!("{}", e);
         HttpResponse::InternalServerError().finish()
     })?;
-
+    if response.len() == 0 {
+        return Err(HttpResponse::NotFound().finish());
+    }
     Ok(HttpResponse::Ok().json(response))
 }

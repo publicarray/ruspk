@@ -80,11 +80,12 @@ async fn main() -> std::io::Result<()> {
             // set up DB pool to be used with web::Data<Pool> extractor
             .data(pool.clone())
             .wrap(middleware::Logger::default())
-            .service(web::resource("/hello/").route(web::get().to(routes::index)))
+            .service(web::resource("/hello").route(web::get().to(routes::index)))
             .service(web::resource("/hello/{name}").route(web::get().to(routes::index)))
             .service(web::resource("/").route(web::get().to(routes::syno)))
             .service(web::resource("/").route(web::post().to(routes::syno)))
             .service(web::resource("/package").route(web::get().to(routes::list_packages)))
+            .service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
     })
     .bind(&bind)?
     .run()

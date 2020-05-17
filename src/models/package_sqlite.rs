@@ -104,13 +104,6 @@ impl DbPackage {
         );
         let packages = bind_and_load(conn, query, language_id, &firmware, architecture_id, build, beta)?;
         Ok(packages)
-        // println!("{:?}", diesel::debug_query::<diesel::mysql::Mysql, _>(&q));
-        // let s = String::new();
-        // let os = Some(String::new());
-        // let mut v = Vec::new();
-        // let ob = Some(false);
-        // v.push(DBQueryResultPackage{package_id:1,version_id:1,beta:false,conflictpkgs:None,deppkgs:None,changelog:os.clone(),desc:os.clone(),distributor:os.clone(),distributor_url:os.clone(),dname:os.clone(),link:os.clone(),maintainer:os.clone(),maintainer_url:os.clone(),package:s.clone(),qinst:ob,qstart:ob,qupgrade:ob,upstream_version:s.clone(),revision:1,md5:s.clone(),size:300});
-        // v
     }
 }
 
