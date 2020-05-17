@@ -28,7 +28,7 @@ impl DbIcon {
             .load::<Self>(conn)
             .expect("Error loading retina icons")
     }
-    pub fn full_path(&self, package: &String) -> String {
+    pub fn full_path(&self, package: &str) -> String {
         format!("{}/{}/{}", URL.to_string(), package, &self.path)
     }
     pub fn paths(icons: Vec<Self>, package: String) -> Vec<String> {

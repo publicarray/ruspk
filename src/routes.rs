@@ -93,7 +93,7 @@ pub async fn get_package_version(pool: web::Data<DbPool>, id: web::Path<Db64>) -
         debug!("{}", e);
         HttpResponse::InternalServerError().finish()
     })?;
-    if response.len() == 0 {
+    if response.is_empty() {
         return Err(HttpResponse::NotFound().finish());
     }
     Ok(HttpResponse::Ok().json(response))

@@ -11,7 +11,7 @@ pub struct DbLanguage {
 }
 
 impl DbLanguage {
-    pub fn get_language_id(conn: &Connection, lang: &String) -> Db64 {
+    pub fn get_language_id(conn: &Connection, lang: &str) -> Db64 {
         let language_id_fallback_eng: Db64 = 1;
         language::table
             .filter(language::code.eq(lang))

@@ -20,8 +20,8 @@ pub struct DbPackage {
 
 impl DbPackage {
     pub fn get_packages(
-        lang: &String,
-        arch: &String,
+        lang: &str,
+        arch: &str,
         build: u64,
         beta: bool,
         major: u8,
@@ -112,7 +112,7 @@ pub fn bind_and_load(
     conn: &Connection,
     query: SqlQuery,
     language_id: u64,
-    firmware: &String,
+    firmware: &str,
     architecture_id: u64,
     build: u64,
     beta: bool,

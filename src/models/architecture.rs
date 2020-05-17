@@ -11,7 +11,7 @@ pub struct DbArchitecture {
 }
 
 impl DbArchitecture {
-    pub fn get_architecute_id(conn: &Connection, arch: &String) -> Result<Db64> {
+    pub fn get_architecute_id(conn: &Connection, arch: &str) -> Result<Db64> {
         let architecture_id = architecture::table
             .filter(architecture::code.eq(arch))
             .select(architecture::id)

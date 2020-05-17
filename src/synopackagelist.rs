@@ -12,7 +12,7 @@ pub struct SynoResponse {
 }
 impl SynoResponse {
     fn set_key(&mut self, key: String) -> &Self {
-        let mut k = self.keyrings.clone().unwrap_or(Vec::new());
+        let mut k = self.keyrings.clone().unwrap_or_default();
         k.push(key);
         self.keyrings = Some(k);
         self
@@ -132,8 +132,8 @@ impl Default for Package {
 
 pub fn get_packages_for_device_lang(
     conn: &DbConn,
-    lang: &String,
-    arch: &String,
+    lang: &str,
+    arch: &str,
     build: Db64,
     package_update_channel: &Option<String>,
     major: Db8,
@@ -162,18 +162,18 @@ pub fn get_packages_for_device_lang(
             package.conflictpkgs.clone(),
             package.deppkgs.clone(),
             package.desc.clone(),
-            package.distributor.clone().unwrap_or(String::new()),
-            package.distributor_url.clone().unwrap_or(String::new()),
+            package.distributor.clone().unwrap_or_default(),
+            package.distributor_url.clone().unwrap_or_default(),
             package.dname.clone(),
             format!(
                 "{}/{}/{}/{}",
                 URL.to_string(),
                 package.package.clone(),
                 package.revision,
-                package.link.clone().unwrap_or(String::new()),
+                package.link.clone().unwrap_or_default(),
             ),
-            package.maintainer.clone().unwrap_or(String::new()),
-            package.maintainer_url.clone().unwrap_or(String::new()),
+            package.maintainer.clone().unwrap_or_default(),
+            package.maintainer_url.clone().unwrap_or_default(),
             package.package.clone(),
             package.qinst.unwrap_or(false),
             package.qstart.unwrap_or(false),
@@ -186,7 +186,7 @@ pub fn get_packages_for_device_lang(
             DbIcon::from_version(package.version_id, &conn),
             format!(
                 "{}/{}",
-                package.dname.clone().unwrap_or(String::new()),
+                package.dname.clone().unwrap_or_default(),
                 package.revision
             ),
         );
