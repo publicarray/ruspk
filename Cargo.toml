@@ -1,6 +1,6 @@
 [package]
 name = "ruspk"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Sebastian Schmidt <publicarray@users.noreply.github.com>"]
 edition = "2018"
 description= "Rust rewrite of spkrepo's / GET API https://github.com/SynoCommunity/spkrepo"
@@ -26,6 +26,7 @@ sqlite = ["diesel/sqlite", "libsqlite3-sys"]
 # Erros
 anyhow = "1.0"
 # Logs
+log = "0.4.0"
 env_logger = "0.7"
 # Database
 diesel = { version = "1.4", features = ["chrono", "r2d2"] }

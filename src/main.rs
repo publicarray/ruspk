@@ -1,4 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
+#[macro_use]
+extern crate log;
+use env_logger::Env;
 
 #[macro_use]
 extern crate diesel;
@@ -59,15 +62,17 @@ const URL: &str = "http://packages.synocommunity.com";
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    std::env::var("RUST_LOG").unwrap_or("actix_web=info,diesel=debug".to_string());
-    env_logger::init();
+    env_logger::from_env(Env::default().default_filter_or("info")).init();
+
     let db_url = std::env::var("DATABASE_URL").expect("missing DATABASE_URL");
     let listen_addr = std::env::var("LISTEN").unwrap_or("127.0.0.1".to_string());
     let listen_port = std::env::var("PORT").unwrap_or("8080".to_string());
     let manager = ConnectionManager::<Connection>::new(db_url);
-    let pool = r2d2::Pool::builder().build(manager).expect("Failed to create database connection pool.");
+    let pool = r2d2::Pool::builder()
+        .build(manager)
+        .expect("Failed to create database connection pool.");
     let bind = format!("{}:{}", listen_addr, listen_port);
-    println!("Starting server at: {}", &bind);
+    info!("Starting server at: {}", &bind);
 
     // Start HTTP server
     HttpServer::new(move || {

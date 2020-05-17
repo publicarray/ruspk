@@ -5,7 +5,7 @@ use crate::DbConn;
 use crate::{Db64, Db8, URL};
 use anyhow::Result;
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Debug)]
 pub struct SynoResponse {
     keyrings: Option<Vec<String>>,
     packages: Vec<Package>,
@@ -20,7 +20,7 @@ impl SynoResponse {
 }
 
 #[serde_with::skip_serializing_none]
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Package {
     // #[serde(skip_serializing_if = "is_false")]
     pub beta: bool,
@@ -154,7 +154,6 @@ pub fn get_packages_for_device_lang(
     sr.set_key(KEYRING.to_string());
 
     let packages = DbPackage::get_packages(&lang, &arch, build, beta, major, micro, minor, &conn)?;
-    // println!("{}", serde_json::to_string_pretty(&packages).unwrap());
 
     for package in packages.iter() {
         let mut p = Package::new(

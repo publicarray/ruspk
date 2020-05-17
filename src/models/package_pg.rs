@@ -31,7 +31,8 @@ impl DbPackage {
     ) -> Result<Vec<DBQueryResultPackage>> {
         let firmware = format!("{}.{}", major, minor);
         let language_id: i64 = DbLanguage::get_language_id(conn, &lang);
-        let architecture_id: i64 = DbArchitecture::get_architecute_id(conn, &arch)?; // todo return 404
+        let architecture_id: i64 = DbArchitecture::get_architecute_id(conn, &arch)
+            .context(format!("Can't find architecute in DB for {}", &arch))?; // todo return 404
 
         let query = sql_query(
             r#"

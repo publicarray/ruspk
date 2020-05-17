@@ -25,7 +25,7 @@ curl -sv 'http://127.0.0.1:8080/?build=24922&language=enu&major=6&micro=2&arch=x
 ## Configuration (`.env` file)
 
 ```env
-RUST_LOG="actix_web=warn,diesel=warn"
+RUST_LOG="ruspk=info,actix_web=info,actix_server=info,diesel=info"
 DATABASE_URL=file:db/database.sqlite
 # DATABASE_URL=mysql://user:pass@localhost/dbname
 # DATABASE_URL=postgresql://user:pass@localhost/dbname

@@ -1300,7 +1300,7 @@ dependencies = [
 
 [[package]]
 name = "ruspk"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "actix-rt",
  "actix-web",
@@ -1311,6 +1311,7 @@ dependencies = [
  "env_logger",
  "futures",
  "libsqlite3-sys",
+ "log",
  "r2d2",
  "serde",
  "serde_derive",
