@@ -156,6 +156,22 @@ pub fn get_packages_for_device_lang(
     let packages = DbPackage::get_packages(&lang, &arch, build, beta, major, micro, minor, &conn)?;
 
     for package in packages.iter() {
+        #[cfg(feature = "postgres")]
+        let retina_icons = Vec::new();
+        #[cfg(any(feature = "mysql", feature = "sqlite"))]
+        let retina_icons = DbIcon::retina_from_version(package.version_id, &conn)
+            .iter()
+            .map(|icon| {
+                format!(
+                    "{}/{}/{}/{}",
+                    URL.to_string(),
+                    package.package.clone(),
+                    package.revision,
+                    icon.path.clone()
+                )
+            })
+            .collect::<Vec<_>>();
+
         let mut p = Package::new(
             package.beta,
             package.changelog.clone(),
@@ -190,18 +206,7 @@ pub fn get_packages_for_device_lang(
                 package.revision
             ),
         );
-        p.thumbnail_retina = DbIcon::retina_from_version(package.version_id, &conn)
-            .iter()
-            .map(|icon| {
-                format!(
-                    "{}/{}/{}/{}",
-                    URL.to_string(),
-                    package.package.clone(),
-                    package.revision,
-                    icon.path.clone()
-                )
-            })
-            .collect::<Vec<_>>();
+        p.thumbnail_retina = retina_icons;
         p.snapshot = DbScreenshot::from_package(package.package_id, &conn)
             .iter()
             .map(|screenshot| {

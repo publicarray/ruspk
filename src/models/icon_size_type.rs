@@ -1,4 +1,3 @@
-use crate::schema::*;
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::pg::{Pg, PgValue};
 use diesel::deserialize::{self, FromSql};
@@ -33,8 +32,8 @@ impl FromSql<IconSize, Pg> for IconSizeEnum {
     fn from_sql(bytes: Option<PgValue<'_>>) -> deserialize::Result<Self> {
         match not_none!(bytes).as_bytes() {
             b"72" => Ok(IconSizeEnum::Icon72),
-            b"b120" => Ok(IconSizeEnum::Icon120),
-            b"b256" => Ok(IconSizeEnum::Icon256),
+            b"120" => Ok(IconSizeEnum::Icon120),
+            b"256" => Ok(IconSizeEnum::Icon256),
             _ => Err("Unrecognized enum variant".into()),
         }
     }

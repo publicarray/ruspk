@@ -3,17 +3,20 @@
 * Not an entirely fair benchmark
 * Benchmarked on a 2012 Macbook Pro
 * Results are in requests/sec
+* `Connection: Close` because keep-alive reqests are unrealistic as a benchmark for the real world.
+* without `Connection: Close` because I want to see what is possable.
 
 || with `Connection: Close` | without `Connection: Close`|
 |-|-|-|
-|nginx + php-fpm (valet)|545.52|2740.95|
-|docker + spkrepo||68.27|
-|warp (hello world)|547.66|38248.11|
-|actix-web (hello world) |547.87|44947.09|
-|ruspk - rocket & mariadb (diesel)|529.57||
-|ruspk - actix-web & mariadb (diesel)|547.23|1131.11|
-|ruspk - actix-web & sqlite (diesel)|548.21|646.12|
-|ruspk - actix-web & postgres (diesel)|404.96|435.94|
+|nginx + php-fpm (valet)|545|2740|
+|docker + spkrepo|46|68|
+|docker + sspks|547|1961|
+|warp (hello world)|547|38248|
+|actix-web (hello world) |547|44947|
+|ruspk - rocket & mariadb (diesel)|529||
+|ruspk - actix-web & mariadb (diesel)|547|1131|
+|ruspk - actix-web & sqlite (diesel)|548|646|
+|ruspk - actix-web & postgres (diesel)|404|435|
 
 So postgresql uses more CPU than any other DB tested here (the queries are probably not optimised for it)
 
@@ -36,8 +39,6 @@ tps = 502.403372 (excluding connections establishing)
 ```
 
 ### nginx
-
-`Connection: Close` because ruspk and spkrepo do not have keep-alive
 
 ```sh
 $ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost'
@@ -100,6 +101,53 @@ Running 30s test @ http://localhost:8080/nas/?package_update_channel=beta&build=
   Non-2xx or 3xx responses: 2054
 Requests/sec:     68.27
 Transfer/sec:     30.00KB
+
+$ hey -z 30s -disable-keepalive -h2 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Summary:
+  Total:	31.1365 secs
+  Slowest:	1.2191 secs
+  Fastest:	0.0365 secs
+  Average:	1.0645 secs
+  Requests/sec:	46.1195
+
+  Total data:	94220269 bytes
+  Size/request:	65613 bytes
+```
+
+### docker + sspks
+
+```sh
+$ docker run --rm -d --name sspks \
+    -v /Users/seb/git/spksrc/packages:/home/user/gosspks/packages/:rw \
+    -p 9999:8080 \
+    -e GOSSPKS_HOSTNAME=localhost \
+    jdel/gosspks:v0.1
+
+$ wrk -c 100 -t 8 -d 30 'http://localhost:9999/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:9999/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    45.06ms   26.55ms 407.52ms   79.46%
+    Req/Sec   271.20     68.86     1.79k    80.82%
+  59030 requests in 30.09s, 7.83MB read
+  Socket errors: connect 0, read 0, write 0, timeout 96
+Requests/sec:   1961.47
+Transfer/sec:    266.25KB
+
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:9999/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
+Running 30s test @ http://localhost:9999/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   112.14ms  118.30ms   1.13s    96.10%
+    Req/Sec    82.92     42.14   222.00     63.20%
+  Latency Distribution
+     50%   90.57ms
+     75%  108.56ms
+     90%  132.70ms
+     99%  877.79ms
+  16470 requests in 30.10s, 2.48MB read
+Requests/sec:    547.13
+Transfer/sec:     84.42KB
 ```
 
 # ruspk

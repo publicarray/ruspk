@@ -1,3 +1,4 @@
+use crate::schema::*;
 use crate::models::DbVersion;
 use crate::Connection;
 use crate::{DbId, URL};
@@ -28,10 +29,17 @@ impl DbIcon {
             .load::<Self>(conn)
             .expect("Error loading icons")
     }
+
+    #[cfg(any(feature = "mysql", feature = "sqlite"))]
     pub fn retina_from_version(version_id: DbId, conn: &Connection) -> Vec<Self> {
+        #[cfg(any(feature = "mysql", feature = "sqlite"))]
+        let retina_img_size:i32 = 256;
+        #[cfg(feature = "postgres")]
+        let retina_img_size = IconSizeEnum::Icon256;
+
         icon::table
-            .filter(icon::version_id.eq(version_id))
-            .filter(icon::size.gt(256))
+            .filter(icon::version_id.eq(version_id)).into_boxed()
+            .filter(icon::size.gt(retina_img_size))
             .load::<Self>(conn)
             .expect("Error loading retina icons")
     }
