@@ -101,7 +101,7 @@ impl DbPackage {
                 )
                 WHERE build.active = true
                 AND firmware.build >= $4
-                AND ($5 OR version.report_url = '')
+                AND ($5 OR (version.report_url = '' OR version.report_url IS NULL))
             "#,
         );
         let packages = bind_and_load(conn, query, language_id, &firmware, architecture_id, build, beta)?;
