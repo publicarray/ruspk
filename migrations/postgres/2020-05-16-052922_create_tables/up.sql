@@ -169,11 +169,10 @@ CREATE TABLE build (
     FOREIGN KEY (package_id) REFERENCES package(id),
     FOREIGN KEY (firmware_id) REFERENCES firmware(id)
   );
-CREATE TYPE img_size AS ENUM ('72', '120', '256');
 CREATE TABLE icon (
     id BIGSERIAL PRIMARY KEY,
     version_id BIGINT NOT NULL,
-    size img_size NOT NULL,
+    size INT NOT NULL,
     path VARCHAR(100) NOT NULL,
     FOREIGN KEY (version_id) REFERENCES version(id)
   );

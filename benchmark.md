@@ -15,9 +15,10 @@
 |actix-web & sqlite (diesel)|548.21|646.12|
 |actix-web & postgres (diesel)|404.96|435.94|
 
-So postgress uses more CPU than any other DB tested here (the queries are probably not optimised for it, as I've tried to limit DBMS specific code)
+So postgress uses more CPU than any other DB tested here (the queries are probably not optimised for it)
 
 https://www.postgresql.org/docs/12/pgbench.htm
+
 ```sh
 $ pgbench -i ruspk
 $ pgbench -c 8 -j 10 -T 30 -f db/pg-bench.sql ruspk

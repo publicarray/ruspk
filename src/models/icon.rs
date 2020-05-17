@@ -26,7 +26,7 @@ impl DbIcon {
             .filter(icon::version_id.eq(version_id))
             .filter(icon::size.gt(256))
             .load::<Self>(conn)
-            .expect("Error loading icons")
+            .expect("Error loading retina icons")
     }
     pub fn full_path(&self, package: &String) -> String {
         format!("{}/{}/{}", URL.to_string(), package, &self.path)
