@@ -17,6 +17,8 @@
 |ruspk - actix-web & mariadb (diesel)|547|1131|
 |ruspk - actix-web & sqlite (diesel)|548|646|
 |ruspk - actix-web & postgres (diesel)|404|435|
+|ruspk - actix-web & postgres Full Copy (diesel) |133|140|
+|ruspk - actix-web & postgres (diesel) & in-memmory cache |547|31619|
 
 So postgresql uses more CPU than any other DB tested here (the queries are probably not optimised for it)
 
@@ -325,4 +327,58 @@ Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=2492
   13122 requests in 30.10s, 23.74MB read
 Requests/sec:    435.94
 Transfer/sec:    807.60KB
+```
+
+## [actix-web](http://actix.rs/) & postgres (full copy of spkrepo)
+
+```
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://127.0.0.1:8080/?package_update_channel=beta&build=900&language=enu&major=6&micro=2&arch=x86&minor=1'
+Running 30s test @ http://127.0.0.1:8080/?package_update_channel=beta&build=900&language=enu&major=6&micro=2&arch=x86&minor=1
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   711.98ms  205.58ms   1.51s    68.66%
+    Req/Sec    18.71     12.72   101.00     80.30%
+  Latency Distribution
+     50%  682.62ms
+     75%  839.39ms
+     90%    1.00s
+     99%    1.26s
+  3998 requests in 30.06s, 121.76MB read
+Requests/sec:    133.00
+Transfer/sec:      4.05MB
+```
+
+
+## [actix-web](http://actix.rs/) & postgres (full copy of spkrepo) & in-memory cache
+
+```sh
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://127.0.0.1:8080/?package_update_channel=beta&build=900&language=enu&major=6&micro=2&arch=x86&minor=1'
+Running 30s test @ http://127.0.0.1:8080/?package_update_channel=beta&build=900&language=enu&major=6&micro=2&arch=x86&minor=1
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    19.57ms   20.26ms 330.64ms   94.76%
+    Req/Sec   231.55    127.46   787.00     77.47%
+  Latency Distribution
+     50%   15.44ms
+     75%   22.83ms
+     90%   32.68ms
+     99%   61.80ms
+  16439 requests in 30.05s, 500.64MB read
+Requests/sec:    547.05
+Transfer/sec:     16.66MB
+
+$ wrk --latency -c 100 -t 8 -d 30 'http://127.0.0.1:8080/?package_update_channel=beta&build=900&language=enu&major=6&micro=2&arch=x86&minor=1'
+Running 30s test @ http://127.0.0.1:8080/?package_update_channel=beta&build=900&language=enu&major=6&micro=2&arch=x86&minor=1
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     7.95ms   44.27ms 897.51ms   98.42%
+    Req/Sec     4.02k   394.61     5.24k    79.65%
+  Latency Distribution
+     50%    2.98ms
+     75%    3.21ms
+     90%    3.45ms
+     99%  236.51ms
+  948891 requests in 30.01s, 28.20GB read
+Requests/sec:  31619.74
+Transfer/sec:      0.94GB
 ```
