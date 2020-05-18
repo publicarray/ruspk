@@ -563,6 +563,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "evmap"
+version = "10.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e3ea06a83f97d3dc2eb06e51e7a729b418f0717a5558a5c870e3d5156dc558d"
+dependencies = [
+ "hashbag",
+ "slab",
+ "smallvec",
+]
+
+[[package]]
 name = "failure"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -757,6 +768,12 @@ dependencies = [
  "tokio",
  "tokio-util 0.3.1",
 ]
+
+[[package]]
+name = "hashbag"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "452b31b3ffe7cf13de531eefae493301c85995a953c808d7c79a8f45abae0706"
 
 [[package]]
 name = "heck"
@@ -1307,6 +1324,7 @@ dependencies = [
  "diesel",
  "dotenv",
  "env_logger",
+ "evmap",
  "lazy_static",
  "libsqlite3-sys",
  "log",

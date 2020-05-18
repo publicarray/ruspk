@@ -13,6 +13,7 @@ extern crate chrono;
 
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::r2d2::{self, ConnectionManager};
+use std::sync::{Arc, Mutex};
 
 pub mod models;
 pub mod routes;
@@ -71,6 +72,12 @@ lazy_static! {
     pub static ref URL: String = std::env::var("URL").unwrap_or("https://packages.synocommunity.com".to_string());
 }
 
+pub struct AppData {
+    pool: DbPool,
+    cache_r: evmap::ReadHandle<String, String>,
+    cache_w: Arc<Mutex<evmap::WriteHandle<String, String>>>,
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
@@ -86,11 +93,17 @@ async fn main() -> std::io::Result<()> {
     let bind = format!("{}:{}", listen_addr, listen_port);
     info!("Starting server at: {}", &bind);
 
+    let (cache_r, mut raw_cache_w) = evmap::new();
+    let cache_w = Arc::new(Mutex::new(raw_cache_w));
     // Start HTTP server
     HttpServer::new(move || {
         App::new()
             // set up DB pool to be used with web::Data<Pool> extractor
-            .data(pool.clone())
+            .data(AppData {
+                pool: pool.clone(),
+                cache_r: cache_r.clone(),
+                cache_w: cache_w.clone(),
+            })
             .wrap(middleware::Logger::default())
             .service(web::resource("/hello").route(web::get().to(routes::index)))
             .service(web::resource("/hello/{name}").route(web::get().to(routes::index)))
