@@ -1,7 +1,7 @@
 use crate::models::DbArchitecture;
 use crate::models::DbBuild;
 use crate::schema::*;
-use crate::{DbId, Db64};
+use crate::{Db64, DbId};
 use chrono::NaiveDateTime;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]

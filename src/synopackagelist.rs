@@ -5,7 +5,7 @@ use crate::DbConn;
 use crate::{Db64, Db8, URL};
 use anyhow::Result;
 
-#[derive(Serialize, Default, Debug)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone)]
 pub struct SynoResponse {
     keyrings: Option<Vec<String>>,
     packages: Vec<Package>,
@@ -20,7 +20,7 @@ impl SynoResponse {
 }
 
 #[serde_with::skip_serializing_none]
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Package {
     // #[serde(skip_serializing_if = "is_false")]
     pub beta: bool,
@@ -200,11 +200,7 @@ pub fn get_packages_for_device_lang(
         );
         p.thumbnail = DbIcon::paths(
             DbIcon::from_version(package.version_id, &conn),
-            format!(
-                "{}/{}",
-                package.dname.clone().unwrap_or_default(),
-                package.revision
-            ),
+            format!("{}/{}", package.dname.clone().unwrap_or_default(), package.revision),
         );
         p.thumbnail_retina = retina_icons;
         p.snapshot = DbScreenshot::from_package(package.package_id, &conn)

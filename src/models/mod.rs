@@ -8,9 +8,9 @@ mod displayname;
 mod download;
 mod firmware;
 mod icon;
-mod language;
 #[cfg(feature = "postgres")]
 mod icon_size_type;
+mod language;
 
 #[cfg(feature = "postgres")]
 #[path = "package_pg.rs"]
@@ -34,6 +34,8 @@ pub use self::displayname::DbDisplayName;
 pub use self::download::DbDownload;
 pub use self::firmware::DbFirmware;
 pub use self::icon::DbIcon;
+#[cfg(feature = "postgres")]
+pub use self::icon_size_type::{IconSize, IconSizeEnum};
 pub use self::language::DbLanguage;
 pub use self::package::DbPackage;
 pub use self::role::DbRole;
@@ -41,8 +43,6 @@ pub use self::screenshot::DbScreenshot;
 pub use self::service::DbService;
 pub use self::user::DbUser;
 pub use self::version::DbVersion;
-#[cfg(feature = "postgres")]
-pub use self::icon_size_type::{IconSize, IconSizeEnum};
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]

@@ -1,13 +1,12 @@
-use diesel::serialize::{self, IsNull, Output, ToSql};
-use diesel::pg::{Pg, PgValue};
 use diesel::deserialize::{self, FromSql};
+use diesel::pg::{Pg, PgValue};
+use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::*;
 use std::io::Write;
 
 #[derive(SqlType)]
 #[postgres(type_name = "icon_size")]
 pub struct IconSize;
-
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, FromSqlRow, AsExpression)]
 pub enum IconSizeEnum {

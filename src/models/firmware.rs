@@ -1,5 +1,5 @@
 use crate::schema::*;
-use crate::{DbId, Db64};
+use crate::{Db64, DbId};
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[table_name = "firmware"]

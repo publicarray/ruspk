@@ -1,5 +1,5 @@
-use crate::models::DbVersion;
 use crate::models::DbFirmware;
+use crate::models::DbVersion;
 use crate::schema::*;
 use crate::DbId;
 use chrono::NaiveDateTime;
