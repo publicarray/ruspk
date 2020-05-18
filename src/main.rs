@@ -93,7 +93,7 @@ async fn main() -> std::io::Result<()> {
     let bind = format!("{}:{}", listen_addr, listen_port);
     info!("Starting server at: {}", &bind);
 
-    let (cache_r, mut raw_cache_w) = evmap::new();
+    let (cache_r, raw_cache_w) = evmap::new();
     let cache_w = Arc::new(Mutex::new(raw_cache_w));
     // Start HTTP server
     HttpServer::new(move || {
