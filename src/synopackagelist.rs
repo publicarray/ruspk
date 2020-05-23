@@ -23,7 +23,7 @@ impl SynoResponse {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Package {
     // #[serde(skip_serializing_if = "is_false")]
-    pub beta: bool,
+    pub beta: Option<bool>,
     pub changelog: Option<String>,
     pub conflictpkgs: Option<String>,
     pub deppkgs: Option<String>,
@@ -53,7 +53,7 @@ pub struct Package {
 
 impl Package {
     fn new(
-        beta: bool,
+        beta: Option<bool>,
         changelog: Option<String>,
         conflictpkgs: Option<String>,
         deppkgs: Option<String>,
@@ -103,7 +103,7 @@ impl Package {
 impl Default for Package {
     fn default() -> Self {
         Package {
-            beta: false,
+            beta: None,
             changelog: None,
             conflictpkgs: None,
             deppkgs: None,
@@ -170,8 +170,13 @@ pub fn get_packages_for_device_lang(
             })
             .collect::<Vec<_>>();
 
+        let pak_beta = match package.beta {
+            false => None,
+            true => Some(true)
+        };
+
         let mut p = Package::new(
-            package.beta,
+            pak_beta,
             package.changelog.clone(),
             package.conflictpkgs.clone(),
             package.deppkgs.clone(),
