@@ -24,12 +24,11 @@ impl DbPackage {
         arch: &str,
         build: u64,
         beta: bool,
-        major: u8,
+        _major: u8,
         _micro: u8,
-        minor: u8,
+        _minor: u8,
         conn: &Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
-        let firmware = format!("{}.{}", major, minor);
         let language_id = DbLanguage::get_language_id(conn, &lang);
         let architecture_id = DbArchitecture::get_architecute_id(conn, &arch)?; // todo return 404
 
@@ -92,18 +91,17 @@ impl DbPackage {
                     (
                         `build`
                         INNER JOIN `firmware` ON `firmware`.`id` = `build`.`firmware_id`
-                        AND `firmware`.`version` = ?
                     )
                     INNER JOIN `build_architecture` ON `build_architecture`.`build_id` = `build`.`id`
-                    AND `build_architecture`.`architecture_id` = ?
+                    AND `build_architecture`.`architecture_id` IN(1, ?)
                     ) ON `build`.`version_id` = `version`.`id`
                 )
                 WHERE `build`.`active` = true
-                AND `firmware`.`build` >= ?
+                AND `firmware`.`build` <= ?
                 AND (? OR `version`.`report_url` = '')
             "#,
         );
-        let packages = bind_and_load(conn, query, language_id, &firmware, architecture_id, build, beta)?;
+        let packages = bind_and_load(conn, query, language_id, architecture_id, build, beta)?;
         Ok(packages)
     }
 }
@@ -112,7 +110,6 @@ pub fn bind_and_load(
     conn: &Connection,
     query: SqlQuery,
     language_id: u64,
-    firmware: &str,
     architecture_id: u64,
     build: u64,
     beta: bool,
@@ -122,7 +119,6 @@ pub fn bind_and_load(
         .bind::<Unsigned<BigInt>, _>(language_id)
         .bind::<Unsigned<BigInt>, _>(language_id)
         .bind::<Unsigned<BigInt>, _>(language_id)
-        .bind::<Text, _>(firmware)
         .bind::<Unsigned<BigInt>, _>(architecture_id)
         .bind::<Unsigned<BigInt>, _>(build)
         .bind::<Bool, _>(beta)

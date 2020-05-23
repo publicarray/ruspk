@@ -163,10 +163,8 @@ pub fn get_packages_for_device_lang(
             .iter()
             .map(|icon| {
                 format!(
-                    "{}/{}/{}/{}",
+                    "{}/{}",
                     URL.to_string(),
-                    package.package.clone(),
-                    package.revision,
                     icon.path.clone()
                 )
             })
@@ -182,10 +180,7 @@ pub fn get_packages_for_device_lang(
             package.distributor_url.clone().unwrap_or_default(),
             package.dname.clone(),
             format!(
-                "{}/{}/{}/{}",
-                URL.to_string(),
-                package.package.clone(),
-                package.revision,
+                "/{}",
                 package.link.clone().unwrap_or_default(),
             ),
             package.maintainer.clone().unwrap_or_default(),
@@ -207,10 +202,8 @@ pub fn get_packages_for_device_lang(
             .iter()
             .map(|screenshot| {
                 format!(
-                    "{}/{}/{}/{}",
+                    "{}/{}",
                     URL.to_string(),
-                    package.package.clone(),
-                    package.revision,
                     screenshot.path.clone()
                 )
             })

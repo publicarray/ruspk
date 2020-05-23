@@ -30,8 +30,8 @@ RUST_LOG="ruspk=info,actix_web=info,actix_server=info,diesel=info"
 
 ## Database connection
 # DATABASE_URL=file:db/database.sqlite
-# DATABASE_URL=mysql://ruspk:ruspk@localhost/ruspk
-# DATABASE_URL=postgresql://ruspk:ruspk@localhost/ruspk
+# DATABASE_URL=mysql://user:pass@localhost/dbname
+# DATABASE_URL=postgresql://user:pass@localhost/dbname
 
 ## IP adress to Bind to and listen for connections
 LISTEN=127.0.0.1

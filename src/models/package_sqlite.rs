@@ -23,12 +23,11 @@ impl DbPackage {
         arch: &str,
         build: i64,
         beta: bool,
-        major: i8,
+        _major: i8,
         _micro: i8,
-        minor: i8,
+        _minor: i8,
         conn: &Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
-        let firmware = format!("{}.{}", major, minor);
         let language_id = DbLanguage::get_language_id(conn, &lang);
         let architecture_id = DbArchitecture::get_architecute_id(conn, &arch)?; // todo return 404
 
@@ -90,19 +89,18 @@ impl DbPackage {
                     INNER JOIN (
                     (
                         `build`
-                        INNER JOIN `firmware` ON `firmware`.`id` = `build`.`firmware_id`
-                        AND `firmware`.`version` = ?
+                        INNER JOIN `firmware` ON `firmware`.`id` = `build`.`firmware_id`s
                     )
                     INNER JOIN `build_architecture` ON `build_architecture`.`build_id` = `build`.`id`
-                    AND `build_architecture`.`architecture_id` = ?
+                    AND `build_architecture`.`architecture_id` IN(1, ?)
                     ) ON `build`.`version_id` = `version`.`id`
                 )
                 WHERE `build`.`active` = true
-                AND `firmware`.`build` >= ?
+                AND `firmware`.`build` <= ?
                 AND (? OR `version`.`report_url` = '')
             "#,
         );
-        let packages = bind_and_load(conn, query, language_id, &firmware, architecture_id, build, beta)?;
+        let packages = bind_and_load(conn, query, language_id, architecture_id, build, beta)?;
         Ok(packages)
     }
 }
@@ -111,7 +109,6 @@ pub fn bind_and_load(
     conn: &Connection,
     query: SqlQuery,
     language_id: i64,
-    firmware: &str,
     architecture_id: i64,
     build: i64,
     beta: bool,
@@ -121,7 +118,6 @@ pub fn bind_and_load(
         .bind::<BigInt, _>(language_id)
         .bind::<BigInt, _>(language_id)
         .bind::<BigInt, _>(language_id)
-        .bind::<Text, _>(firmware)
         .bind::<BigInt, _>(architecture_id)
         .bind::<BigInt, _>(build)
         .bind::<Bool, _>(beta)
