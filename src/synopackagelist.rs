@@ -156,7 +156,7 @@ pub fn get_packages_for_device_lang(
     let packages = DbPackage::get_packages(&lang, &arch, build, beta, major, micro, minor, &conn)?;
 
     for package in packages.iter() {
-        #[cfg(feature = "postgres")]
+        #[cfg(feature = "postgres")] // ToDo enum is not yet fully supported
         let retina_icons = Vec::new();
         #[cfg(any(feature = "mysql", feature = "sqlite"))]
         let retina_icons = DbIcon::retina_from_version(package.version_id, &conn)
@@ -185,7 +185,8 @@ pub fn get_packages_for_device_lang(
             package.distributor_url.clone().unwrap_or_default(),
             package.dname.clone(),
             format!(
-                "/{}",
+                "{}/{}",
+                URL.to_string(),
                 package.link.clone().unwrap_or_default(),
             ),
             package.maintainer.clone().unwrap_or_default(),

@@ -49,3 +49,7 @@ URL=https://packages.synocommunity.com
 https://diesel.rs/
 
 https://actix.rs/
+
+https://github.com/SynoCommunity/spksrc/wiki/Package-Center-specifications
+
+http://spkrepo.readthedocs.org/
