@@ -14,6 +14,7 @@ extern crate chrono;
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::r2d2::{self, ConnectionManager};
 use std::sync::{Arc, Mutex};
+pub mod utils;
 
 pub mod models;
 pub mod routes;
@@ -76,6 +77,7 @@ pub struct AppData {
     pool: DbPool,
     cache_r: evmap::ReadHandle<String, String>,
     cache_w: Arc<Mutex<evmap::WriteHandle<String, String>>>,
+    keyring: String,
 }
 
 #[actix_rt::main]
@@ -93,6 +95,24 @@ async fn main() -> std::io::Result<()> {
     let bind = format!("{}:{}", listen_addr, listen_port);
     info!("Starting server at: {}", &bind);
 
+    // get public key / keychain
+    let public_key = match std::env::var("PUBLIC_KEY_FILE") {
+        Ok(public_key_filename) => {
+            debug!("loading public key: {}", public_key_filename);
+            match utils::read_file(&public_key_filename) {
+                Ok(public_key) => public_key,
+                Err(err) => {
+                    error!("Unable to get public key '{}'. {}", public_key_filename, err);
+                    "".to_string()
+                }
+            }
+        },
+        Err(err) => {
+            warn!("PUBLIC_KEY_FILE {}", err);
+            "".to_string()
+        }
+    };
+
     let (cache_r, raw_cache_w) = evmap::new();
     let cache_w = Arc::new(Mutex::new(raw_cache_w));
     // Start HTTP server
@@ -103,6 +123,7 @@ async fn main() -> std::io::Result<()> {
                 pool: pool.clone(),
                 cache_r: cache_r.clone(),
                 cache_w: cache_w.clone(),
+                keyring: public_key.clone(),
             })
             .wrap(middleware::Logger::default())
             .service(web::resource("/hello").route(web::get().to(routes::index)))

@@ -1,6 +1,5 @@
 extern crate serde_with;
 use crate::models::*;
-use crate::routes::KEYRING;
 use crate::DbConn;
 use crate::{Db64, Db8, URL};
 use anyhow::Result;
@@ -12,9 +11,9 @@ pub struct SynoResponse {
     packages: Vec<Package>,
 }
 impl SynoResponse {
-    fn set_key(&mut self, key: String) -> &Self {
+    fn set_key(&mut self, key: &String) -> &Self {
         let mut k = self.keyrings.clone().unwrap_or_default();
-        k.push(key);
+        k.push(key.clone());
         self.keyrings = Some(k);
         self
     }
@@ -133,6 +132,7 @@ impl Default for Package {
 
 pub fn get_packages_for_device_lang(
     conn: &DbConn,
+    keyring: &String,
     lang: &str,
     arch: &str,
     build: Db64,
@@ -152,7 +152,7 @@ pub fn get_packages_for_device_lang(
         packages: Vec::new(),
         ..Default::default()
     };
-    sr.set_key(KEYRING.to_string());
+    sr.set_key(keyring);
 
     let packages = DbPackage::get_packages(&lang, &arch, build, beta, major, micro, minor, &conn)?;
 

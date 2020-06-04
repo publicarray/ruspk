@@ -41,13 +41,16 @@ RUST_LOG="info"
 # DATABASE_URL=postgresql://user:pass@localhost/dbname
 
 ## IP adress to Bind to and listen for connections
-LISTEN=127.0.0.1
+LISTEN=0.0.0.0
 
 ## Port to Bind to and listen for connections
 PORT=80
 
 ## URL to prepend for spk archive, icon and screenshot files
 URL=https://packages.synocommunity.com
+
+## Public key to advertise for signed packages
+PUBLIC_KEY_FILE=pubkey.pem
 
 ```
 
