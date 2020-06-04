@@ -11,9 +11,9 @@ pub struct SynoResponse {
     packages: Vec<Package>,
 }
 impl SynoResponse {
-    fn set_key(&mut self, key: &String) -> &Self {
+    fn set_key(&mut self, key: &str) -> &Self {
         let mut k = self.keyrings.clone().unwrap_or_default();
-        k.push(key.clone());
+        k.push(key.to_string());
         self.keyrings = Some(k);
         self
     }
@@ -132,7 +132,7 @@ impl Default for Package {
 
 pub fn get_packages_for_device_lang(
     conn: &DbConn,
-    keyring: &String,
+    keyring: &str,
     lang: &str,
     arch: &str,
     build: Db64,

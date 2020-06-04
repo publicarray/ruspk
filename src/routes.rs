@@ -48,9 +48,9 @@ pub async fn syno(
 
     if let Some(response_cache) = cache_r.get_one(&key) {
         trace!("HIT {}ms", now.elapsed().as_millis());
-        return Ok(HttpResponse::Ok()
+        Ok(HttpResponse::Ok()
             .content_type("application/json")
-            .body(&*response_cache));
+            .body(&*response_cache))
     } else {
         let conn = data.pool.get().expect("couldn't get db connection from pool");
         let keyring = data.keyring.clone();

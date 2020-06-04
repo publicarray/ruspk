@@ -70,7 +70,7 @@ type DbConn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Con
 
 lazy_static! {
     #[derive(Copy, Clone, Debug)]
-    pub static ref URL: String = std::env::var("URL").unwrap_or("https://packages.synocommunity.com".to_string());
+    pub static ref URL: String = std::env::var("URL").unwrap_or_else(|_| "https://packages.synocommunity.com".to_string());
 }
 
 pub struct AppData {
@@ -86,8 +86,8 @@ async fn main() -> std::io::Result<()> {
     env_logger::from_env(Env::default().default_filter_or("info")).init();
 
     let db_url = std::env::var("DATABASE_URL").expect("missing DATABASE_URL");
-    let listen_addr = std::env::var("LISTEN").unwrap_or("127.0.0.1".to_string());
-    let listen_port = std::env::var("PORT").unwrap_or("8080".to_string());
+    let listen_addr = std::env::var("LISTEN").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let listen_port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let manager = ConnectionManager::<Connection>::new(db_url);
     let pool = r2d2::Pool::builder()
         .build(manager)
@@ -106,7 +106,7 @@ async fn main() -> std::io::Result<()> {
                     "".to_string()
                 }
             }
-        },
+        }
         Err(err) => {
             warn!("PUBLIC_KEY_FILE {}", err);
             "".to_string()
