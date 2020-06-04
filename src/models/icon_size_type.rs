@@ -1,5 +1,6 @@
 use diesel::deserialize::{self, FromSql};
-use diesel::pg::{Pg, PgValue};
+use diesel::pg::Pg;
+use diesel::backend::Backend;
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::*;
 use std::io::Write;
@@ -16,6 +17,7 @@ pub enum IconSizeEnum {
 }
 
 // https://github.com/diesel-rs/diesel/blob/master/diesel_tests/tests/custom_types.rs
+// https://github.com/diesel-rs/diesel/blob/master/guide_drafts/custom_types.md
 impl ToSql<IconSize, Pg> for IconSizeEnum {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
         match *self {
@@ -28,8 +30,8 @@ impl ToSql<IconSize, Pg> for IconSizeEnum {
 }
 
 impl FromSql<IconSize, Pg> for IconSizeEnum {
-    fn from_sql(bytes: Option<PgValue<'_>>) -> deserialize::Result<Self> {
-        match not_none!(bytes).as_bytes() {
+    fn from_sql(bytes: Option<&<Pg as Backend>::RawValue>) -> deserialize::Result<Self> {
+        match not_none!(bytes) {
             b"72" => Ok(IconSizeEnum::Icon72),
             b"120" => Ok(IconSizeEnum::Icon120),
             b"256" => Ok(IconSizeEnum::Icon256),
