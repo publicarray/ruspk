@@ -9,7 +9,9 @@
 || with `Connection: Close` | without `Connection: Close`|
 |-|-|-|
 |nginx + php-fpm (valet)|545|2740|
-|docker + spkrepo|46|68|
+|docker + hpgy/spkrepo|46|68|
+|[spkrepo](https://github.com/SynoCommunity/spkrepo/pull/44#issuecomment-632007107)|1|1|
+|[spkrepo + CACHE_TYPE="simple"](https://github.com/SynoCommunity/spkrepo/pull/44#issuecomment-632007107)|221|221|
 |docker + sspks|547|1961|
 |warp (hello world)|547|38248|
 |actix-web (hello world) |547|44947|
