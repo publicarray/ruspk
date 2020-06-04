@@ -11,6 +11,10 @@ license = "GPL-3.0-only"
 build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[badges]
+is-it-maintained-issue-resolution = { repository = "https://github.com/publicarray/ruspk" }
+is-it-maintained-open-issues = { repository = "https://github.com/publicarray/ruspk" }
+maintenance = { status = "passively-maintained" }
 
 [features]
 # default = ["mysql"]
