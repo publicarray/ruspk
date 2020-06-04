@@ -26,7 +26,14 @@ curl -sv 'http://127.0.0.1:8080/?build=24922&language=enu&major=6&micro=2&arch=x
 
 ```env
 ## Log levels for each component
-RUST_LOG="ruspk=info,actix_web=info,actix_server=info,diesel=info"
+# RUST_LOG="ruspk=info,actix_web=info,actix_server=info"
+## Or generic
+RUST_LOG="info"
+## For web server logs set one of
+# RUST_LOG="info"
+# RUST_LOG="actix_web=info"
+## For verbose logs
+# RUST_LOG="trace"
 
 ## Database connection
 # DATABASE_URL=file:db/database.sqlite
