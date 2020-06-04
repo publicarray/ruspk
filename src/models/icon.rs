@@ -44,10 +44,10 @@ impl DbIcon {
             .load::<Self>(conn)
             .expect("Error loading retina icons")
     }
-    pub fn full_path(&self, package: &str) -> String {
-        format!("{}/{}/{}", URL.to_string(), package, &self.path)
+    pub fn full_path(&self) -> String {
+        format!("{}/{}", URL.to_string(), &self.path)
     }
-    pub fn paths(icons: Vec<Self>, package: String) -> Vec<String> {
-        icons.iter().map(|icon| icon.full_path(&package)).collect::<Vec<_>>()
+    pub fn paths(icons: Vec<Self>) -> Vec<String> {
+        icons.iter().map(|icon| icon.full_path()).collect::<Vec<_>>()
     }
 }

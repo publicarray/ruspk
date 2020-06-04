@@ -68,7 +68,7 @@ pub async fn syno(
             )
         })
         .await;
-        trace!("MISS {}ms",  now.elapsed().as_millis());
+        trace!("MISS {}ms", now.elapsed().as_millis());
         match response {
             Ok(packages) => {
                 let value = serde_json::to_string(&packages).unwrap();

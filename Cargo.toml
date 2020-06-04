@@ -53,6 +53,9 @@ serde = "1"
 serde_derive = "1"
 serde_with = "1.4"
 
+# percent encoode / url encoding
+percent-encoding = "2"
+
 #  Date and time
 chrono = { version = "0.4", features = ["serde"] }
 

@@ -4,6 +4,7 @@ use crate::routes::KEYRING;
 use crate::DbConn;
 use crate::{Db64, Db8, URL};
 use anyhow::Result;
+use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
 pub struct SynoResponse {
@@ -161,19 +162,18 @@ pub fn get_packages_for_device_lang(
         #[cfg(any(feature = "mysql", feature = "sqlite"))]
         let retina_icons = DbIcon::retina_from_version(package.version_id, &conn)
             .iter()
-            .map(|icon| {
-                format!(
-                    "{}/{}",
-                    URL.to_string(),
-                    icon.path.clone()
-                )
-            })
+            .map(|icon| format!("{}/{}", URL.to_string(), icon.path.clone()))
             .collect::<Vec<_>>();
 
         let pak_beta = match package.beta {
             false => None,
-            true => Some(true)
+            true => Some(true),
         };
+
+        // url encode the [ ]<> from the package link
+        let package_link = package.link.clone().unwrap_or_default();
+        const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'[').add(b']').add(b'<').add(b'>');
+        let package_link_urlencoded: String = utf8_percent_encode(&package_link, FRAGMENT).to_string();
 
         let mut p = Package::new(
             pak_beta,
@@ -184,11 +184,7 @@ pub fn get_packages_for_device_lang(
             package.distributor.clone().unwrap_or_default(),
             package.distributor_url.clone().unwrap_or_default(),
             package.dname.clone(),
-            format!(
-                "{}/{}",
-                URL.to_string(),
-                package.link.clone().unwrap_or_default(),
-            ),
+            format!("{}/{}", URL.to_string(), package_link_urlencoded),
             package.maintainer.clone().unwrap_or_default(),
             package.maintainer_url.clone().unwrap_or_default(),
             package.package.clone(),
@@ -199,20 +195,11 @@ pub fn get_packages_for_device_lang(
             package.md5.clone(),
             package.size,
         );
-        p.thumbnail = DbIcon::paths(
-            DbIcon::from_version(package.version_id, &conn),
-            format!("{}/{}", package.dname.clone().unwrap_or_default(), package.revision),
-        );
+        p.thumbnail = DbIcon::paths(DbIcon::from_version(package.version_id, &conn));
         p.thumbnail_retina = retina_icons;
         p.snapshot = DbScreenshot::from_package(package.package_id, &conn)
             .iter()
-            .map(|screenshot| {
-                format!(
-                    "{}/{}",
-                    URL.to_string(),
-                    screenshot.path.clone()
-                )
-            })
+            .map(|screenshot| format!("{}/{}", URL.to_string(), screenshot.path.clone()))
             .collect::<Vec<_>>();
         sr.packages.push(p);
     }

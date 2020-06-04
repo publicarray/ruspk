@@ -1328,6 +1328,7 @@ dependencies = [
  "lazy_static",
  "libsqlite3-sys",
  "log",
+ "percent-encoding",
  "r2d2",
  "serde",
  "serde_derive",
