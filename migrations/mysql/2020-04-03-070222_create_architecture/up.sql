@@ -1,6 +1,6 @@
 CREATE TABLE architecture (
-  id SERIAL PRIMARY KEY,
-  code VARCHAR(20) NOT NULL UNIQUE
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(20) NOT NULL UNIQUE
 );
 
 INSERT INTO architecture (code) VALUES
@@ -18,4 +18,26 @@ INSERT INTO architecture (code) VALUES
     ('evansport'),
     ('comcerto2k'),
     ('avoton'),
-    ('armada375');
+    ('armada375'),
+    ('alpine'),
+    ('powerpc'),
+    ('alpine4k'),
+    ('monaco'),
+    ('braswell'),
+    ('armada38x'),
+    ('broadwell'),
+    ('x86_64'),
+    ('grantley'),
+    ('apollolake'),
+    ('rtd1296'),
+    ('denverton'),
+    ('dockerx64'),
+    ('broadwellnk'),
+    ('kvmx64'),
+    ('ipq806x'),
+    ('northstarplus'),
+    ('hi3535'),
+    ('armada37xx'),
+    ('aarch64'),
+    ('dakota'),
+    ('purley');
