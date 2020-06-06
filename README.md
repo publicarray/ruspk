@@ -15,7 +15,7 @@ diesel migration --migration-dir migrations/postgres/ run
 ruspk
 ```
 
-Avaliable Features: `mysql`, `postgres` and `sqlite`
+Available Features: `mysql`, `postgres` and `sqlite`
 
 ### Test the API
 

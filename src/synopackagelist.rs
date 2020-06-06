@@ -165,7 +165,7 @@ pub fn get_packages_for_device_lang(
             .map(|icon| format!("{}/{}", URL.to_string(), icon.path.clone()))
             .collect::<Vec<_>>();
 
-        let pak_beta = match package.beta {
+        let beta_package = match package.beta {
             false => None,
             true => Some(true),
         };
@@ -175,8 +175,9 @@ pub fn get_packages_for_device_lang(
         const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'[').add(b']').add(b'<').add(b'>');
         let package_link_urlencoded: String = utf8_percent_encode(&package_link, FRAGMENT).to_string();
 
+        // construct package reply object
         let mut p = Package::new(
-            pak_beta,
+            beta_package,
             package.changelog.clone(),
             package.conflictpkgs.clone(),
             package.deppkgs.clone(),
