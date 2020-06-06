@@ -123,18 +123,17 @@ CREATE TABLE service (
   );
 INSERT INTO service (code)
 VALUES
-  ('apache-web'),
-  ('mysql'),
-  ('php_disable_safe_exec_dir'),
-  ('ssh');
+    ('apache-web'),
+    ('mysql'),
+    ('php_disable_safe_exec_dir'),
+    ('ssh'),
+    ('Docker');
 CREATE TABLE package (
     id SERIAL PRIMARY KEY,
     author_user_id BIGINT DEFAULT NULL,
     name VARCHAR(50) NOT NULL UNIQUE,
     insert_date timestamp,
-    FOREIGN KEY (author_user_id) REFERENCES "user"(id) ON DELETE
-    SET
-      NULL
+    FOREIGN KEY (author_user_id) REFERENCES "user"(id) ON DELETE SET NULL
   );
 CREATE TABLE user_role (
     user_id BIGINT,

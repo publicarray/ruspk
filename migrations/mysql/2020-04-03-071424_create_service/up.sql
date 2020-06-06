@@ -7,4 +7,5 @@ INSERT INTO service (code) VALUES
     ('apache-web'),
     ('mysql'),
     ('php_disable_safe_exec_dir'),
-    ('ssh');
+    ('ssh'),
+    ('Docker');

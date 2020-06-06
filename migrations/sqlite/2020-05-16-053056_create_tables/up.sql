@@ -89,6 +89,7 @@ INSERT INTO language (code, name) VALUES
     ('hun', 'Hungarian'),
     ('trk', 'Turkish'),
     ('csy', 'Czech');
+
 CREATE TABLE firmware (
   id INTEGER NOT NULL PRIMARY KEY,
   version VARCHAR(3) NOT NULL UNIQUE,
@@ -127,7 +128,8 @@ INSERT INTO service (code) VALUES
     ('apache-web'),
     ('mysql'),
     ('php_disable_safe_exec_dir'),
-    ('ssh');
+    ('ssh'),
+    ('Docker');
 CREATE TABLE package (
     id INTEGER NOT NULL PRIMARY KEY,
     author_user_id BIGINT UNSIGNED DEFAULT NULL,
