@@ -54,6 +54,8 @@ URL=https://packages.synocommunity.com
 ## Public key to advertise for signed packages
 PUBLIC_KEY_FILE=pubkey.pem
 
+## Time in seconds to allow stale responses to be served from memory cache
+CACHE_TTL=600
 ```
 
 # Dev Guides
