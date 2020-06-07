@@ -14,6 +14,10 @@ extern crate chrono;
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::r2d2::{self, ConnectionManager};
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
+
+use evmap_derive::ShallowCopy;
+
 pub mod utils;
 
 pub mod models;
@@ -71,12 +75,23 @@ type DbConn = diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Con
 lazy_static! {
     #[derive(Copy, Clone, Debug)]
     pub static ref URL: String = std::env::var("URL").unwrap_or_else(|_| "https://packages.synocommunity.com".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref CACHE_TTL: String = std::env::var("CACHE_TTL").unwrap_or_else(|_| "600".to_string());
 }
+
+// Cache Type
+#[derive(Clone, Debug, Hash, PartialEq, ShallowCopy)]
+pub struct CacheValue {
+    http_response: Arc<String>,
+    insert_time: Arc<Instant>,
+}
+impl Eq for CacheValue {}
 
 pub struct AppData {
     pool: DbPool,
-    cache_r: evmap::ReadHandle<String, String>,
-    cache_w: Arc<Mutex<evmap::WriteHandle<String, String>>>,
+    cache_r: evmap::ReadHandle<String, CacheValue>,
+    cache_w: Arc<Mutex<evmap::WriteHandle<String, CacheValue>>>,
     keyring: String,
 }
 
@@ -84,7 +99,9 @@ pub struct AppData {
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::from_env(Env::default().default_filter_or("info")).init();
-
+    lazy_static::initialize(&CACHE_TTL);
+    lazy_static::initialize(&URL);
+    trace!("CACHE_TTL:{}", *CACHE_TTL);
     let db_url = std::env::var("DATABASE_URL").expect("missing DATABASE_URL");
     let listen_addr = std::env::var("LISTEN").unwrap_or_else(|_| "127.0.0.1".to_string());
     let listen_port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());

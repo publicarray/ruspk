@@ -162,7 +162,7 @@ pub fn get_packages_for_device_lang(
         #[cfg(any(feature = "mysql", feature = "sqlite"))]
         let retina_icons = DbIcon::retina_from_version(package.version_id, &conn)
             .iter()
-            .map(|icon| format!("{}/{}", URL.to_string(), icon.path.clone()))
+            .map(|icon| format!("{}/{}", *URL, icon.path.clone()))
             .collect::<Vec<_>>();
 
         let beta_package = match package.beta {
@@ -185,7 +185,7 @@ pub fn get_packages_for_device_lang(
             package.distributor.clone().unwrap_or_default(),
             package.distributor_url.clone().unwrap_or_default(),
             package.dname.clone(),
-            format!("{}/{}", URL.to_string(), package_link_urlencoded),
+            format!("{}/{}", *URL, package_link_urlencoded),
             package.maintainer.clone().unwrap_or_default(),
             package.maintainer_url.clone().unwrap_or_default(),
             package.package.clone(),
@@ -200,7 +200,7 @@ pub fn get_packages_for_device_lang(
         p.thumbnail_retina = retina_icons;
         p.snapshot = DbScreenshot::from_package(package.package_id, &conn)
             .iter()
-            .map(|screenshot| format!("{}/{}", URL.to_string(), screenshot.path.clone()))
+            .map(|screenshot| format!("{}/{}", *URL, screenshot.path.clone()))
             .collect::<Vec<_>>();
         sr.packages.push(p);
     }

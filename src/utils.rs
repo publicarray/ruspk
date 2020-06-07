@@ -10,3 +10,8 @@ pub fn read_file(file_name: &str) -> Result<String> {
     buf_reader.read_to_string(&mut contents)?;
     Ok(contents)
 }
+
+pub fn str_to_u64(str: &str) -> u64 {
+    // trace!("str_to_u64: {}",  str.parse::<u64>().unwrap());
+    str.parse().unwrap()
+}

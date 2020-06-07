@@ -576,6 +576,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "evmap-derive"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c44f8d80f2418fd670f67e0bc020baffd8c596fc47195a453338292d872da374"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "failure"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1337,6 +1348,7 @@ dependencies = [
  "dotenv",
  "env_logger",
  "evmap",
+ "evmap-derive",
  "lazy_static",
  "libsqlite3-sys 0.18.0",
  "log",

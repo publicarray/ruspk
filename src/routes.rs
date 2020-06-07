@@ -2,11 +2,13 @@ use crate::models::*;
 use actix_web::{error::BlockingError, web, Error, HttpRequest, HttpResponse, Responder};
 
 use crate::synopackagelist::*;
-use crate::{AppData, Db64, Db8, DbConn, DbId};
+use crate::{AppData, CacheValue, Db64, Db8, DbConn, DbId, CACHE_TTL};
 use anyhow::Result;
 use diesel::{self, prelude::*};
 use std::sync::Arc;
 use std::time::Instant;
+
+use crate::utils;
 
 pub async fn index(req: HttpRequest) -> impl Responder {
     let name = req.match_info().get("name").unwrap_or("World");
@@ -46,50 +48,61 @@ pub async fn syno(
         synorequest.minor
     );
 
-    if let Some(response_cache) = cache_r.get_one(&key) {
+    if let Some(value) = cache_r.get_one(&key) {
         trace!("HIT {}ms", now.elapsed().as_millis());
-        Ok(HttpResponse::Ok()
-            .content_type("application/json")
-            .body(&*response_cache))
-    } else {
-        let conn = data.pool.get().expect("couldn't get db connection from pool");
-        let keyring = data.keyring.clone();
-        let response = web::block(move || {
-            get_packages_for_device_lang(
-                &conn,
-                &keyring,
-                &synorequest.language,
-                &synorequest.arch,
-                synorequest.build,
-                &synorequest.package_update_channel,
-                synorequest.major,
-                synorequest.micro,
-                synorequest.minor,
-            )
-        })
-        .await;
-        trace!("MISS {}ms", now.elapsed().as_millis());
-        match response {
-            Ok(packages) => {
-                let value = serde_json::to_string(&packages).unwrap();
-                let cache_w_arc = Arc::clone(&data.cache_w);
-                let mut cache_w = cache_w_arc.lock().unwrap();
+        debug!("cache age {}", value.insert_time.elapsed().as_secs());
+        if value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL) {
+            return Ok(HttpResponse::Ok()
+                .content_type("application/json")
+                .body(&*value.http_response));
+        }
+    }
+
+    let conn = data.pool.get().expect("couldn't get db connection from pool");
+    let keyring = data.keyring.clone();
+    let response = web::block(move || {
+        get_packages_for_device_lang(
+            &conn,
+            &keyring,
+            &synorequest.language,
+            &synorequest.arch,
+            synorequest.build,
+            &synorequest.package_update_channel,
+            synorequest.major,
+            synorequest.micro,
+            synorequest.minor,
+        )
+    })
+    .await;
+    trace!("MISS {}ms", now.elapsed().as_millis());
+    match response {
+        Ok(packages) => {
+            let http_response = serde_json::to_string(&packages).unwrap();
+            let value = CacheValue {
+                http_response: Arc::new(http_response),
+                insert_time: Arc::new(Instant::now()),
+            };
+            let cache_w_arc = Arc::clone(&data.cache_w);
+            let mut cache_w = cache_w_arc.lock().unwrap();
+            if cache_r.get(&key).map(|rs| rs.len()) == None {
                 cache_w.insert(key, value);
-                cache_w.refresh();
-                Ok(HttpResponse::Ok().json(&packages))
+            } else {
+                cache_w.update(key, value);
             }
-            Err(err) => {
-                trace!("{}", err);
-                match err {
-                    BlockingError::Error(err) => match err.downcast_ref::<diesel::result::Error>().unwrap() {
-                        diesel::result::Error::NotFound => {
-                            debug!("{}", err);
-                            Err(HttpResponse::NotFound().finish())
-                        }
-                        _ => Err(HttpResponse::InternalServerError().finish()),
-                    },
-                    BlockingError::Canceled => Err(HttpResponse::InternalServerError().finish()),
-                }
+            cache_w.refresh();
+            Ok(HttpResponse::Ok().json(&packages))
+        }
+        Err(err) => {
+            trace!("{}", err);
+            match err {
+                BlockingError::Error(err) => match err.downcast_ref::<diesel::result::Error>().unwrap() {
+                    diesel::result::Error::NotFound => {
+                        debug!("{}", err);
+                        Err(HttpResponse::NotFound().finish())
+                    }
+                    _ => Err(HttpResponse::InternalServerError().finish()),
+                },
+                BlockingError::Canceled => Err(HttpResponse::InternalServerError().finish()),
             }
         }
     }

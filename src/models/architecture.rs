@@ -15,7 +15,7 @@ impl DbArchitecture {
         let arch = match arch {
             "88f6281" => "88f628x",
             "88f6282" => "88f628x",
-            _ => arch
+            _ => arch,
         };
 
         // to_syno = {"88f628x": "88f6281"}
