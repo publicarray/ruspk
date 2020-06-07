@@ -21,6 +21,7 @@
 |ruspk - actix-web & postgres (diesel)|404|435|
 |ruspk - actix-web & postgres Full Copy (diesel) |133|140|
 |ruspk - actix-web & postgres (diesel) & in-memmory cache |547|31619|
+|ruspk 0.1.4 - actix-web, postgres, in-memmory cache, TTL |547|21767|
 
 So postgresql uses more CPU than any other DB tested here (the queries are probably not optimised for it)
 
