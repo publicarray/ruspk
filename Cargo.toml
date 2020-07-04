@@ -12,8 +12,8 @@ build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [badges]
-is-it-maintained-issue-resolution = { repository = "https://github.com/publicarray/ruspk" }
-is-it-maintained-open-issues = { repository = "https://github.com/publicarray/ruspk" }
+is-it-maintained-issue-resolution = { repository = "publicarray/ruspk" }
+is-it-maintained-open-issues = { repository = "publicarray/ruspk" }
 maintenance = { status = "passively-maintained" }
 
 [features]
@@ -40,6 +40,9 @@ r2d2 = "0.8"
 # diesel_migrations = "1.4.0"
 # Bundled SQLites
 libsqlite3-sys = { version = "0.18", features = ["bundled"], optional = true }
+
+# OpenPHP - rpgp check signatures
+# pgp = "0.6.0"
 
 # grap environemt vars
 dotenv = "0.9"
@@ -68,4 +71,4 @@ evmap-derive = "0.1.0"
 
 [profile.release]
 lto = "thin"
-#panic = "abort"
+panic = "abort"
