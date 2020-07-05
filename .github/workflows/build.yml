@@ -36,4 +36,5 @@ jobs:
       uses: orf/cargo-bloat-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        args: --release --features ${{ matrix.features }} --crates -p ruspk --message-format=json -n 0
 
