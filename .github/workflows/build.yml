@@ -1,0 +1,37 @@
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        features:
+          - postgres
+          - mysql
+          - sqlite
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Stable toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+
+    - name: Release build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --features ${{ matrix.features }}
+
+    - name: Run cargo bloat
+      uses: orf/cargo-bloat-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
