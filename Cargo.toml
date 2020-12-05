@@ -17,7 +17,7 @@ is-it-maintained-open-issues = { repository = "publicarray/ruspk" }
 maintenance = { status = "passively-maintained" }
 
 [features]
-# default = ["mysql"]
+default = ["postgres"]
 mysql = ["diesel/mysql"]
 postgres = ["diesel/postgres"]
 sqlite = ["diesel/sqlite", "libsqlite3-sys"]
@@ -32,33 +32,33 @@ sqlite = ["diesel/sqlite", "libsqlite3-sys"]
 anyhow = "1.0"
 # Logs
 log = "0.4"
-env_logger = "0.7"
+env_logger = "0.8"
 # Database
 # diesel = { git = "https://github.com/diesel-rs/diesel/",  features = ["chrono", "r2d2"] }
 diesel = { version = "1.4", features = ["chrono", "r2d2"] }
 r2d2 = "0.8"
 # diesel_migrations = "1.4.0"
 # Bundled SQLites
-libsqlite3-sys = { version = "0.18", features = ["bundled"], optional = true }
+libsqlite3-sys = { version = "0.20.1", features = ["bundled"], optional = true }
 
 # OpenPHP - rpgp check signatures
 # pgp = "0.6.0"
 
 # grap environemt vars
-dotenv = "0.9"
+dotenv = "0.15"
 
 # global static vars at runtime
 lazy_static = "1.4"
 
 # Web framework / server
-actix-web = "2"
+actix-web = "3"
 actix-rt = "1"
 
 # Serialization/Deserialization
 serde_json = "1"
 serde = "1"
 serde_derive = "1"
-serde_with = "1.4"
+serde_with = "1.6"
 
 # percent encoode / url encoding
 percent-encoding = "2"
@@ -67,7 +67,7 @@ percent-encoding = "2"
 chrono = { version = "0.4", features = ["serde"] }
 
 evmap = "10"
-evmap-derive = "0.1.0"
+evmap-derive = "0.2.0"
 
 [profile.release]
 lto = "thin"

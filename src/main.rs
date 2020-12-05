@@ -97,7 +97,7 @@ pub struct AppData {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    env_logger::from_env(Env::default().default_filter_or("info")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     lazy_static::initialize(&CACHE_TTL);
     lazy_static::initialize(&URL);
     trace!("CACHE_TTL:{}", *CACHE_TTL);
