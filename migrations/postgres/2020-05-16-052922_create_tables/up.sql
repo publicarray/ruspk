@@ -91,8 +91,8 @@ VALUES
   ('csy', 'Czech');
 CREATE TABLE firmware (
     id SERIAL PRIMARY KEY,
-    version VARCHAR(3) NOT NULL UNIQUE,
-    build INT NOT NULL
+    version VARCHAR(3) NOT NULL,
+    build INT NOT NULL UNIQUE
   );
 INSERT INTO firmware (version, build)
 VALUES
