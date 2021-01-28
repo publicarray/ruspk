@@ -20,7 +20,7 @@ maintenance = { status = "passively-maintained" }
 default = ["postgres"]
 mysql = ["diesel/mysql"]
 postgres = ["diesel/postgres"]
-sqlite = ["diesel/sqlite", "libsqlite3-sys"]
+sqlite = ["diesel/sqlite"]
 # mysql = ["diesel/mysql", "diesel_migrations/mysql"]
 # postgresql = ["diesel/postgres", "diesel_migrations/postgres"]
 # sqlite = ["diesel/sqlite", "diesel_migrations/sqlite", "libsqlite3-sys"]

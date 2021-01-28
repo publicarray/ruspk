@@ -30,12 +30,12 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: --release --features ${{ matrix.features }} --verbose
+        args: --release --no-default-features --features ${{ matrix.features }} --verbose
 
     - name: Run cargo bloat
       uses: orf/cargo-bloat-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        bloat_args: --release --features ${{ matrix.features }} --crates -p ruspk
+        bloat_args: --release --no-default-features --features ${{ matrix.features }} --crates -p ruspk
         tree_args: --prefix-depth --features ${{ matrix.features }} --no-dev-dependencies -p ruspk
 
