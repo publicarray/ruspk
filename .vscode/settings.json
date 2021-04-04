@@ -1,0 +1,13 @@
+{
+    "cSpell.words": [
+        "actix",
+        "chrono",
+        "dotenv",
+        "evmap",
+        "ruspk",
+        "serde"
+    ],
+    "rust-analyzer.cargo.features": [
+        "postgres"
+    ]
+}

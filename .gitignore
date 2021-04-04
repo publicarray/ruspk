@@ -2,7 +2,7 @@
 .DS_Store
 db/*.sqlite
 db/*.db
-.vscode
+.vscode/launch.json
 *.json
 src/schema.rs
 .env
