@@ -9,7 +9,6 @@ Only the GET API for the synology devices is supported. You have to update the d
 ## Install
 
 ```sh
-rustup override add nightly
 cargo install diesel_cli
 cargo install ruspk --features postgres
 cargo install ruspk --no-default-features --features mysql
@@ -88,7 +87,8 @@ psql -U ruspk -d ruspk -f ruspk.sql
 ## development
 
 ```sh
-rustup override add nightly
+# rustup override add nightly
+# rustup override unset
 cargo build
 ./target/debug/ruspk
 ```
@@ -102,11 +102,14 @@ cargo-fmt
 # $ rustup component add clippy
 cargo-clippy
 # check security advisories
-# $ cago install cargo-audit
+# $ cargo install cargo-audit
 cargo audit
 # Get latest versions defined in Cargo.toml
 # $ cargo install cargo-update
 cargo update
+# check of errors
+cargo check
 # show errors in your favourite editor
-# $ rustup component add rust-analyzer
+# https://rust-analyzer.github.io/manual.html#rust-analyzer-language-server-binary
+# $ rustup +nightly component add rust-analyzer-preview
 ```
