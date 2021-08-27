@@ -28,7 +28,7 @@ sqlite = ["diesel/sqlite"]
 
 [dependencies]
 
-# Erros
+# Errors
 anyhow = "1.0"
 # Logs
 log = "0.4"
@@ -44,15 +44,15 @@ libsqlite3-sys = { version = "0.22.2", features = ["bundled"], optional = true }
 # OpenPHP - rpgp check signatures
 # pgp = "0.6.0"
 
-# grap environemt vars
+# grab environment vars
 dotenv = "0.15"
 
 # global static vars at runtime
 lazy_static = "1.4"
 
-# Web framework / server
+# Web framework / server https://github.com/actix/actix-web/blob/master/MIGRATION.md
 actix-web = "3"
-actix-rt = "2.2.0"
+actix-rt = "1"
 
 # Serialization/Deserialization
 serde_json = "1"
@@ -60,7 +60,7 @@ serde = "1"
 serde_derive = "1"
 serde_with = "1.6"
 
-# percent encoode / url encoding
+# percent encode / url encoding
 percent-encoding = "2"
 
 #  Date and time

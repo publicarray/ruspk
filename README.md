@@ -84,3 +84,11 @@ cd db
 pg_dump -U ruspk ruspk > ruspk.sql
 psql -U ruspk -d ruspk -f ruspk.sql
 ```
+
+## development
+
+```sh
+rustup override add nightly
+cargo build
+./target/debug/ruspk
+```
