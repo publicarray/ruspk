@@ -2,10 +2,13 @@
     "cSpell.words": [
         "actix",
         "chrono",
+        "dbname",
         "dotenv",
         "evmap",
+        "pubkey",
         "ruspk",
-        "serde"
+        "serde",
+        "spkrepo"
     ],
     "rust-analyzer.cargo.features": [
         "postgres"

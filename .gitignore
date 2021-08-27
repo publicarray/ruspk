@@ -6,3 +6,4 @@ db/*.db
 *.json
 src/schema.rs
 .env
+db/ruspk*.sql

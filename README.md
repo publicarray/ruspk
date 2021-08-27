@@ -1,4 +1,5 @@
 # spkrepo-rs
+
 [![ruspk's current version badge](https://img.shields.io/crates/v/ruspk.svg)](https://crates.io/crates/ruspk)
 
 ruspk is a simple and fast synology repository server. It uses the existing database structure from [spkrepo](https://github.com/SynoCommunity/spkrepo)
@@ -8,6 +9,7 @@ Only the GET API for the synology devices is supported. You have to update the d
 ## Install
 
 ```sh
+rustup override add nightly
 cargo install diesel_cli
 cargo install ruspk --features postgres
 cargo install ruspk --no-default-features --features mysql
@@ -22,8 +24,11 @@ Available Features: `mysql`, `postgres` and `sqlite`
 ### Test the API
 
 ```sh
+# NAS package list request
 curl -sv 'http://127.0.0.1:80/?package_update_channel=beta&unique=synology_apollolake_418play&build=24922&language=enu&major=6&micro=2&arch=apollolake&minor=2&timezone=Melbourne&nano=4' | jq
 
+# upload new package (wip)
+http --verify=no --ignore-stdin --auth $PUBLISH_API_KEY: POST $PUBLISH_URL/packages @$SPK_FILE_NAME
 ```
 
 ## Configuration (`.env` file)
@@ -44,7 +49,7 @@ RUST_LOG="info"
 # DATABASE_URL=mysql://user:pass@localhost/dbname
 # DATABASE_URL=postgresql://user:pass@localhost/dbname
 
-## IP adress to Bind to and listen for connections
+## IP address to Bind to and listen for connections
 LISTEN=0.0.0.0
 
 ## Port to Bind to and listen for connections
@@ -62,10 +67,18 @@ CACHE_TTL=600
 
 # Dev Guides
 
-https://diesel.rs/
+<https://diesel.rs/>
 
-https://actix.rs/
+<https://actix.rs/>
 
-https://github.com/SynoCommunity/spksrc/wiki/Package-Center-specifications
+<https://github.com/SynoCommunity/spksrc/wiki/Package-Center-specifications>
 
-http://spkrepo.readthedocs.org/
+<http://spkrepo.readthedocs.org/>
+
+## Backup and restore database
+
+```sh
+cd db
+pg_dump -U ruspk ruspk > ruspk.sql
+psql -U ruspk -d ruspk -f ruspk.sql
+```
