@@ -154,7 +154,7 @@ pub fn get_packages_for_device_lang(
     };
     sr.set_key(keyring);
 
-    let packages = DbPackage::get_packages(&lang, arch, build, beta, major, micro, minor, conn)?;
+    let packages = DbPackage::get_packages(lang, arch, build, beta, major, micro, minor, conn)?;
 
     for package in packages.iter() {
         #[cfg(feature = "postgres")] // ToDo enum is not yet fully supported

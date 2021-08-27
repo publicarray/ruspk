@@ -92,3 +92,21 @@ rustup override add nightly
 cargo build
 ./target/debug/ruspk
 ```
+
+## lint
+
+```sh
+# formatting
+cargo-fmt
+# fix common mmistakes
+# $ rustup component add clippy
+cargo-clippy
+# check security advisories
+# $ cago install cargo-audit
+cargo audit
+# Get latest versions defined in Cargo.toml
+# $ cargo install cargo-update
+cargo update
+# show errors in your favourite editor
+# $ rustup component add rust-analyzer
+```

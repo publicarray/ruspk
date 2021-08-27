@@ -11,7 +11,7 @@ pub struct DbArchitecture {
 }
 
 impl DbArchitecture {
-    pub fn get_architecture_id  (conn: &Connection, arch: &str) -> Result<DbId> {
+    pub fn get_architecture_id(conn: &Connection, arch: &str) -> Result<DbId> {
         let arch = match arch {
             "88f6281" => "88f628x",
             "88f6282" => "88f628x",
