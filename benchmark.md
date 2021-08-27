@@ -1,10 +1,10 @@
-## Unscientific Benchmark
+# Unscientific Benchmark
 
 * Not an entirely fair benchmark
 * Benchmarked on a 2012 Macbook Pro
 * Results are in requests/sec
-* `Connection: Close` because keep-alive reqests are unrealistic as a benchmark for the real world.
-* without `Connection: Close` because I want to see what is possable.
+* `Connection: Close` because keep-alive requests are unrealistic as a benchmark for the real world.
+* without `Connection: Close` because I want to see what is possible.
 
 || with `Connection: Close` | without `Connection: Close`|
 |-|-|-|
@@ -20,12 +20,12 @@
 |ruspk - actix-web & sqlite (diesel)|548|646|
 |ruspk - actix-web & postgres (diesel)|404|435|
 |ruspk - actix-web & postgres Full Copy (diesel) |133|140|
-|ruspk - actix-web & postgres (diesel) & in-memmory cache |547|31619|
-|ruspk 0.1.4 - actix-web, postgres, in-memmory cache, TTL |547|21767|
+|ruspk - actix-web & postgres (diesel) & in-memory cache |547|31619|
+|ruspk 0.1.4 - actix-web, postgres, in-memory cache, TTL |547|21767|
 
 So postgresql uses more CPU than any other DB tested here (the queries are probably not optimised for it)
 
-https://www.postgresql.org/docs/12/pgbench.htm
+<https://www.postgresql.org/docs/12/pgbench.htm>
 
 ```sh
 $ pgbench -i ruspk
@@ -43,7 +43,7 @@ tps = 502.154301 (including connections establishing)
 tps = 502.403372 (excluding connections establishing)
 ```
 
-### nginx
+## nginx
 
 ```sh
 $ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost'
@@ -109,14 +109,14 @@ Transfer/sec:     30.00KB
 
 $ hey -z 30s -disable-keepalive -h2 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
 Summary:
-  Total:	31.1365 secs
-  Slowest:	1.2191 secs
-  Fastest:	0.0365 secs
-  Average:	1.0645 secs
-  Requests/sec:	46.1195
+  Total: 31.1365 secs
+  Slowest: 1.2191 secs
+  Fastest: 0.0365 secs
+  Average: 1.0645 secs
+  Requests/sec: 46.1195
 
-  Total data:	94220269 bytes
-  Size/request:	65613 bytes
+  Total data: 94220269 bytes
+  Size/request: 65613 bytes
 ```
 
 ### docker + sspks
@@ -263,7 +263,6 @@ Transfer/sec:      1.61MB
 
 ## [actix-web](http://actix.rs/) & sqlite
 
-
 ```
 $ wrk --latency -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2'
 Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x64&minor=2
@@ -351,7 +350,6 @@ Requests/sec:    133.00
 Transfer/sec:      4.05MB
 ```
 
-
 ## [actix-web](http://actix.rs/) & postgres (full copy of spkrepo) & in-memory cache
 
 ```sh
@@ -384,4 +382,77 @@ Running 30s test @ http://127.0.0.1:8080/?package_update_channel=beta&build=900&
   948891 requests in 30.01s, 28.20GB read
 Requests/sec:  31619.74
 Transfer/sec:      0.94GB
+```
+
+---
+
+## Different hardware
+
+```sh
+$ cargo install ruspk --features postgres
+$ RUST_LOG="warn" CACHE_TTL=600 ruspk
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     2.89ms    5.61ms 212.02ms   95.17%
+    Req/Sec     4.48k   833.09     8.38k    72.63%
+  Latency Distribution
+     50%    1.72ms
+     75%    3.50ms
+     90%    6.02ms
+     99%   16.43ms
+  1068415 requests in 30.10s, 64.06GB read
+Requests/sec:  35499.86
+Transfer/sec:      2.13GB
+
+$ docker run --rm -it --name sspks \
+          -v /home/seb/git/spksrc/packages:/home/user/gosspks/packages/:rw \
+          -p 8080:8080 \
+          -e GOSSPKS_HOSTNAME=localhost \
+          jdel/gosspks:v0.1
+$ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2'
+Running 30s test @ http://localhost:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    28.16ms   24.74ms 277.29ms   83.32%
+    Req/Sec   488.44    363.97     1.39k    75.50%
+  Latency Distribution
+     50%   19.43ms
+     75%   39.60ms
+     90%   61.06ms
+     99%  112.50ms
+  116618 requests in 30.07s, 637.38MB read
+Requests/sec:   3878.72
+Transfer/sec:     21.20MB
+
+$ RUST_LOG="info" CACHE_TTL=600 ruspk
+$ siege -c 100 -r 1000 --benchmark 'http://127.0.0.1:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2'
+Transactions:        100000 hits
+Availability:        100.00 %
+Elapsed time:         62.57 secs
+Data transferred:      6127.74 MB
+Response time:          0.06 secs
+Transaction rate:      1598.21 trans/sec
+Throughput:         97.93 MB/sec
+Concurrency:         97.70
+Successful transactions:      100000
+Failed transactions:            0
+Longest transaction:         0.93
+Shortest transaction:         0.00
+
+$ RUST_LOG="warn" CACHE_TTL=1 ruspk
+$ siege -c 100 -r 1000 --benchmark 'http://127.0.0.1:8080/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2'
+Transactions:        100000 hits
+Availability:        100.00 %
+Elapsed time:          8.29 secs
+Data transferred:      6127.74 MB
+Response time:          0.01 secs
+Transaction rate:     12062.73 trans/sec
+Throughput:        739.17 MB/sec
+Concurrency:         82.01
+Successful transactions:      100000
+Failed transactions:            0
+Longest transaction:         0.15
+Shortest transaction:         0.00
 ```

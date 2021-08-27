@@ -29,9 +29,9 @@ impl DbPackage {
         _minor: i8,
         conn: &Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
-        let language_id: i32 = DbLanguage::get_language_id(conn, &lang);
-        let architecture_id: i32 = DbArchitecture::get_architecute_id(conn, &arch)
-            .context(format!("Can't find architecute in DB for {}", &arch))?; // todo return 404
+        let language_id: i32 = DbLanguage::get_language_id(conn, lang);
+        let architecture_id: i32 = DbArchitecture::get_architecture_id(conn, arch)
+            .context(format!("Can't find architecture in DB for {}", &arch))?; // todo return 404
 
         let query = sql_query(
             r#"

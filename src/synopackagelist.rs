@@ -154,7 +154,7 @@ pub fn get_packages_for_device_lang(
     };
     sr.set_key(keyring);
 
-    let packages = DbPackage::get_packages(&lang, &arch, build, beta, major, micro, minor, &conn)?;
+    let packages = DbPackage::get_packages(&lang, arch, build, beta, major, micro, minor, conn)?;
 
     for package in packages.iter() {
         #[cfg(feature = "postgres")] // ToDo enum is not yet fully supported
@@ -196,9 +196,9 @@ pub fn get_packages_for_device_lang(
             package.md5.clone(),
             package.size,
         );
-        p.thumbnail = DbIcon::paths(DbIcon::from_version(package.version_id, &conn));
+        p.thumbnail = DbIcon::paths(DbIcon::from_version(package.version_id, conn));
         p.thumbnail_retina = retina_icons;
-        p.snapshot = DbScreenshot::from_package(package.package_id, &conn)
+        p.snapshot = DbScreenshot::from_package(package.package_id, conn)
             .iter()
             .map(|screenshot| format!("{}/{}", *URL, screenshot.path.clone()))
             .collect::<Vec<_>>();

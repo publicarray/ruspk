@@ -29,8 +29,8 @@ impl DbPackage {
         _minor: u8,
         conn: &Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
-        let language_id = DbLanguage::get_language_id(conn, &lang);
-        let architecture_id = DbArchitecture::get_architecute_id(conn, &arch)?; // todo return 404
+        let language_id = DbLanguage::get_language_id(conn, lang);
+        let architecture_id = DbArchitecture::get_architecture_id(conn, arch)?; // todo return 404
 
         let query = sql_query(
             r#"

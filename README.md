@@ -25,7 +25,7 @@ Available Features: `mysql`, `postgres` and `sqlite`
 
 ```sh
 # NAS package list request
-curl -sv 'http://127.0.0.1:80/?package_update_channel=beta&unique=synology_apollolake_418play&build=24922&language=enu&major=6&micro=2&arch=apollolake&minor=2&timezone=Melbourne&nano=4' | jq
+curl -sv 'http://127.0.0.1:8080/?package_update_channel=beta&unique=synology_apollolake_418play&build=24922&language=enu&major=6&micro=2&arch=apollolake&minor=2&timezone=Melbourne&nano=4' | jq
 
 # upload new package (wip)
 http --verify=no --ignore-stdin --auth $PUBLISH_API_KEY: POST $PUBLISH_URL/packages @$SPK_FILE_NAME
@@ -70,6 +70,8 @@ CACHE_TTL=600
 <https://diesel.rs/>
 
 <https://actix.rs/>
+
+<https://yew.rs/>
 
 <https://github.com/SynoCommunity/spksrc/wiki/Package-Center-specifications>
 
