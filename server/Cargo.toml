@@ -1,0 +1,71 @@
+[package]
+name = "ruspk"
+version = "0.1.5"
+authors = ["Sebastian Schmidt <publicarray@users.noreply.github.com>"]
+edition = "2018"
+description= "Rust rewrite of spkrepo's / GET API https://github.com/SynoCommunity/spkrepo"
+keywords = ["synology"]
+repository = "https://github.com/publicarray/ruspk"
+readme = "../README.md"
+license = "GPL-3.0-only"
+build = "build.rs"
+default-run = "ruspk"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[badges]
+is-it-maintained-issue-resolution = { repository = "publicarray/ruspk" }
+is-it-maintained-open-issues = { repository = "publicarray/ruspk" }
+maintenance = { status = "passively-maintained" }
+
+[features]
+default = ["postgres"]
+mysql = ["diesel/mysql"]
+postgres = ["diesel/postgres"]
+sqlite = ["diesel/sqlite"]
+# mysql = ["diesel/mysql", "diesel_migrations/mysql"]
+# postgresql = ["diesel/postgres", "diesel_migrations/postgres"]
+# sqlite = ["diesel/sqlite", "diesel_migrations/sqlite", "libsqlite3-sys"]
+
+[dependencies]
+
+# Errors
+anyhow = "1.0"
+# Logs
+log = "0.4"
+env_logger = "0.9"
+# Database
+# diesel = { git = "https://github.com/diesel-rs/diesel/",  features = ["chrono", "r2d2"] }
+diesel = { version = "1.4", features = ["chrono", "r2d2"] }
+r2d2 = "0.8"
+# diesel_migrations = "1.4.0"
+# Bundled SQLites
+libsqlite3-sys = { version = "0.22.2", features = ["bundled"], optional = true }
+
+# OpenPHP - rpgp check signatures
+# pgp = "0.6.0"
+
+# grab environment vars
+dotenv = "0.15"
+
+# global static vars at runtime
+lazy_static = "1.4"
+
+# Web framework / server https://github.com/actix/actix-web/blob/master/MIGRATION.md
+actix-web = "3"
+actix-rt = "1"
+actix-files = "0.5"
+
+# Serialization/Deserialization
+serde_json = "1"
+serde = "1"
+serde_derive = "1"
+serde_with = "1.6"
+
+# percent encode / url encoding
+percent-encoding = "2"
+
+#  Date and time
+chrono = { version = "0.4", features = ["serde"] }
+
+evmap = "10"
+evmap-derive = "0.2.0"

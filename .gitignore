@@ -1,9 +1,11 @@
 /target
 .DS_Store
-db/*.sqlite
-db/*.db
+*.sqlite
+*.db
+ruspk*.sql
+schema.rs
 .vscode/launch.json
 *.json
-src/schema.rs
 .env
-db/ruspk*.sql
+frontend/dist
+server/public

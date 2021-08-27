@@ -12,6 +12,7 @@ extern crate chrono;
 
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::r2d2::{self, ConnectionManager};
+use actix_files as fs;
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
@@ -19,6 +20,7 @@ use evmap_derive::ShallowCopy;
 
 pub mod utils;
 
+pub mod new_build;
 pub mod models;
 pub mod routes;
 pub mod synopackagelist;
@@ -144,10 +146,13 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(web::resource("/hello").route(web::get().to(routes::index)))
             .service(web::resource("/hello/{name}").route(web::get().to(routes::index)))
-            .service(web::resource("/").route(web::get().to(routes::syno)))
-            .service(web::resource("/").route(web::post().to(routes::syno)))
+            .service(web::resource("/nas").route(web::get().to(routes::syno)))
+            .service(web::resource("/nas").route(web::post().to(routes::syno)))
             .service(web::resource("/package").route(web::get().to(routes::list_packages)))
             .service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
+            .service(new_build::new_build)
+            // .service(fs::Files::new("/", "server/public").index_file("index.html"))
+            .service(fs::Files::new("/", "frontend/dist").index_file("index.html"))
     })
     .bind(&bind)?
     .run()

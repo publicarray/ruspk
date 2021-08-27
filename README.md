@@ -79,7 +79,7 @@ CACHE_TTL=600
 ## Backup and restore database
 
 ```sh
-cd db
+cd server/db
 pg_dump -U ruspk ruspk > ruspk.sql
 psql -U ruspk -d ruspk -f ruspk.sql
 ```
@@ -87,10 +87,10 @@ psql -U ruspk -d ruspk -f ruspk.sql
 ## development
 
 ```sh
+trunk serve --open frontend/index.html
+cargo run
 # rustup override add nightly
 # rustup override unset
-cargo build
-./target/debug/ruspk
 ```
 
 ## lint
@@ -112,4 +112,12 @@ cargo check
 # show errors in your favourite editor
 # https://rust-analyzer.github.io/manual.html#rust-analyzer-language-server-binary
 # $ rustup +nightly component add rust-analyzer-preview
+```
+
+## release
+
+```
+trunk build --release frontend/index.html
+cargo build --release
+cargo publish
 ```

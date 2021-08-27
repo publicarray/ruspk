@@ -1,0 +1,15 @@
+[package]
+name = "ruspk-frontend"
+version = "0.1.0"
+authors = ["Sebastian Schmidt <publicarray@users.noreply.github.com>"]
+edition = "2018"
+description = "Rust rewrite of spkrepo's / GET API https://github.com/SynoCommunity/spkrepo"
+keywords = ["synology"]
+repository = "https://github.com/publicarray/ruspk"
+readme = "README.md"
+license = "GPL-3.0-only"
+
+[dependencies]
+yew = "0.18"
+wee_alloc = "0.4.5"
+ybc = "0.2"
