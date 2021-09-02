@@ -4,6 +4,7 @@ import Table from "../../components/table";
 import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
+import { formatBoolean } from '../../utils';
 
 export async function getStaticProps(context) {
     const res = await fetch(`http://127.0.0.1:8080/api/version`)
@@ -36,17 +37,17 @@ export default function VersionPage({data}) {
     // ];
 
     const columns = [
-        { Header: 'ID', accessor: 'id',},
-        { Header: 'Package', accessor: 'package',},
-        { Header: 'Upstream Version', accessor: 'version',},
-        { Header: 'Revision', accessor: 'revision',},
-        { Header: 'Beta', accessor: 'beta',},
-        { Header: 'Services', accessor: 'services',},
-        { Header: 'Insert Date', accessor: 'insert_date',},
-        { Header: 'All Builds Active', accessor: 'all_builds_active',},
-        { Header: 'Install Wizard', accessor: 'install_wizard',},
-        { Header: 'Upgrade Wizard', accessor: 'upgrade_wizard',},
-        { Header: 'Startable', accessor: 'startable',},
+        { Header: 'ID', accessor: 'id' },
+        { Header: 'Package', accessor: 'package' },
+        { Header: 'Upstream Version', accessor: 'upstream_version' },
+        { Header: 'Revision', accessor: 'revision' },
+        { Header: 'Beta', accessor: 'beta' },
+        // { Header: 'Services', accessor: 'services' },
+        { Header: 'Insert Date', accessor: 'insert_date' },
+        { Header: 'All Builds Active', accessor: row => formatBoolean(row.all_builds_active) },
+        { Header: 'Install Wizard', accessor: row => formatBoolean(row.install_wizard) },
+        { Header: 'Upgrade Wizard', accessor: row => formatBoolean(row.upgrade_wizard) },
+        { Header: 'Startable', accessor: row => formatBoolean(row.startable) },
     ];
 
     return (

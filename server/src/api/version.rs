@@ -2,15 +2,9 @@ use crate::models::*;
 use actix_web::{get, web, Error, HttpResponse};
 use crate::{AppData, DbConn};
 use anyhow::Result;
-use diesel::{self, prelude::*};
 
-
-fn db_get_versions(conn: &DbConn) -> Result<Vec<DbVersion>> {
-    use crate::schema::version;
-    let p = version::table
-        .load::<DbVersion>(conn)
-        .expect("Error loading versions from DB");
-    Ok(p)
+fn db_get_versions(conn: &DbConn) -> Result<Vec<Version>> {
+    Ok(DbVersion::find_all(conn)?)
 }
 
 /// retrieve all versions

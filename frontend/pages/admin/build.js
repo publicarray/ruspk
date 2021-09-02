@@ -4,6 +4,7 @@ import Table from "../../components/table";
 import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
+import { formatBoolean } from '../../utils';
 
 export async function getStaticProps(context) {
     const res = await fetch(`http://127.0.0.1:8080/api/build`)
@@ -17,6 +18,7 @@ export async function getStaticProps(context) {
 
     return {
         props: { data },
+        revalidate: 5,
     }
 }
 
@@ -39,13 +41,13 @@ export default function BuildPage({data}) {
     const columns = [
         { Header: 'ID', accessor: 'id',},
         { Header: 'Package', accessor: 'package',},
-        { Header: 'Upstream Version', accessor: 'version',},
+        { Header: 'Upstream Version', accessor: 'upstream_version',},
         { Header: 'Revision', accessor: 'revision',},
-        { Header: 'Architectures', accessor: 'arch',},
+        { Header: 'Architectures', accessor: 'architectures',},
         { Header: 'Firmware', accessor: 'firmware',},
         { Header: 'Publisher', accessor: 'publisher',},
         { Header: 'Insert Date', accessor: 'insert_date',},
-        { Header: 'Active', accessor: 'active',},
+        { Header: 'Active', accessor: row => formatBoolean(row.active) },
     ];
 
     return (

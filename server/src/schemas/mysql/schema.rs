@@ -175,6 +175,7 @@ table! {
 
 joinable!(build -> firmware (firmware_id));
 joinable!(build -> version (version_id));
+joinable!(build -> user (publisher_user_id));
 joinable!(build_architecture -> architecture (architecture_id));
 joinable!(build_architecture -> build (build_id));
 joinable!(description -> language (language_id));

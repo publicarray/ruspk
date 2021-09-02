@@ -10,8 +10,11 @@ import DeleteBtn from './delete-btn'
 //     { id: 4, arch: "ppc853x" },
 //     { id: 5, arch: "88f628x" },
 // ];
+
 export default function Table({ columns, data }) {
+
     const tableInstance = useTable({ columns, data })
+
     const {
         getTableProps,
         getTableBodyProps,

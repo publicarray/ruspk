@@ -2,6 +2,8 @@ use crate::models::DbPackage;
 use crate::schema::*;
 use crate::{Db32, DbId};
 use chrono::NaiveDateTime;
+use crate::Connection;
+use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
 #[table_name = "version"]
@@ -25,4 +27,27 @@ pub struct DbVersion {
     pub startable: Option<bool>,
     pub license: Option<String>,
     pub insert_date: NaiveDateTime,
+}
+
+#[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
+pub struct Version {
+    pub id: DbId,
+    pub package: String,
+    pub upstream_version: String,
+    pub revision: Db32,
+    // beta
+    pub insert_date: NaiveDateTime,
+    // all active
+    pub install_wizard: Option<bool>,
+    pub upgrade_wizard: Option<bool>,
+    pub startable: Option<bool>,
+}
+
+impl DbVersion {
+    pub fn find_all(conn: &Connection) -> QueryResult<Vec<Version>> {
+        version::table
+            .inner_join(package::table)
+            .select((version::id, package::name, version::upstream_version, version::ver, version::insert_date, version::install_wizard, version::upgrade_wizard, version::startable))
+            .load::<Version>(conn)
+    }
 }

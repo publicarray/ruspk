@@ -1,16 +1,10 @@
-use crate::models::*;
+use crate::{models::*};
 use actix_web::{get, web, Error, HttpResponse};
 use crate::{AppData, DbConn};
 use anyhow::Result;
-use diesel::{self, prelude::*};
 
-
-fn db_get_screenshots(conn: &DbConn) -> Result<Vec<DbScreenshot>> {
-    use crate::schema::screenshot;
-    let p = screenshot::table
-        .load::<DbScreenshot>(conn)
-        .expect("Error loading screenshot from DB");
-    Ok(p)
+fn db_get_screenshots(conn: &DbConn) -> Result<Vec<Screenshot>> {
+    Ok(DbScreenshot::find_all(&conn)?)
 }
 
 /// retrieve all screenshots

@@ -17,7 +17,25 @@ pub struct DbPackage {
     pub insert_date: Option<NaiveDateTime>,
 }
 
+#[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
+pub struct Package {
+    pub id: i32,
+    pub author: String,
+    pub name: String,
+    pub insert_date: Option<NaiveDateTime>,
+}
+
 impl DbPackage {
+
+    pub fn find_all(conn: &Connection) -> QueryResult<Vec<Package>> {
+        package::table
+            .limit(20)
+            .offset(0)
+            .inner_join(user::table)
+            .select((package::id, user::username, package::name, package::insert_date))
+            .load::<Package>(conn)
+    }
+
     pub fn get_packages(
         lang: &str,
         arch: &str,

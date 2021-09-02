@@ -5,7 +5,6 @@ import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 
-
 export async function getStaticProps(context) {
     const res = await fetch(`http://127.0.0.1:8080/api/package`)
     const data = await res.json()
@@ -18,6 +17,7 @@ export async function getStaticProps(context) {
 
     return {
         props: { data },
+        revalidate: 5,
     }
 }
 
@@ -40,7 +40,7 @@ export default function PackagePage({data}) {
         { Header: 'ID', accessor: 'id',},
         { Header: 'Name', accessor: 'name',},
         { Header: 'Author', accessor: 'author',}, // author_user_id
-        { Header: 'Maintainers', accessor: 'maintainers',},
+        // { Header: 'Maintainers', accessor: 'maintainers',},
         { Header: 'Insert Date', accessor: 'insert_date',},
     ];
 

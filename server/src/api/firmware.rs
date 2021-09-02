@@ -2,15 +2,9 @@ use crate::models::*;
 use actix_web::{get, web, Error, HttpResponse};
 use crate::{AppData, DbConn};
 use anyhow::Result;
-use diesel::{self, prelude::*};
-
 
 fn db_get_firmware(conn: &DbConn) -> Result<Vec<DbFirmware>> {
-    use crate::schema::firmware;
-    let p = firmware::table
-        .load::<DbFirmware>(conn)
-        .expect("Error loading firmware from DB");
-    Ok(p)
+    Ok(DbFirmware::find_all(conn)?)
 }
 
 /// retrieve all firmware

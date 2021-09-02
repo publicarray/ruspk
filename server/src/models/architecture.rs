@@ -11,6 +11,18 @@ pub struct DbArchitecture {
 }
 
 impl DbArchitecture {
+    pub fn find_all(conn: &Connection) -> QueryResult<Vec<DbArchitecture>> {
+        architecture::table
+            .limit(20)
+            .offset(0)
+            // .order(id.asc())
+            .load::<DbArchitecture>(conn)
+    }
+
+    pub fn find_by_id(i: i32, conn: &Connection) -> QueryResult<DbArchitecture> {
+        architecture::table.find(i).get_result::<DbArchitecture>(conn)
+    }
+
     pub fn get_architecture_id(conn: &Connection, arch: &str) -> Result<DbId> {
         let arch = match arch {
             "88f6281" => "88f628x",

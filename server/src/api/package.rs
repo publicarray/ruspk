@@ -2,15 +2,9 @@ use crate::models::*;
 use actix_web::{get, post, web, Error, HttpResponse};
 use crate::{AppData, DbConn};
 use anyhow::Result;
-use diesel::{self, prelude::*};
 
-
-fn db_get_packages(conn: &DbConn) -> Result<Vec<DbPackage>> {
-    use crate::schema::package;
-    let p = package::table
-        .load::<DbPackage>(conn)
-        .expect("Error loading packages from DB");
-    Ok(p)
+fn db_get_packages(conn: &DbConn) -> Result<Vec<Package>> {
+    Ok(DbPackage::find_all(&conn)?)
 }
 
 /// retrieve all packages
