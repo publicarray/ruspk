@@ -87,8 +87,9 @@ psql -U ruspk -d ruspk -f ruspk.sql
 ## development
 
 ```sh
-trunk serve --open frontend/index.html
+mkdir -p frontend/dist
 cargo run
+yarn --cwd frontend dev
 # rustup override add nightly
 # rustup override unset
 ```
@@ -116,8 +117,9 @@ cargo check
 
 ## release
 
-```
-trunk build --release frontend/index.html
+```sh
 cargo build --release
+RUST_LOG="warn" target/release/ruspk
+yarn --cwd frontend export -o dist
 cargo publish
 ```
