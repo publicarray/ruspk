@@ -12,9 +12,9 @@ table! {
         firmware_id -> BigInt,
         publisher_user_id -> Nullable<BigInt>,
         checksum -> Nullable<Text>,
-        extract_size -> Integer,
+        extract_size -> Nullable<Integer>,
         path -> Text,
-        md5 -> Text,
+        md5 -> Nullable<Text>,
         insert_date -> Timestamp,
         active -> Nullable<Bool>,
     }

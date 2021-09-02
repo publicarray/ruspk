@@ -14,9 +14,9 @@ pub struct DbBuild {
     pub firmware_id: DbId,
     pub publisher_user_id: Option<DbId>,
     pub checksum: Option<String>,
-    pub exec_size: i32,
+    pub extract_size: Option<i32>,
     pub path: String,
-    pub md5: String,
+    pub md5: Option<String>,
     pub insert_date: NaiveDateTime,
     pub active: Option<bool>,
 }

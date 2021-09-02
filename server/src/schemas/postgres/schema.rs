@@ -12,9 +12,9 @@ table! {
         firmware_id -> Int4,
         publisher_user_id -> Nullable<Int4>,
         checksum -> Nullable<Varchar>,
-        extract_size -> Int4,
+        extract_size -> Nullable<Int4>,
         path -> Varchar,
-        md5 -> Varchar,
+        md5 -> Nullable<Varchar>,
         insert_date -> Timestamp,
         active -> Nullable<Bool>,
     }
@@ -61,7 +61,7 @@ table! {
     firmware (id) {
         id -> Int4,
         version -> Varchar,
-        build -> BigInt,
+        build -> Int4,
     }
 }
 

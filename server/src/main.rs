@@ -18,9 +18,11 @@ use std::time::Instant;
 
 use evmap_derive::ShallowCopy;
 
+use crate::api::*;
+
 pub mod utils;
 
-pub mod new_build;
+pub mod api;
 pub mod models;
 pub mod routes;
 pub mod synopackagelist;
@@ -150,9 +152,19 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/nas").route(web::post().to(routes::syno)))
             .service(web::resource("/package").route(web::get().to(routes::list_packages)))
             .service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
-            .service(new_build::new_build)
-            // .service(fs::Files::new("/", "server/public").index_file("index.html"))
-            .service(fs::Files::new("/", "frontend/dist").index_file("index.html"))
+            .service(web::scope("/api")
+                .service(build::get_builds)
+                .service(architecture::get_architectures)
+                .service(firmware::get_firmware)
+                .service(version::get_versions)
+                .service(screenshot::get_screenshots)
+                .service(package::get_packages)
+                .service(package::new_package)
+            )
+            .service(web::scope("/admin")
+                .service(fs::Files::new("/", "frontend/dist/admin").index_file("index.html").prefer_utf8(true))
+            )
+            .service(fs::Files::new("/", "frontend/dist").index_file("index.html").prefer_utf8(true))
     })
     .bind(&bind)?
     .run()
