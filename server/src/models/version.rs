@@ -44,10 +44,10 @@ pub struct Version {
 }
 
 impl DbVersion {
-    pub fn find_all(conn: &Connection) -> QueryResult<Vec<Version>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Version>> {
         version::table
-            .limit(20)
-            .offset(0)
+            .limit(limit)
+            .offset(offset)
             .inner_join(package::table)
             .select((version::id, package::name, version::upstream_version, version::ver, version::insert_date, version::install_wizard, version::upgrade_wizard, version::startable))
             .load::<Version>(conn)

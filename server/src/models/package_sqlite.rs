@@ -27,10 +27,10 @@ pub struct Package {
 
 impl DbPackage {
 
-    pub fn find_all(conn: &Connection) -> QueryResult<Vec<Package>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Package>> {
         package::table
-            .limit(20)
-            .offset(0)
+            .limit(limit)
+            .offset(offset)
             .inner_join(user::table)
             .select((package::id, user::username, package::name, package::insert_date))
             .load::<Package>(conn)

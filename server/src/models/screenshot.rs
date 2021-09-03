@@ -18,10 +18,10 @@ pub struct Screenshot {
 }
 
 impl DbScreenshot {
-    pub fn find_all(conn: &Connection) -> QueryResult<Vec<Screenshot>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Screenshot>> {
         screenshot::table
-            .limit(20)
-            .offset(0)
+            .limit(limit)
+            .offset(offset)
             .inner_join(package::table)
             .select((screenshot::id, package::name, screenshot::path))
             .load::<Screenshot>(conn)

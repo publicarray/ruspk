@@ -54,8 +54,14 @@ pub struct Build {
 }
 
 impl DbBuild {
-    pub fn find_all(conn: &Connection) -> QueryResult<Vec<Build>> {
-        let builds_by_id = build::table.select(build::id).load::<DbId>(conn)?;
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Build>> {
+
+        let builds_by_id = build::table
+            .limit(limit)
+            .offset(offset)
+            .select(build::id)
+            .load::<DbId>(conn)?;
+
         let mut architectures: Vec<Vec<String>> = Vec::new();
         for build_id in builds_by_id {
             let arch = build_architecture::table
@@ -67,8 +73,8 @@ impl DbBuild {
         }
 
         let db_builds = build::table
-            .limit(20)
-            .offset(0)
+            .limit(limit)
+            .offset(offset)
             .inner_join(version::table.inner_join(package::table))
             .inner_join(firmware::table)
             .inner_join(user::table)

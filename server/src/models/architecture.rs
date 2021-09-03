@@ -11,10 +11,10 @@ pub struct DbArchitecture {
 }
 
 impl DbArchitecture {
-    pub fn find_all(conn: &Connection) -> QueryResult<Vec<DbArchitecture>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<DbArchitecture>> {
         architecture::table
-            .limit(20)
-            .offset(0)
+            .limit(limit)
+            .offset(offset)
             // .order(id.asc())
             .load::<DbArchitecture>(conn)
     }

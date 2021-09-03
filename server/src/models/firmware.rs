@@ -10,10 +10,10 @@ pub struct DbFirmware {
 }
 
 impl DbFirmware {
-    pub fn find_all(conn: &Connection) -> QueryResult<Vec<DbFirmware>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<DbFirmware>> {
         firmware::table
-            .limit(20)
-            .offset(0)
+            .limit(limit)
+            .offset(offset)
             .load::<DbFirmware>(conn)
     }
 }
