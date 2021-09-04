@@ -1,19 +1,35 @@
+// import React from 'react'
 import { useTable } from 'react-table'
 import DetailBtn from './detail-btn'
 import EditBtn from './edit-btn'
 import DeleteBtn from './delete-btn'
-// https://react-table.tanstack.com/docs/quick-start
-// const data = [
-//     { id: 1, arch: "noarch" },
-//     { id: 2, arch: "ppc824x" },
-//     { id: 3, arch: "ppc854x" },
-//     { id: 4, arch: "ppc853x" },
-//     { id: 5, arch: "88f628x" },
-// ];
+import { fetch_json } from "../utils";
+import useSWR from 'swr'
+import ReactPaginate from 'react-paginate';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from "next/router"
 
-export default function Table({ columns, data }) {
+// https://react-table.tanstack.com/
+export default function Table({columns, data, url, loading, currentPage,pageCount}) {
+    const [data1, setData] = useState([])
+    const router = useRouter()
+    useEffect(() => {
+        if (data) {
+          if (data.error) {
+            return
+          } else {
+            setData(data)
+          }
+        }
+      }, [data])
 
-    const tableInstance = useTable({ columns, data })
+    const paginationHandler = (page) => {
+        router.query.page = page.selected + 1
+        router.push({
+            pathname: router.pathname,
+            query: router.query,
+        });
+    };
 
     const {
         getTableProps,
@@ -21,7 +37,11 @@ export default function Table({ columns, data }) {
         headerGroups,
         rows,
         prepareRow,
-    } = tableInstance
+    } = useTable({
+            columns,
+            data:data1,
+        },
+    )
 
     return (
         <div className="flex overflow-x-auto">
@@ -31,7 +51,7 @@ export default function Table({ columns, data }) {
                         <thead>
                             {
                                 headerGroups.map(headerGroup => (
-                                    <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal" {...headerGroup.getHeaderGroupProps()}>
+                                    <tr className="bg-gray-200 text-black uppercase text-sm leading-normal" {...headerGroup.getHeaderGroupProps()}>
                                         {
                                             headerGroup.headers.map(column => (
                                                 <th className="py-3 px-6 text-left" {...column.getHeaderProps()}>{column.render('Header')}</th>
@@ -41,7 +61,7 @@ export default function Table({ columns, data }) {
                                 ))
                             }
                         </thead>
-                        <tbody className="text-gray-600 text-sm font-light" {...getTableBodyProps()}>
+                        <tbody className="text-gray-700 text-sm" {...getTableBodyProps()}>
                             {rows.map(row => {
                                 prepareRow(row)
                                 return (
@@ -58,8 +78,32 @@ export default function Table({ columns, data }) {
                             })}
                         </tbody>
                     </table>
+
+
+                <ReactPaginate
+                    previousLabel={'previous'}
+                    nextLabel={'next'}
+                    breakLabel={'...'}
+                    containerClassName={'pagination'}
+                    pageClassName={'inline-block'}
+                    pageLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
+                    previousClassName={'inline-block'}
+                    previousLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
+                    nextClassName={'inline-block float-right'}
+                    nextLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
+                    breakClassName={'inline-block'}
+                    breakLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
+                    activeClassName={'inline-block'}
+                    activeLinkClassName={'bg-blue-700'}
+                    currentPage={currentPage}
+                    pageCount={pageCount}
+                    marginPagesDisplayed={1}
+                    pageRangeDisplayed={4}
+                    onPageChange={paginationHandler}
+                />
+
                 </div>
             </div>
         </div>
-    );
+    )
 }

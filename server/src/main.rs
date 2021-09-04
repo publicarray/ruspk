@@ -10,6 +10,7 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate chrono;
 
+use actix_cors::Cors;
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::r2d2::{self, ConnectionManager};
 use actix_files as fs;
@@ -137,7 +138,14 @@ async fn main() -> std::io::Result<()> {
     let cache_w = Arc::new(Mutex::new(raw_cache_w));
     // Start HTTP server
     HttpServer::new(move || {
+        let cors = Cors::default()
+            // .allowed_origin("https://localhost:3000")
+            .allow_any_origin()
+            .send_wildcard()
+            .allowed_methods(vec!["GET", "POST"])
+            .max_age(3600);
         App::new()
+            .wrap(cors)
             // set up DB pool to be used with web::Data<Pool> extractor
             .data(AppData {
                 pool: pool.clone(),

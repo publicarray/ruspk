@@ -4,9 +4,12 @@ import Table from "../../components/table";
 import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
+import { formatImage } from '../../utils';
 
-export async function getStaticProps(context) {
-    const res = await fetch(`http://127.0.0.1:8080/api/screenshot`)
+export async function getServerSideProps({ query }) {
+    const url = `http://127.0.0.1:8080/api/screenshot`
+    const page = query.page || 1; //if page empty we request the first page
+    const res = await fetch(`${url}?page=${page}&size=15`)
     const data = await res.json()
 
     if (!data) {
@@ -16,12 +19,15 @@ export async function getStaticProps(context) {
     }
 
     return {
-        props: { data },
-        revalidate: 5,
+        props: {
+            data,
+            currentPage: page,
+            pageCount: 100
+        }
     }
 }
 
-export default function ScreenshotPage({data}) {
+export default function ScreenshotPage({data, currentPage, pageCount}) {
     let [isOpen, setIsOpen] = useState(true);
 
     function closeModal() {
@@ -37,15 +43,15 @@ export default function ScreenshotPage({data}) {
     // ];
 
     const columns = [
-        { Header: 'ID', accessor: 'id',},
-        { Header: 'Package', accessor: 'package',},
-        { Header: 'Image', accessor: 'path',},
+        { Header: 'ID', accessor: 'id' },
+        { Header: 'Package', accessor: 'package' },
+        { Header: 'Image', accessor: 'path', Cell: ({ value }) => formatImage(value)},
     ];
 
     return (
         <Layout>
             <h1>Screenshot</h1>
-            <Table columns={columns} data={data}></Table>
+            <Table columns={columns} data={data} currentPage={currentPage} pageCount={pageCount}></Table>
             <Button>Add Firmware</Button>
         </Layout>
     );

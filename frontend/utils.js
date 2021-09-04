@@ -20,3 +20,7 @@ export function formatArray(array) {
     }
     return str += array[array.length -1]
 }
+
+export function formatImage(url, alt, title) {
+    return <img src={url} alt={alt} title={title}></img>
+}
