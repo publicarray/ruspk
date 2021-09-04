@@ -1,36 +1,22 @@
-// import React from 'react'
 import { useTable } from 'react-table'
-import DetailBtn from './detail-btn'
-import EditBtn from './edit-btn'
-import DeleteBtn from './delete-btn'
 import { fetch_json } from "../utils";
 import useSWR from 'swr'
-import ReactPaginate from 'react-paginate';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from "next/router"
+import React from 'react';
 
 // https://react-table.tanstack.com/
-export default function Table({columns, data, url, loading, currentPage, pageCount}) {
-    const [data1, setData] = useState([])
-    const router = useRouter()
-
-    useEffect(() => {
-        if (data) {
-          if (data.error) {
-            return
-          } else {
-            setData(data)
-          }
-        }
-      }, [data])
-
-    const paginationHandler = (page) => {
-        router.query.page = page.selected + 1
-        router.push({
-            pathname: router.pathname,
-            query: router.query,
-        });
-    };
+export default function Table({pageIndex, columns, url}) {
+    if (!pageIndex || pageIndex <= 0) {
+        pageIndex = 1
+    }
+    console.log(`${url}?page=${pageIndex}&size=10`);
+    let { data, error } = useSWR(`${url}?page=${pageIndex}&size=10`, fetch_json);
+    if (error) {
+        console.error(error)
+        return (<div>failed to load</div>)
+    }
+    if (!data) {
+        data = []
+    }
 
     const {
         getTableProps,
@@ -40,7 +26,7 @@ export default function Table({columns, data, url, loading, currentPage, pageCou
         prepareRow,
     } = useTable({
             columns,
-            data:data1,
+            data,
         },
     )
 
@@ -79,30 +65,6 @@ export default function Table({columns, data, url, loading, currentPage, pageCou
                             })}
                         </tbody>
                     </table>
-
-
-                <ReactPaginate
-                    previousLabel={'previous'}
-                    nextLabel={'next'}
-                    breakLabel={''}
-                    containerClassName={'pagination'}
-                    pageClassName={'inline-block'}
-                    pageLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
-                    previousClassName={'inline-block'}
-                    previousLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
-                    nextClassName={'inline-block'}
-                    nextLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
-                    breakClassName={'inline-block'}
-                    breakLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
-                    activeClassName={'inline-block'}
-                    activeLinkClassName={'bg-blue-700'}
-                    initialPage={currentPage-1}
-                    pageCount={pageCount}
-                    marginPagesDisplayed={0}
-                    pageRangeDisplayed={0}
-                    onPageChange={paginationHandler}
-                />
-
                 </div>
             </div>
         </div>

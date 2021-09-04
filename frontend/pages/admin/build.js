@@ -1,34 +1,11 @@
 import React from 'react'
 import Layout from "../../components/layout";
 import Button from "../../components/button";
-import Table from "../../components/table";
-import Model from "../../components/model";
+import TablePaginate from "../../components/table-paginate";
 import { Dialog } from "@headlessui/react";
-import { formatBoolean, formatArray, client_get_json } from '../../utils';
+import { formatBoolean, formatArray } from '../../utils';
 
-
-export async function getServerSideProps({ query }) {
-    const url = `http://127.0.0.1:8080/api/build`
-    const page = query.page || 1; //if page empty we request the first page
-    const res = await fetch(`${url}?page=${page}&size=15`)
-    const data = await res.json()
-
-    if (!data) {
-        return {
-            notFound: true,
-        }
-    }
-
-    return {
-        props: {
-            data,
-            currentPage: page,
-            pageCount: page+1
-        }
-    }
-}
-
-export default function BuildPage({data, currentPage, pageCount}) {
+export default function BuildPage({data}) {
     const url = `http://127.0.0.1:8080/api/build`
 
     const columns = [
@@ -46,7 +23,7 @@ export default function BuildPage({data, currentPage, pageCount}) {
     return (
         <Layout>
             <h1>Build</h1>
-            <Table columns={columns} data={data} currentPage={currentPage} pageCount={pageCount}></Table>
+            <TablePaginate columns={columns} url={url}></TablePaginate>
             <Button>Add Build</Button>
         </Layout>
     );

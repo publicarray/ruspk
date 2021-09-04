@@ -5,7 +5,7 @@
 ruspk*.sql
 schema.rs
 .vscode/launch.json
-*.json
+server/*.json
 .env
 frontend/dist
 server/public
