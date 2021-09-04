@@ -83,13 +83,13 @@ export default function Table({columns, data, url, loading, currentPage,pageCoun
                 <ReactPaginate
                     previousLabel={'previous'}
                     nextLabel={'next'}
-                    breakLabel={'...'}
+                    breakLabel={''}
                     containerClassName={'pagination'}
                     pageClassName={'inline-block'}
                     pageLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
                     previousClassName={'inline-block'}
                     previousLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
-                    nextClassName={'inline-block float-right'}
+                    nextClassName={'inline-block'}
                     nextLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
                     breakClassName={'inline-block'}
                     breakLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
@@ -97,8 +97,8 @@ export default function Table({columns, data, url, loading, currentPage,pageCoun
                     activeLinkClassName={'bg-blue-700'}
                     currentPage={currentPage}
                     pageCount={pageCount}
-                    marginPagesDisplayed={1}
-                    pageRangeDisplayed={4}
+                    marginPagesDisplayed={0}
+                    pageRangeDisplayed={0}
                     onPageChange={paginationHandler}
                 />
 

@@ -21,7 +21,7 @@ export async function getServerSideProps({ query }) {
         props: {
             data,
             currentPage: page,
-            pageCount: 100
+            pageCount: page+1
         }
     }
 }
