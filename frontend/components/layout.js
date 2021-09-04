@@ -10,7 +10,7 @@ export default function Layout({ children }) {
                 {/* <link rel="icon" href="/favicon.ico" /> */}
             </Head>
 
-            <main className="flex flex-col w-full flex-1 px-20">
+            <main className="flex flex-col w-full flex-1 md:px-20">
                 <nav className="flex flex-wrap flex-row justify-between md:items-center md:space-x-4 bg-white py-6 px-6 relative">
                     <Link href="/admin">
                         <a className="block text-xl lg:text-2xl font-bold cursor-pointer">Admin</a>
