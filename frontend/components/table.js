@@ -10,9 +10,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
 
 // https://react-table.tanstack.com/
-export default function Table({columns, data, url, loading, currentPage,pageCount}) {
+export default function Table({columns, data, url, loading, currentPage, pageCount}) {
     const [data1, setData] = useState([])
     const router = useRouter()
+
     useEffect(() => {
         if (data) {
           if (data.error) {
@@ -95,7 +96,7 @@ export default function Table({columns, data, url, loading, currentPage,pageCoun
                     breakLinkClassName={'py-1 px-3 text-white rounded-lg bg-blue-500 hover:bg-blue-700'}
                     activeClassName={'inline-block'}
                     activeLinkClassName={'bg-blue-700'}
-                    currentPage={currentPage}
+                    initialPage={currentPage-1}
                     pageCount={pageCount}
                     marginPagesDisplayed={0}
                     pageRangeDisplayed={0}
