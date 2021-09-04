@@ -98,10 +98,11 @@ yarn --cwd frontend dev
 
 ```sh
 # formatting
-cargo-fmt
+# $ rustup component add rustfmt
+cargo fmt
 # fix common mmistakes
 # $ rustup component add clippy
-cargo-clippy
+cargo clippy
 # check security advisories
 # $ cargo install cargo-audit
 cargo audit

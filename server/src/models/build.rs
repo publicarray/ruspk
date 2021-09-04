@@ -1,12 +1,12 @@
-use crate::Db32;
 use crate::models::DbFirmware;
 use crate::models::DbVersion;
 use crate::schema::*;
+use crate::Connection;
+use crate::Db32;
 use crate::DbId;
 use chrono::NaiveDateTime;
-use diesel::QueryDsl;
-use crate::Connection;
 use diesel::prelude::*;
+use diesel::QueryDsl;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbVersion, foreign_key = "version_id")]
@@ -24,7 +24,6 @@ pub struct DbBuild {
     pub insert_date: NaiveDateTime,
     pub active: Option<bool>,
 }
-
 
 #[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
 
@@ -55,7 +54,6 @@ pub struct Build {
 
 impl DbBuild {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Build>> {
-
         let builds_by_id = build::table
             .limit(limit)
             .offset(offset)
@@ -88,27 +86,27 @@ impl DbBuild {
                 firmware::version,
                 user::username,
                 build::insert_date,
-                build::active))
+                build::active,
+            ))
             .order_by(build::id.asc())
             .load::<Build1>(conn)
             .expect("Failed to get builds from db");
 
         let mut builds: Vec<Build> = Vec::new();
         for (i, b) in db_builds.iter().enumerate() {
-            builds.push(
-                Build {
-                    id: b.id,
-                    package: b.package.clone(),
-                    upstream_version: b.upstream_version.clone(),
-                    revision: b.revision.clone(),
-                    architectures: architectures[i].clone(),
-                    firmware: b.firmware.clone(),
-                    publisher: b.publisher.clone(),
-                    insert_date: b.insert_date,
-                    active: b.active,
-                }
-            )
+            builds.push(Build {
+                id: b.id,
+                package: b.package.clone(),
+                upstream_version: b.upstream_version.clone(),
+                revision: b.revision,
+                architectures: architectures[i].clone(),
+                firmware: b.firmware.clone(),
+                publisher: b.publisher.clone(),
+                insert_date: b.insert_date,
+                active: b.active,
+            })
         }
-        return Ok(builds);
+
+        Ok(builds)
     }
 }

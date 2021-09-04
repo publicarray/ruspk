@@ -33,7 +33,10 @@ pub fn paginate_qs(query_str: &str) -> (i64, i64) {
     }
 
     // if strings are found use defaults
-    let params: Parameters = qs::from_str(query_str).unwrap_or(Parameters{ page: Some(0), size: Some(20) });
+    let params: Parameters = qs::from_str(query_str).unwrap_or(Parameters {
+        page: Some(0),
+        size: Some(20),
+    });
     let mut offset = params.page.unwrap_or(1); //defaults if not provided
     let mut limit = params.size.unwrap_or(20); //defaults if not provided
 
@@ -47,5 +50,6 @@ pub fn paginate_qs(query_str: &str) -> (i64, i64) {
     } else if limit > 60 {
         limit = 60
     }
-    return (limit, (offset-1) * limit)
+
+    (limit, (offset - 1) * limit)
 }

@@ -32,7 +32,7 @@ impl ToSql<IconSize, Pg> for IconSizeEnum {
 // https://docs.diesel.rs/diesel/deserialize/trait.FromSql.html
 impl FromSql<IconSize, Pg> for IconSizeEnum {
     fn from_sql(bytes: Option<&<Pg as Backend>::RawValue>) -> deserialize::Result<Self> {
-    // fn from_sql(bytes: backend::RawValue<DB>) -> deserialize::Result<Self> {
+        // fn from_sql(bytes: backend::RawValue<DB>) -> deserialize::Result<Self> {
         match not_none!(bytes) {
             b"72" => Ok(IconSizeEnum::Icon72),
             b"120" => Ok(IconSizeEnum::Icon120),

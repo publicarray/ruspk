@@ -11,9 +11,9 @@ extern crate serde_derive;
 extern crate chrono;
 
 use actix_cors::Cors;
+use actix_files as fs;
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::r2d2::{self, ConnectionManager};
-use actix_files as fs;
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
@@ -160,19 +160,28 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/nas").route(web::post().to(routes::syno)))
             .service(web::resource("/package").route(web::get().to(routes::list_packages)))
             .service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
-            .service(web::scope("/api")
-                .service(build::get_builds)
-                .service(architecture::get_architectures)
-                .service(firmware::get_firmware)
-                .service(version::get_versions)
-                .service(screenshot::get_screenshots)
-                .service(package::get_packages)
-                .service(package::new_package)
+            .service(
+                web::scope("/api")
+                    .service(build::get_builds)
+                    .service(architecture::get_architectures)
+                    .service(firmware::get_firmware)
+                    .service(version::get_versions)
+                    .service(screenshot::get_screenshots)
+                    .service(package::get_packages)
+                    .service(package::new_package),
             )
-            .service(web::scope("/admin")
-                .service(fs::Files::new("/", "frontend/dist/admin").index_file("index.html").prefer_utf8(true))
+            .service(
+                web::scope("/admin").service(
+                    fs::Files::new("/", "frontend/dist/admin")
+                        .index_file("index.html")
+                        .prefer_utf8(true),
+                ),
             )
-            .service(fs::Files::new("/", "frontend/dist").index_file("index.html").prefer_utf8(true))
+            .service(
+                fs::Files::new("/", "frontend/dist")
+                    .index_file("index.html")
+                    .prefer_utf8(true),
+            )
     })
     .bind(&bind)?
     .run()

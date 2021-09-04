@@ -27,7 +27,6 @@ pub struct Package {
 }
 
 impl DbPackage {
-
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Package>> {
         package::table
             .limit(limit)

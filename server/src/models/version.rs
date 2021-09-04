@@ -1,8 +1,8 @@
 use crate::models::DbPackage;
 use crate::schema::*;
+use crate::Connection;
 use crate::{Db32, DbId};
 use chrono::NaiveDateTime;
-use crate::Connection;
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbPackage, foreign_key = "package_id")]
@@ -49,7 +49,16 @@ impl DbVersion {
             .limit(limit)
             .offset(offset)
             .inner_join(package::table)
-            .select((version::id, package::name, version::upstream_version, version::ver, version::insert_date, version::install_wizard, version::upgrade_wizard, version::startable))
+            .select((
+                version::id,
+                package::name,
+                version::upstream_version,
+                version::ver,
+                version::insert_date,
+                version::install_wizard,
+                version::upgrade_wizard,
+                version::startable,
+            ))
             .load::<Version>(conn)
     }
 }

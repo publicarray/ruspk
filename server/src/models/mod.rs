@@ -28,8 +28,8 @@ mod user;
 mod version;
 
 pub use self::architecture::DbArchitecture;
-pub use self::build::DbBuild;
 pub use self::build::Build;
+pub use self::build::DbBuild;
 pub use self::description::DbDescription;
 pub use self::displayname::DbDisplayName;
 pub use self::download::DbDownload;
