@@ -48,23 +48,24 @@ type Connection = diesel::pg::PgConnection;
 #[cfg(feature = "sqlite")]
 type DbId = i64;
 #[cfg(feature = "mysql")]
-type DbId = u64;
+type DbId = u64; //Unsigned<Bigint>
 #[cfg(feature = "postgres")]
-type DbId = i32;
+type DbId = i32; //Int4
 
 #[cfg(feature = "sqlite")]
 type Db64 = i64;
 #[cfg(feature = "mysql")]
 type Db64 = u64;
 #[cfg(feature = "postgres")]
-type Db64 = i64;
+type Db64 = i64; //BigInt
 
+//mysql(Integer),postgres(Int4),sqlite(Integer) = i32
 #[cfg(feature = "sqlite")]
-type Db32 = i32;
+type Dbu32 = i32;
 #[cfg(feature = "mysql")]
-type Db32 = u32;
+type Dbu32 = u32;
 #[cfg(feature = "postgres")]
-type Db32 = i32;
+type Dbu32 = i32; //Int4
 
 #[cfg(feature = "sqlite")]
 type Db8 = i8;

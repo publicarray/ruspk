@@ -22,8 +22,8 @@ table! {
 
 table! {
     build_architecture (build_id, architecture_id) {
-        build_id -> Nullable<BigInt>,
-        architecture_id -> Nullable<BigInt>,
+        build_id -> BigInt,
+        architecture_id -> BigInt,
     }
 }
 

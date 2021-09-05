@@ -19,7 +19,7 @@ impl DbArchitecture {
             .load::<DbArchitecture>(conn)
     }
 
-    pub fn find_by_id(i: i32, conn: &Connection) -> QueryResult<DbArchitecture> {
+    pub fn find_by_id(i: DbId, conn: &Connection) -> QueryResult<DbArchitecture> {
         architecture::table.find(i).get_result::<DbArchitecture>(conn)
     }
 

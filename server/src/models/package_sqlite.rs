@@ -19,7 +19,7 @@ pub struct DbPackage {
 
 #[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
 pub struct Package {
-    pub id: i32,
+    pub id: i64,
     pub author: String,
     pub name: String,
     pub insert_date: Option<NaiveDateTime>,

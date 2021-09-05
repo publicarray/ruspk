@@ -1,4 +1,4 @@
-use crate::{schema::*, Connection, Db32, DbId};
+use crate::{schema::*, Connection, DbId};
 use diesel::prelude::*;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
@@ -6,7 +6,7 @@ use diesel::prelude::*;
 pub struct DbFirmware {
     pub id: DbId,
     pub version: String,
-    pub build: Db32,
+    pub build: i32,
 }
 
 impl DbFirmware {

@@ -4,7 +4,7 @@ use crate::models::DbFirmware;
 use crate::models::DbVersion;
 use crate::schema::*;
 use crate::Connection;
-use crate::Db32;
+use crate::Dbu32;
 use crate::DbId;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
@@ -33,7 +33,7 @@ pub struct BuildTmp {
     pub id: DbId,
     pub package: String,
     pub upstream_version: String,
-    pub revision: Db32,
+    pub revision: Dbu32,
     pub firmware: String,
     pub publisher: String,
     pub insert_date: NaiveDateTime,
@@ -46,7 +46,7 @@ pub struct Build {
     pub id: DbId,
     pub package: String,
     pub upstream_version: String,
-    pub revision: Db32,
+    pub revision: Dbu32,
     pub architectures: Vec<String>,
     pub firmware: String,
     pub publisher: String,

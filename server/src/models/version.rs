@@ -1,7 +1,7 @@
 use crate::models::DbPackage;
 use crate::schema::*;
 use crate::Connection;
-use crate::{Db32, DbId};
+use crate::{Dbu32, DbId};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
@@ -10,7 +10,7 @@ use diesel::prelude::*;
 pub struct DbVersion {
     pub id: DbId,
     pub package_id: DbId,
-    pub ver: Db32,
+    pub ver: Dbu32,
     pub upstream_version: String,
     pub changelog: Option<String>,
     pub report_url: Option<String>,
@@ -34,7 +34,7 @@ pub struct Version {
     pub id: DbId,
     pub package: String,
     pub upstream_version: String,
-    pub revision: Db32,
+    pub revision: Dbu32,
     // beta
     pub insert_date: NaiveDateTime,
     // all active
