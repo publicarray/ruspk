@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate log;
+use actix_web::web::Data;
 use env_logger::Env;
 use lazy_static::lazy_static;
 #[macro_use]
@@ -148,12 +149,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             // set up DB pool to be used with web::Data<Pool> extractor
-            .data(AppData {
+            .app_data(Data::new(AppData {
                 pool: pool.clone(),
                 cache_r: cache_r.clone(),
                 cache_w: cache_w.clone(),
                 keyring: public_key.clone(),
-            })
+            }))
             .wrap(middleware::Logger::default())
             .service(web::resource("/hello").route(web::get().to(routes::index)))
             .service(web::resource("/hello/{name}").route(web::get().to(routes::index)))
