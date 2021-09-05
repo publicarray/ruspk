@@ -29,6 +29,7 @@ mod version;
 
 pub use self::architecture::DbArchitecture;
 pub use self::build::Build;
+pub use self::build::BuildTmp;
 pub use self::build::DbBuild;
 pub use self::description::DbDescription;
 pub use self::displayname::DbDisplayName;
@@ -50,10 +51,21 @@ pub use self::version::Version;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]
+#[belongs_to(Build, foreign_key = "build_id")]
+#[belongs_to(BuildTmp, foreign_key = "build_id")]
 #[belongs_to(DbArchitecture, foreign_key = "architecture_id")]
 #[primary_key(build_id, architecture_id)]
 #[table_name = "build_architecture"]
 pub struct DbBuildArchitecture {
+    pub build_id: DbId,
+    pub architecture_id: DbId,
+}
+
+#[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
+#[belongs_to(BuildTmp, foreign_key = "build_id")]
+#[primary_key(build_id, architecture_id)]
+#[table_name = "build_architecture"]
+pub struct BuildArchitecture {
     pub build_id: DbId,
     pub architecture_id: DbId,
 }

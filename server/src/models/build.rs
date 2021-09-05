@@ -1,3 +1,5 @@
+use crate::models::BuildArchitecture;
+use crate::models::DbArchitecture;
 use crate::models::DbFirmware;
 use crate::models::DbVersion;
 use crate::schema::*;
@@ -25,21 +27,21 @@ pub struct DbBuild {
     pub active: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
-
-pub struct Build1 {
+#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
+#[table_name = "build"]
+pub struct BuildTmp {
     pub id: DbId,
     pub package: String,
     pub upstream_version: String,
     pub revision: Db32,
-    // pub architectures: String,
     pub firmware: String,
     pub publisher: String,
     pub insert_date: NaiveDateTime,
     pub active: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
+#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
+#[table_name = "build"]
 pub struct Build {
     pub id: DbId,
     pub package: String,
@@ -53,60 +55,65 @@ pub struct Build {
 }
 
 impl DbBuild {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Build>> {
-        let builds_by_id = build::table
-            .limit(limit)
-            .offset(offset)
-            .select(build::id)
-            .load::<DbId>(conn)?;
-
-        let mut architectures: Vec<Vec<String>> = Vec::new();
-        for build_id in builds_by_id {
-            let arch = build_architecture::table
-                .filter(build_architecture::build_id.eq(build_id))
-                .inner_join(architecture::table)
-                .select(architecture::code)
-                .load::<String>(conn)?;
-            architectures.push(arch)
+    pub fn new_build(b: BuildTmp, architectures: Vec<String>) -> Build {
+        Build {
+            id: b.id,
+            package: b.package.clone(),
+            upstream_version: b.upstream_version.clone(),
+            revision: b.revision,
+            architectures,
+            firmware: b.firmware.clone(),
+            publisher: b.publisher.clone(),
+            insert_date: b.insert_date,
+            active: b.active,
         }
+    }
 
-        let db_builds = build::table
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Build>> {
+        // https://github.com/ChristophWurst/diesel_many_to_many/
+        // https://www.reddit.com/r/rust/comments/frkta2/manytomany_relationships_in_diesel_does_anybody/
+        // https://stackoverflow.com/questions/52279553/what-is-the-standard-pattern-to-relate-three-tables-many-to-many-relation-with
+        // https://docs.diesel.rs/1.4.x/diesel/query_dsl/trait.BelongingToDsl.html
+        // https://docs.diesel.rs/1.4.x/diesel/associations/trait.GroupedBy.html
+        // https://docs.diesel.rs/1.4.x/diesel/associations/index.html
+        let builds_tmp = build::table
             .limit(limit)
             .offset(offset)
             .inner_join(version::table.inner_join(package::table))
             .inner_join(firmware::table)
             .inner_join(user::table)
-            .inner_join(build_architecture::table.inner_join(architecture::table))
             .select((
                 build::id,
                 package::name,
                 version::upstream_version,
                 version::ver,
-                // architecture::code, // as an array or vector
                 firmware::version,
                 user::username,
                 build::insert_date,
                 build::active,
             ))
-            .order_by(build::id.asc())
-            .load::<Build1>(conn)
-            .expect("Failed to get builds from db");
+            .load::<BuildTmp>(conn)?;
 
-        let mut builds: Vec<Build> = Vec::new();
-        for (i, b) in db_builds.iter().enumerate() {
-            builds.push(Build {
-                id: b.id,
-                package: b.package.clone(),
-                upstream_version: b.upstream_version.clone(),
-                revision: b.revision,
-                architectures: architectures[i].clone(),
-                firmware: b.firmware.clone(),
-                publisher: b.publisher.clone(),
-                insert_date: b.insert_date,
-                active: b.active,
+        let builds_architectures = BuildArchitecture::belonging_to(&builds_tmp)
+            .inner_join(architecture::table)
+            .load::<(BuildArchitecture, DbArchitecture)>(conn)?
+            .grouped_by(&builds_tmp);
+
+        // Reduce the database result to match Build struct
+        let builds = builds_tmp
+            .into_iter()
+            .zip(builds_architectures)
+            .map(|(b, ba_a)| {
+                // move data from BuildTmp to Build struct
+                DbBuild::new_build(
+                    b,
+                    ba_a.into_iter()
+                        // drop BuildArchitecture and only get Architecture.code
+                        .map(|(_, a)| a.code)
+                        .collect::<Vec<_>>(),
+                )
             })
-        }
-
+            .collect::<Vec<_>>();
         Ok(builds)
     }
 }
