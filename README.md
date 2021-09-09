@@ -87,6 +87,7 @@ psql -U ruspk -d ruspk -f ruspk.sql
 ## development
 
 ```sh
+systemctl start postgresql
 mkdir -p frontend/dist
 cargo run
 yarn --cwd frontend dev

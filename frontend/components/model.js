@@ -2,29 +2,13 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 
 // https://headlessui.dev/react/dialog
-export default function Model({ title, children }) {
-    let [isOpen, setIsOpen] = useState(false);
-
+export default function Model({ isOpen, setIsOpen, title, description, children }) {
     function closeModal() {
         setIsOpen(false);
     }
 
-    function openModal() {
-        setIsOpen(true);
-    }
-
     return (
         <>
-            <div className="fixed inset-0 flex items-center justify-center">
-                <button
-                    type="button"
-                    onClick={openModal}
-                    className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md bg-opacity-20 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
-                >
-                    Open dialog
-                </button>
-            </div>
-
             <Transition appear show={isOpen} as={Fragment}>
                 <Dialog
                     as="div"
@@ -69,17 +53,17 @@ export default function Model({ title, children }) {
                                 </Dialog.Title>
                                 <div className="mt-2">
                                     <Dialog.Description className="text-sm text-gray-500">
-                                        { children }
+                                        { description }
                                     </Dialog.Description>
+                                    { children }
                                 </div>
-
                                 <div className="mt-4">
                                     <button
                                         type="button"
                                         className="inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                                         onClick={closeModal}
                                     >
-                                        Got it, thanks!
+                                        Cancel
                                     </button>
                                 </div>
                             </div>

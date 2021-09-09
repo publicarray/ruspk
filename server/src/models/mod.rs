@@ -27,27 +27,22 @@ mod service;
 mod user;
 mod version;
 
-pub use self::architecture::DbArchitecture;
-pub use self::build::Build;
-pub use self::build::BuildTmp;
-pub use self::build::DbBuild;
-pub use self::description::DbDescription;
-pub use self::displayname::DbDisplayName;
-pub use self::download::DbDownload;
-pub use self::firmware::DbFirmware;
-pub use self::icon::DbIcon;
+pub use self::architecture::*;
+pub use self::build::*;
+pub use self::description::*;
+pub use self::displayname::*;
+pub use self::download::*;
+pub use self::firmware::*;
+pub use self::icon::*;
 #[cfg(feature = "postgres")]
 pub use self::icon_size_type::{IconSize, IconSizeEnum};
-pub use self::language::DbLanguage;
-pub use self::package::DbPackage;
-pub use self::package::Package;
-pub use self::role::DbRole;
-pub use self::screenshot::DbScreenshot;
-pub use self::screenshot::Screenshot;
-pub use self::service::DbService;
-pub use self::user::DbUser;
-pub use self::version::DbVersion;
-pub use self::version::Version;
+pub use self::language::*;
+pub use self::package::*;
+pub use self::role::*;
+pub use self::screenshot::*;
+pub use self::service::*;
+pub use self::user::*;
+pub use self::version::*;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
 #[belongs_to(DbBuild, foreign_key = "build_id")]

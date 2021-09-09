@@ -12,7 +12,6 @@ export default function Table({pageIndex, columns, url}) {
     let { data, error } = useSWR(`${url}?page=${pageIndex}&size=15`, fetch_json);
     if (error) {
         console.error(error)
-        return (<div>failed to load</div>)
     }
     if (!data) {
         data = []

@@ -1,7 +1,7 @@
 use crate::models::*;
 use crate::utils;
 use crate::{AppData, DbConn};
-use actix_web::{get, web, Error, HttpRequest, HttpResponse};
+use actix_web::{get, post, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 
 fn db_get_architectures(conn: &DbConn, limit: i64, offset: i64) -> Result<Vec<DbArchitecture>> {
@@ -25,4 +25,12 @@ pub async fn get_architectures(req: HttpRequest, data: web::Data<AppData>) -> Re
         })?;
 
     Ok(HttpResponse::Ok().json(response))
+}
+
+/// retrieve all architectures
+#[post("/architecture")]
+pub async fn post_architectures(architecture: web::Json<NewArchitecture>) -> Result<HttpResponse, Error> {
+    // Ok(format!("Welcome {}!", architecture.code))
+
+    Ok(HttpResponse::Ok().json(format!("Ok: {}", architecture.code)))
 }
