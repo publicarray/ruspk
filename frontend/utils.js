@@ -24,3 +24,15 @@ export function formatArray(array) {
 export function formatImage(url, alt, title) {
     return <img src={url} alt={alt} title={title}></img>
 }
+
+export async function postJson(url, data) {
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    };
+
+    let response = await fetch(url, requestOptions)
+        .catch((err) => console.error(err));
+    return response.json().catch((err) => console.error(err));
+}

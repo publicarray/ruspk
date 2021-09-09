@@ -3,8 +3,9 @@ import Model from "../../components/model";
 import Button from "../../components/button";
 import TablePaginate from "../../components/table-paginate";
 import { useState } from "react";
+import { postJson } from "../../utils";
 
-export default function ArchitecturePage({ data }) {
+export default function ArchitecturePage() {
     const url = `http://127.0.0.1:8080/api/architecture`;
 
     let [isOpen, setIsOpen] = useState(false);
@@ -16,17 +17,10 @@ export default function ArchitecturePage({ data }) {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        const requestOptions = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code: newArchitecture.value }),
-        };
-
-        let response = await fetch(
-            "http://127.0.0.1:8080/api/architecture",
-            requestOptions
-        ).catch((err) => console.error(err));
-        console.log(await response.json().catch((err) => console.error(err)));
+        let response = await postJson("http://127.0.0.1:8080/api/architecture", {
+            code: newArchitecture.value,
+        });
+        console.log(response);
         setIsOpen(false);
     }
 
