@@ -143,6 +143,7 @@ async fn main() -> std::io::Result<()> {
         let cors = Cors::default()
             // .allowed_origin("https://localhost:3000")
             .allow_any_origin()
+            .allow_any_header()
             .send_wildcard()
             .allowed_methods(vec!["GET", "POST"])
             .max_age(3600);
