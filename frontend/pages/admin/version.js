@@ -5,18 +5,10 @@ import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import { formatBoolean } from '../../utils';
+import { postJsonForm } from "../../utils";
 
 export default function VersionPage({data}) {
     const url = `http://127.0.0.1:8080/api/version`
-    let [isOpen, setIsOpen] = useState(true);
-
-    function closeModal() {
-        setIsOpen(false);
-    }
-
-    function openModal() {
-        setIsOpen(true);
-    }
 
     // const data = [
     //     { id: 1, package: "python38", version: "3.8.11", revision: "4", beta: "false", services: "", insert_date: "2021-08-31 22:42:37.109035", all_builds_active: "true", install_wizard: "false", upgrade_wizard: "false", startable: "false"  },
@@ -40,7 +32,6 @@ export default function VersionPage({data}) {
         <Layout>
             <h1>Version</h1>
             <TablePaginate columns={columns} url={url}></TablePaginate>
-            <Button>Add Version</Button>
         </Layout>
     );
 }

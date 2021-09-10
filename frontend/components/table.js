@@ -1,5 +1,5 @@
 import { useTable } from 'react-table'
-import { fetch_json } from "../utils";
+import { fetchJson } from "../utils";
 import useSWR from 'swr'
 import React from 'react';
 
@@ -9,7 +9,7 @@ export default function Table({pageIndex, columns, url}) {
         pageIndex = 1
     }
 
-    let { data, error } = useSWR(`${url}?page=${pageIndex}&size=15`, fetch_json);
+    let { data, error } = useSWR(`${url}?page=${pageIndex}&size=15`, fetchJson);
     if (error) {
         console.error(error)
     }
