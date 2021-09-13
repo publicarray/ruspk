@@ -101,7 +101,7 @@ Running 30s test @ http://127.0.0.1:8000/nas/?package_update_channel=beta&build=
      90%   36.00ms
      99%   58.46ms
   83674 requests in 30.10s, 5.73GB read
-Requests/sec:   .90
+Requests/sec:   2779.90
 Transfer/sec:    195.07MB
 
 ```
