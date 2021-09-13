@@ -459,7 +459,7 @@ Shortest transaction:         0.00
 
 ## spkrepo vs ruspk with the same database
 
-* ruspk can out perform spkrepo by 10 times when memory cache is enabled!
+* ruspk out performs spkrepo by a huge margin.
 
 ```sh
 ## spkrepo wsgi NO Cache

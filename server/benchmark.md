@@ -9,7 +9,10 @@
 ||spkrepo|ruspk|
 |-|-|-|
 |No Cache|16 Req/sec|**371** Req/sec|
-|With Cache|2,936 Req/sec|**62,514** Req/sec|
+|With build in Memory Cache||**62,514** Req/sec|
+|With File Cache|3,231 Req/sec||
+|With Redis Cache|2,779 Req/sec||
+
 
 ```sh
 ## spkrepo wsgi NO Cache
@@ -56,16 +59,16 @@ Transfer/sec:     22.79MB
 Running 30s test @ http://127.0.0.1:8000/nas/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2
   8 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    40.70ms   66.81ms 974.90ms   97.87%
-    Req/Sec   377.73     47.94     0.94k    83.84%
+    Latency    38.02ms   67.84ms 904.39ms   97.85%
+    Req/Sec   415.64     34.48   474.00     85.67%
   Latency Distribution
-     50%   30.50ms
-     75%   32.57ms
-     90%   38.19ms
-     99%  467.00ms
-  88391 requests in 30.10s, 6.06GB read
-Requests/sec:   2936.85
-Transfer/sec:    206.08MB
+     50%   28.74ms
+     75%   29.07ms
+     90%   29.53ms
+     99%  475.55ms
+  97108 requests in 30.05s, 6.65GB read
+Requests/sec:   3231.25
+Transfer/sec:    226.74MB
 
 ## rusk memory cache
 # RUST_LOG="warn" ./target/release/ruspk
@@ -83,4 +86,22 @@ Running 30s test @ http://localhost:8080/nas?package_update_channel=beta&build=2
   1881521 requests in 30.10s, 112.82GB read
 Requests/sec:  62514.48
 Transfer/sec:      3.75GB
+
+## spkrepo wsgi RedisCache
+# SPKREPO_CONFIG=$PWD/spkrepo/config-bench.py gunicorn -w (nproc) 'wsgi:app'
+❯ wrk --latency -H 'Connection: Close' -c 100 -t 8 -d 30 'http://127.0.0.1:8000/nas/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2'
+Running 30s test @ http://127.0.0.1:8000/nas/?package_update_channel=beta&build=24922&language=enu&major=6&micro=2&arch=x86_64&minor=2
+  8 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    34.41ms    4.35ms  81.63ms   95.48%
+    Req/Sec   349.34     34.03   393.00     92.85%
+  Latency Distribution
+     50%   33.56ms
+     75%   34.36ms
+     90%   36.00ms
+     99%   58.46ms
+  83674 requests in 30.10s, 5.73GB read
+Requests/sec:   .90
+Transfer/sec:    195.07MB
+
 ```
