@@ -13,6 +13,7 @@
 |With File Cache|3,231 Req/sec||
 |With Redis Cache|2,779 Req/sec||
 
+To run this test on your own, my spkrepo [config-bench.py](https://github.com/publicarray/spkrepo/blob/benchmark/spkrepo/config-bench.py)
 
 ```sh
 ## spkrepo wsgi NO Cache
