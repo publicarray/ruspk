@@ -1,7 +1,7 @@
 use crate::models::*;
 use crate::utils;
 use crate::{AppData, DbConn};
-use actix_web::{get, post, web, Error, HttpRequest, HttpResponse};
+use actix_web::{get, post, delete, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 
 fn db_get_architectures(conn: &DbConn, limit: i64, offset: i64) -> Result<Vec<DbArchitecture>> {
@@ -27,10 +27,36 @@ pub async fn get_architectures(req: HttpRequest, data: web::Data<AppData>) -> Re
     Ok(HttpResponse::Ok().json(response))
 }
 
-/// retrieve all architectures
+/// add an architecture
 #[post("/architecture")]
-pub async fn post_architectures(architecture: web::Json<NewArchitecture>) -> Result<HttpResponse, Error> {
-    // Ok(format!("Welcome {}!", architecture.code))
+pub async fn post_architecture(architecture: web::Json<NewArchitecture>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbArchitecture::new_architecture(&conn, architecture.code.clone()))
+    .await
+    .map_err(|e| {
+        debug!("{}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
 
-    Ok(HttpResponse::Ok().json(format!("Ok: {}", architecture.code)))
+    Ok(HttpResponse::Ok().json(format!("Ok: id:{}", response)))
+}
+
+use crate::DbId;
+#[derive(Deserialize)]
+pub struct DelArchitecture {
+    pub id: DbId,
+}
+
+/// delete an architecture by id
+#[delete("/architecture")]
+pub async fn delete_architecture(del_arch: web::Json<DelArchitecture>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbArchitecture::delete_architecture(&conn, del_arch.id))
+    .await
+    .map_err(|e| {
+        debug!("{}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
+
+    Ok(HttpResponse::Ok().json(format!("Ok: number of rows effected:{}", response)))
 }

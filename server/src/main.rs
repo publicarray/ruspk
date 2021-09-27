@@ -166,7 +166,8 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api")
                     .service(build::get_builds)
-                    .service(architecture::post_architectures)
+                    .service(architecture::post_architecture)
+                    .service(architecture::delete_architecture)
                     .service(architecture::get_architectures)
                     .service(firmware::get_firmware)
                     .service(version::get_versions)

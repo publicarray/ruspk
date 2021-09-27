@@ -10,7 +10,8 @@ pub struct DbArchitecture {
     pub code: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize, Insertable, Clone)]
+#[table_name = "architecture"]
 pub struct NewArchitecture {
     pub code: String,
 }
@@ -44,5 +45,20 @@ impl DbArchitecture {
             .first::<DbId>(conn)
             .context("Error loading architecture from DB")?; // todo return 404
         Ok(architecture_id)
+    }
+
+    pub fn new_architecture(conn: &Connection, code: String) -> QueryResult<DbId> {
+        let t_new_arch = architecture::code.eq(code);
+
+        let new = diesel::insert_into(architecture::table)
+            .values(&t_new_arch)
+            .returning(architecture::id)
+            .get_results(conn)?;
+        Ok(new[0])
+    }
+
+    pub fn delete_architecture(conn: &Connection, id: i32) -> QueryResult<usize> {
+        let result = diesel::delete(architecture::table.filter(architecture::id.eq(id))).execute(conn)?;
+        Ok(result)
     }
 }
