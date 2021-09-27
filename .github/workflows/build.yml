@@ -28,6 +28,7 @@ jobs:
 
     - name: Release build
       uses: actions-rs/cargo@v1
+      continue-on-error: true
       with:
         command: build
         args: --release --no-default-features --features ${{ matrix.features }} --verbose
