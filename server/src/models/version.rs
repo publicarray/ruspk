@@ -10,7 +10,7 @@ use diesel::prelude::*;
 pub struct DbVersion {
     pub id: DbId,
     pub package_id: DbId,
-    pub ver: Dbu32,
+    pub ver: Dbu32, // revision
     pub upstream_version: String,
     pub changelog: Option<String>,
     pub report_url: Option<String>,
@@ -61,4 +61,14 @@ impl DbVersion {
             ))
             .load::<Version>(conn)
     }
+
+    pub fn delete_version(conn: &Connection, id: i32) -> QueryResult<usize> {
+        conn.build_transaction().read_write().run(|| {
+            let builds = diesel::delete(build::table
+                .filter(build::version_id.eq(id))).execute(conn)?;
+            let versions = diesel::delete(version::table.filter(version::id.eq(id))).execute(conn)?;
+            Ok(builds+versions) // number of rows effected
+        })
+    }
+
 }

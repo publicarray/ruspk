@@ -31,14 +31,14 @@ pub async fn get_architectures(req: HttpRequest, data: web::Data<AppData>) -> Re
 #[post("/architecture")]
 pub async fn post_architecture(architecture: web::Json<NewArchitecture>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::new_architecture(&conn, architecture.code.clone()))
+    let response = web::block(move || DbArchitecture::create_architecture(&conn, architecture.code.clone()))
     .await
     .map_err(|e| {
         debug!("{}", e);
         HttpResponse::InternalServerError().finish()
     })?;
 
-    Ok(HttpResponse::Ok().json(format!("Ok: id:{}", response)))
+    Ok(HttpResponse::Ok().json(response))
 }
 
 use crate::DbId;
@@ -58,5 +58,5 @@ pub async fn delete_architecture(del_arch: web::Json<DelArchitecture>, data: web
         HttpResponse::InternalServerError().finish()
     })?;
 
-    Ok(HttpResponse::Ok().json(format!("Ok: number of rows effected:{}", response)))
+    Ok(HttpResponse::Ok().json(response))
 }

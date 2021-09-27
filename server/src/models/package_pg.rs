@@ -4,6 +4,7 @@ use crate::schema::*;
 use crate::Connection;
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
+use diesel::dsl;
 use diesel::prelude::*;
 use diesel::query_builder::SqlQuery;
 use diesel::sql_query;
@@ -34,6 +35,38 @@ impl DbPackage {
             .inner_join(user::table)
             .select((package::id, user::username, package::name, package::insert_date))
             .load::<Package>(conn)
+    }
+
+    pub fn create_package(conn: &Connection, author_id: Option<i32>, name: String) -> QueryResult<DbPackage> {
+
+        let new_package = (
+            package::author_user_id.eq(author_id),
+            package::name.eq(name),
+            package::insert_date.eq(dsl::now)
+        );
+
+        let package = diesel::insert_into(package::table)
+            .values(&new_package)
+            .get_result::<DbPackage>(conn)?;
+        Ok(package)
+    }
+
+    pub fn delete_package(conn: &Connection, id: i32) -> QueryResult<usize> {
+        conn.build_transaction().read_write().run(|| {
+            let builds = diesel::delete(build::table.filter(
+                build::version_id.eq_any(
+                    version::table.filter(version::package_id.eq(id)
+                )
+                .select(version::id))))
+            .execute(conn)?;
+
+            let versions = diesel::delete(version::table
+                .filter(version::package_id.eq(id))).execute(conn)?;
+
+            let packages = diesel::delete(package::table.filter(package::id.eq(id))).execute(conn)?;
+
+            Ok(builds+versions+packages) // number of rows effected
+        })
     }
 
     pub fn get_packages(

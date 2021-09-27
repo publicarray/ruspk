@@ -173,7 +173,7 @@ async fn main() -> std::io::Result<()> {
                     .service(version::get_versions)
                     .service(screenshot::get_screenshots)
                     .service(package::get_packages)
-                    .service(package::new_package),
+                    .service(package::create_package),
             )
             .service(
                 web::scope("/admin").service(

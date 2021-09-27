@@ -25,6 +25,6 @@ pub async fn get_packages(req: HttpRequest, data: web::Data<AppData>) -> Result<
 
 /// create a new package
 #[post("/package")]
-pub async fn new_package(_: web::Data<AppData>) -> Result<HttpResponse, Error> {
+pub async fn create_package(_: web::Data<AppData>) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::Ok().json(""))
 }
