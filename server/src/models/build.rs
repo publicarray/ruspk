@@ -230,7 +230,7 @@ impl DbBuild {
         Ok(builds)
     }
 
-    pub fn delete_build(conn: &Connection, id: i32) -> QueryResult<usize> {
+    pub fn delete_build(conn: &Connection, id: DbId) -> QueryResult<usize> {
         let result = diesel::delete(build::table.filter(build::id.eq(id))).execute(conn)?;
         Ok(result)
     }

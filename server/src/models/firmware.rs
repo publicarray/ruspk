@@ -14,7 +14,7 @@ impl DbFirmware {
         firmware::table.limit(limit).offset(offset).load::<DbFirmware>(conn)
     }
 
-    pub fn create_firmware(conn: &Connection, vers_str: String, build: i32) -> QueryResult<DbFirmware> {
+    pub fn create_firmware(conn: &Connection, vers_str: String, build: DbId) -> QueryResult<DbFirmware> {
         let firmware = diesel::insert_into(firmware::table)
             .values(&(firmware::version.eq(vers_str), firmware::build.eq(build)))
             .get_result::<DbFirmware>(conn)?;

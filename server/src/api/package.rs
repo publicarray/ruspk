@@ -25,16 +25,16 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 }
 
 #[derive(Deserialize, Clone)]
-struct PostPackage {
+pub struct PostPackage {
     name: String,
-    authorId: Option<DbId>,
+    author_id: Option<DbId>,
 }
 
 /// create a new package
 #[post("/package")]
 pub async fn post(post_data: web::Json<PostPackage>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::create_package(&conn, post_data.authorId, post_data.name.clone()))
+    let response = web::block(move || DbPackage::create_package(&conn, post_data.author_id, post_data.name.clone()))
         .await
         .map_err(|e| {
             debug!("{}", e);

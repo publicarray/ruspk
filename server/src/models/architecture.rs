@@ -53,7 +53,7 @@ impl DbArchitecture {
         Ok(arch)
     }
 
-    pub fn delete_architecture(conn: &Connection, id: i32) -> QueryResult<usize> {
+    pub fn delete_architecture(conn: &Connection, id: DbId) -> QueryResult<usize> {
         // todo remove everything else linked to the architecture
         let result = diesel::delete(architecture::table.filter(architecture::id.eq(id))).execute(conn)?;
         Ok(result)

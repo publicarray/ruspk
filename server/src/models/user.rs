@@ -34,7 +34,7 @@ impl User {
             .load::<User>(conn)
     }
 
-    pub fn delete(conn: &Connection, id: i32) -> QueryResult<usize> {
+    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
         let result = diesel::delete(user::table.filter(user::id.eq(id))).execute(conn)?;
         Ok(result)
     }
