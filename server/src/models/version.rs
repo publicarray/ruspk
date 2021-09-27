@@ -1,7 +1,7 @@
 use crate::models::DbPackage;
 use crate::schema::*;
 use crate::Connection;
-use crate::{Dbu32, DbId};
+use crate::{DbId, Dbu32};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
@@ -64,11 +64,9 @@ impl DbVersion {
 
     pub fn delete_version(conn: &Connection, id: i32) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
-            let builds = diesel::delete(build::table
-                .filter(build::version_id.eq(id))).execute(conn)?;
+            let builds = diesel::delete(build::table.filter(build::version_id.eq(id))).execute(conn)?;
             let versions = diesel::delete(version::table.filter(version::id.eq(id))).execute(conn)?;
-            Ok(builds+versions) // number of rows effected
+            Ok(builds + versions) // number of rows effected
         })
     }
-
 }

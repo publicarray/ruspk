@@ -16,7 +16,6 @@ pub struct NewArchitecture {
     pub code: String,
 }
 
-
 impl DbArchitecture {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<DbArchitecture>> {
         architecture::table

@@ -165,15 +165,17 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
             .service(
                 web::scope("/api")
-                    .service(build::get_builds)
-                    .service(architecture::post_architecture)
-                    .service(architecture::delete_architecture)
-                    .service(architecture::get_architectures)
-                    .service(firmware::get_firmware)
-                    .service(version::get_versions)
-                    .service(screenshot::get_screenshots)
-                    .service(package::get_packages)
-                    .service(package::create_package),
+                    .service(user::get_all)
+                    .service(user::delete)
+                    .service(build::get_all)
+                    .service(architecture::post)
+                    .service(architecture::delete)
+                    .service(architecture::get_all)
+                    .service(firmware::get_all)
+                    .service(version::get_all)
+                    .service(screenshot::get_all)
+                    .service(package::get_all)
+                    .service(package::post),
             )
             .service(
                 web::scope("/admin").service(

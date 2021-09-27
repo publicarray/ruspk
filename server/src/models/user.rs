@@ -1,8 +1,8 @@
 use crate::schema::*;
 use crate::Connection;
-use diesel::prelude::*;
 use crate::DbId;
 use chrono::NaiveDateTime;
+use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "user"]
 pub struct DbUser {
@@ -25,7 +25,6 @@ pub struct User {
     pub confirmed_at: Option<NaiveDateTime>,
 }
 
-
 impl User {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<User>> {
         user::table
@@ -35,7 +34,7 @@ impl User {
             .load::<User>(conn)
     }
 
-    pub fn delete_user(conn: &Connection, id: i32) -> QueryResult<usize> {
+    pub fn delete(conn: &Connection, id: i32) -> QueryResult<usize> {
         let result = diesel::delete(user::table.filter(user::id.eq(id))).execute(conn)?;
         Ok(result)
     }

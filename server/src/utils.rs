@@ -3,6 +3,12 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 
+use crate::DbId;
+#[derive(Deserialize)]
+pub struct IdType {
+    pub id: DbId,
+}
+
 pub fn read_file(file_name: &str) -> Result<String> {
     let file = File::open(file_name)?;
     let mut buf_reader = BufReader::new(file);

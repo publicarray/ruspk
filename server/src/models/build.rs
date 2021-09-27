@@ -4,8 +4,8 @@ use crate::models::DbFirmware;
 use crate::models::DbVersion;
 use crate::schema::*;
 use crate::Connection;
-use crate::Dbu32;
 use crate::DbId;
+use crate::Dbu32;
 use chrono::NaiveDateTime;
 use diesel::dsl;
 use diesel::prelude::*;
@@ -56,7 +56,7 @@ pub struct Build {
 }
 
 impl DbBuild {
-    pub fn create_build(conn: &Connection) -> QueryResult<DbBuild>{
+    pub fn create_build(conn: &Connection) -> QueryResult<DbBuild> {
         // firmware
         let fw_build = 41890;
         let fw_version = "7.0";
@@ -84,7 +84,7 @@ impl DbBuild {
 
         // build
         // let publisher_user_id = 152;// from api key
-        let publisher_user_id = 0;// from api key
+        let publisher_user_id = 0; // from api key
         let checksum = "";
         let md5 = "";
         let extract_size = 0;
@@ -92,16 +92,17 @@ impl DbBuild {
 
         //////
         conn.build_transaction().read_write().run(|| {
-
             let firmware_id = firmware::table
                 .filter(firmware::build.eq(fw_build))
                 .filter(firmware::version.eq(fw_version))
-                .select(firmware::id).first::<DbId>(conn)?;
+                .select(firmware::id)
+                .first::<DbId>(conn)?;
 
             // package create if not available?
             let package_id = package::table
                 .filter(package::name.eq(package_name))
-                .select(package::id).first::<DbId>(conn)?;
+                .select(package::id)
+                .first::<DbId>(conn)?;
             // let new_package = (package::name.eq(package_name), package::insert_date.eq(dsl::noq));
             // let package = diesel::insert_into(package::table)
             //     .values(&new_package)
@@ -111,12 +112,15 @@ impl DbBuild {
                 .filter(version::package_id.eq(package_id))
                 .filter(version::ver.eq(revision))
                 // .filter(version::upstream_version.eq(upstream_version))  // strict comparison
-                .select(version::id).first::<DbId>(conn).optional()?;
+                .select(version::id)
+                .first::<DbId>(conn)
+                .optional()?;
 
-           let version_id = match t_version_id {
+            let version_id = match t_version_id {
                 Some(id) => id,
-                None => { // create a new version if one doesn't exist
-                    let new_version =  (
+                None => {
+                    // create a new version if one doesn't exist
+                    let new_version = (
                         version::package_id.eq(package_id),
                         version::ver.eq(revision),
                         version::upstream_version.eq(upstream_version),
@@ -141,7 +145,7 @@ impl DbBuild {
                         .values(&new_version)
                         .returning(version::id)
                         .get_result::<DbId>(conn)?
-                    }
+                }
             };
 
             let new_build = (

@@ -12,7 +12,7 @@ fn db_get_build(conn: &DbConn, limit: i64, offset: i64) -> Result<Vec<Build>> {
 
 #[get("/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
-pub async fn get_builds(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let (limit, offset) = utils::paginate_qs(req.query_string());
     // let (q_limit, q_offset) = utils::paginate_qs(req.query_string());
     // let limit = json_data.size.unwrap_or(q_limit);
