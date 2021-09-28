@@ -2297,7 +2297,6 @@ dependencies = [
  "env_logger",
  "evmap",
  "evmap-derive",
- "flate2",
  "futures",
  "lazy_static",
  "libsqlite3-sys",
@@ -2311,7 +2310,6 @@ dependencies = [
  "serde_json",
  "serde_qs",
  "serde_with",
- "tar",
  "toml",
 ]
 
@@ -2705,17 +2703,6 @@ dependencies = [
  "quote",
  "syn",
  "unicode-xid",
-]
-
-[[package]]
-name = "tar"
-version = "0.4.37"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6f5515d3add52e0bbdcad7b83c388bb36ba7b754dda3b5f5bc2d38640cdba5c"
-dependencies = [
- "filetime",
- "libc",
- "xattr",
 ]
 
 [[package]]

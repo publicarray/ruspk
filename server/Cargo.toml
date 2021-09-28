@@ -44,14 +44,11 @@ libsqlite3-sys = { version = "0.22.2", features = ["bundled"], optional = true }
 bcrypt = "0.10.1"
 
 # OpenPHP - rpgp check signatures
-pgp = "0.7.2"
-md5 = "0.7.0"
+pgp = "0.7"
+md5 = "0.7"
 async-tar = "0.4"
-tar = "0.4" # use regular tar until flate2 supports async-std
-# flate2 = { version = "1.0", features = ["tokio", "rust_backend"] }
-flate2 = "1.0"
-futures = "0.3.5"
-async-std = "1.8.0"
+futures = "0.3"
+async-std = "1.10"
 #sanitize-filename = "0.3.0"
 
 # grab environment vars
@@ -81,7 +78,9 @@ percent-encoding = "2"
 chrono = { version = "0.4", features = ["serde"] }
 
 evmap = "10"
-evmap-derive = "0.2.0"
+evmap-derive = "0.2"
 
 
 # https://crates.io/crates/semver
+# https://crates.io/crates/infer
+# https://crates.io/crates/tempfile

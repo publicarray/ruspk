@@ -58,7 +58,7 @@ pub struct Build {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Info {
     pub package: String,
-    pub version: String, // "1.2.3-0001"
+    pub version: String,    // "1.2.3-0001"
     pub os_min_ver: String, // X.Y-Z "7.0-40000"
     pub description: String,
     pub arch: String, //space separated list "x86_64 alpine"
@@ -75,12 +75,12 @@ pub struct Info {
     pub model: Option<String>, //space separated list "synology_bromolow_3612xs synology_cedarview_rs812rp+"
     pub exclude_arch: Option<String>, //space separated list "bromolow cedarview"
     pub checksum: Option<String>,
-    pub adminport: Option<String>, // 0~65536
-    pub adminurl: Option<String>,  // "/web"
-    pub adminprotocol: Option<String>, // "http"
-    pub dsmuidir: Option<String>, // "ui"
-    pub dsmappname: Option<String>, // "SYNO.SDS.PhotoStation"
-    pub dsmapppage: Option<String>, // "SYNO.SDS.AdminCenter.Application"
+    pub adminport: Option<String>,        // 0~65536
+    pub adminurl: Option<String>,         // "/web"
+    pub adminprotocol: Option<String>,    // "http"
+    pub dsmuidir: Option<String>,         // "ui"
+    pub dsmappname: Option<String>,       // "SYNO.SDS.PhotoStation"
+    pub dsmapppage: Option<String>,       // "SYNO.SDS.AdminCenter.Application"
     pub dsmapplaunchname: Option<String>, // "SYNO.SDS.AdminCenter.Application"
     pub checkport: Option<bool>,
     pub startable: Option<bool>,
@@ -91,20 +91,20 @@ pub struct Info {
     pub beta: Option<bool>,
     pub report_url: Option<String>,
     pub install_reboot: Option<bool>,
-    pub install_dep_packages: Option<String>, // "packageA>2.2.2:packageB"
+    pub install_dep_packages: Option<String>,      // "packageA>2.2.2:packageB"
     pub install_conflict_packages: Option<String>, // "packageA>2.2.2:packageB"
-    pub install_break_packages: Option<String>, // "packageA>2.2.2:packageB"
-    pub install_replace_packages: Option<String>, // "packageA>2.2.2:packageB"
-    pub install_dep_services: Option<String>, // "apache-web ssh"
-    pub start_dep_services: Option<String>, // "apache-web ssh"
-    pub extractsize: Option<String>, // usize "253796"
+    pub install_break_packages: Option<String>,    // "packageA>2.2.2:packageB"
+    pub install_replace_packages: Option<String>,  // "packageA>2.2.2:packageB"
+    pub install_dep_services: Option<String>,      // "apache-web ssh"
+    pub start_dep_services: Option<String>,        // "apache-web ssh"
+    pub extractsize: Option<String>,               // usize "253796"
     pub support_conf_folder: Option<bool>,
     pub install_type: Option<String>, // "system"
     pub silent_install: Option<bool>,
     pub silent_upgrade: Option<bool>,
     pub silent_uninstall: Option<bool>,
     pub auto_upgrade_from: Option<String>, // "2.0"
-    pub offline_install: Option<bool>, // disable listing the package on the server, but allow manual install
+    pub offline_install: Option<bool>,     // disable listing the package on the server, but allow manual install
     pub thirdparty: Option<bool>,
     pub os_max_ver: Option<String>, // X.Y-Z "7.0-40000"
     pub support_move: Option<bool>,
@@ -116,14 +116,14 @@ pub struct Info {
 }
 
 impl DbBuild {
-    pub fn create_build(conn: &Connection, info: Info) -> QueryResult<DbBuild> {
+    pub fn create_build(conn: &Connection, info: Info, install_wizard: bool, uninstall_wizard: bool, upgrade_wizard: bool) -> QueryResult<DbBuild> {
         let info_clone = info.clone();
         let pkg_ver: Vec<&str> = info_clone.version.split("-").collect();
         let fw_min_ver: Vec<&str> = info_clone.os_min_ver.split("-").collect();
         let fw_max_ver: Vec<&str> = info_clone.os_max_ver.unwrap_or_default().split("-").collect();
         let architectures: Vec<&str> = info_clone.arch.split(" ").collect();
         // firmware
-        let fw_build:i32 = fw_min_ver[1].parse().unwrap(); // todo change data type to usize
+        let fw_build: i32 = fw_min_ver[1].parse().unwrap(); // todo change data type to usize
         let fw_version = fw_min_ver[0];
 
         // version
@@ -133,22 +133,30 @@ impl DbBuild {
         let conf_dependencies = "";
         let conflicts = "";
         let conf_conflicts = "";
-        let install_wizard = false;
-        let upgrade_wizard = false;
 
         // build
-        let publisher_user_id = 152;// fixme from api key
+        let publisher_user_id = 152; // fixme from api key
 
-        let path = format!("{}/{}/{}.v{}.f{}[{}].spk", info.package, revision, info.package, revision, fw_build, architectures.join("-"));
+        let path = format!(
+            "{}/{}/{}.v{}.f{}[{}].spk",
+            info.package,
+            revision,
+            info.package,
+            revision,
+            fw_build,
+            architectures.join("-")
+        );
         debug!("{}", path);
 
         let mut extractsize: Option<i32> = None;
-        let t_extractsize = info_clone.extractsize.unwrap_or_default().parse::<i32>().unwrap_or_default();
+        let t_extractsize = info_clone
+            .extractsize
+            .unwrap_or_default()
+            .parse::<i32>()
+            .unwrap_or_default();
         if t_extractsize > 0 {
             extractsize = Some(t_extractsize);
         }
-
-        //return Ok(DbBuild {id:1, version_id:1, firmware_id:1, publisher_user_id: None, checksum: None, extract_size: None, path, md5: None, insert_date: NaiveDateTime::from_timestamp(0, 42_000_000), active: Some(false)});
 
         //////
         conn.build_transaction().read_write().run(|| {
@@ -163,10 +171,6 @@ impl DbBuild {
                 .filter(package::name.eq(info.package))
                 .select(package::id)
                 .first::<DbId>(conn)?;
-            // let new_package = (package::name.eq(package_name), package::insert_date.eq(dsl::noq));
-            // let package = diesel::insert_into(package::table)
-            //     .values(&new_package)
-            //     .get_result::<DbPackage>(conn)?;
 
             let t_version_id = version::table
                 .filter(version::package_id.eq(package_id))
@@ -194,8 +198,9 @@ impl DbBuild {
                         version::conf_dependencies.eq(info.install_conflict_packages),
                         // version::conflicts.eq(conflicts),
                         // version::conf_conflicts.eq(conf_conflicts),
-                        // version::install_wizard.eq(install_wizard),
-                        // version::upgrade_wizard.eq(upgrade_wizard),
+                        version::install_wizard.eq(install_wizard),
+                        // version::uninstall_wizard.eq(uninstall_wizard),
+                        version::upgrade_wizard.eq(upgrade_wizard),
                         version::startable.eq(info.startable),
                         // version::license.eq(license),
                         version::insert_date.eq(dsl::now),
@@ -221,8 +226,12 @@ impl DbBuild {
             );
 
             // stop duplicate builds where the path is yet set to UNIQUE in the database.
-            let exists:i64 = build::table.filter(build::path.eq(path.clone())).count().get_result(conn)?;
-            if exists > 0 { // fixme: do proper error handling
+            let exists: i64 = build::table
+                .filter(build::path.eq(path.clone()))
+                .count()
+                .get_result(conn)?;
+            if exists > 0 {
+                // fixme: do proper error handling
                 debug!("The file {} already exists in the database", path);
                 return Err(diesel::result::Error::NotFound);
             }
