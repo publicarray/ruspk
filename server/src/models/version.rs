@@ -46,6 +46,7 @@ pub struct Version {
 impl DbVersion {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Version>> {
         version::table
+            .order(version::id.desc())
             .limit(limit)
             .offset(offset)
             .inner_join(package::table)

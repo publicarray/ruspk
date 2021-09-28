@@ -89,11 +89,15 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
 
 
     // convert to booleans hack
-    info_contents = info_contents.replace("=\"yes\"", "=true").replace("=\"no\"", "=false")
-        .replace("=\"Yes\"", "=true").replace("=\"No\"", "=false")
-        .replace("=\"YES\"", "=true").replace("=\"NO\"", "=false");
+    info_contents = info_contents
+        .replace("=\"yes\"", "=true")
+        .replace("=\"no\"", "=false")
+        .replace("=\"Yes\"", "=true")
+        .replace("=\"No\"", "=false")
+        .replace("=\"YES\"", "=true")
+        .replace("=\"NO\"", "=false");
     // serialise info file to a struct
-    let info: Info = toml::from_str(&info_contents).map_err(|_|actix_web::error::ParseError::Incomplete)?;
+    let info: Info = toml::from_str(&info_contents).map_err(|_| actix_web::error::ParseError::Incomplete)?;
 
     // serialise info file to a struct & save info into database
 

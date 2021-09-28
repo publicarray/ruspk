@@ -28,6 +28,7 @@ pub struct Package {
 impl DbPackage {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Package>> {
         package::table
+            .order(package::id.desc())
             .limit(limit)
             .offset(offset)
             .inner_join(user::table)

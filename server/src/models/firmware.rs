@@ -11,7 +11,11 @@ pub struct DbFirmware {
 
 impl DbFirmware {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<DbFirmware>> {
-        firmware::table.limit(limit).offset(offset).load::<DbFirmware>(conn)
+        firmware::table
+            .order(firmware::id.desc())
+            .limit(limit)
+            .offset(offset)
+            .load::<DbFirmware>(conn)
     }
 
     pub fn create_firmware(conn: &Connection, vers_str: String, build: DbId) -> QueryResult<DbFirmware> {

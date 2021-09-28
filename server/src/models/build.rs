@@ -257,6 +257,7 @@ impl DbBuild {
         // https://docs.diesel.rs/1.4.x/diesel/associations/trait.GroupedBy.html
         // https://docs.diesel.rs/1.4.x/diesel/associations/index.html
         let builds_tmp = build::table
+            .order(build::id.desc())
             .limit(limit)
             .offset(offset)
             .inner_join(version::table.inner_join(package::table))

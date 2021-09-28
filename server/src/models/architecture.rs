@@ -19,6 +19,7 @@ pub struct NewArchitecture {
 impl DbArchitecture {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<DbArchitecture>> {
         architecture::table
+            .order(architecture::id.desc())
             .limit(limit)
             .offset(offset)
             // .order(id.asc())

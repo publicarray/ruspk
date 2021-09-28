@@ -20,6 +20,7 @@ pub struct Screenshot {
 impl DbScreenshot {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Screenshot>> {
         screenshot::table
+            .order(screenshot::id.desc())
             .limit(limit)
             .offset(offset)
             .inner_join(package::table)
