@@ -240,6 +240,21 @@ impl DbBuild {
                 .values(&new_build)
                 .get_result::<DbBuild>(conn)?;
 
+            // todo optimise
+            for arch in architectures {
+                let architecture_id = architecture::table
+                .filter(architecture::code.eq(arch))
+                .select(architecture::id)
+                .first::<DbId>(conn)?;
+
+                diesel::insert_into(build_architecture::table)
+                    .values((
+                        build_architecture::architecture_id.eq(architecture_id),
+                        build_architecture::build_id.eq(build.id)
+                    ))
+                    .execute(conn)?;
+            }
+
             Ok(build) // return id
         })
     }
