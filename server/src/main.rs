@@ -168,6 +168,8 @@ async fn main() -> std::io::Result<()> {
                     .service(user::get_all)
                     .service(user::delete)
                     .service(build::get_all)
+                    .service(build::post)
+                    .service(build::delete)
                     .service(architecture::post)
                     .service(architecture::delete)
                     .service(architecture::get_all)

@@ -31,7 +31,7 @@ jobs:
       continue-on-error: true
       with:
         command: build
-        args: --release --no-default-features --features ${{ matrix.features }} --verbose
+        args: --release --no-default-features --features ${{ matrix.features }}
 
     # - name: Run cargo bloat
     #   uses: orf/cargo-bloat-action@v1

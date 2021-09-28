@@ -41,8 +41,15 @@ r2d2 = "0.8"
 # Bundled SQLites
 libsqlite3-sys = { version = "0.22.2", features = ["bundled"], optional = true }
 
+bcrypt = "0.10.1"
+
 # OpenPHP - rpgp check signatures
-# pgp = "0.6.0"
+pgp = "0.7.2"
+md5 = "0.7.0"
+async-tar = "0.4"
+futures = "0.3.5"
+async-std = "1.8.0"
+#sanitize-filename = "0.3.0"
 
 # grab environment vars
 dotenv = "0.15"
@@ -51,7 +58,7 @@ dotenv = "0.15"
 lazy_static = "1.4"
 
 # Web framework / server https://github.com/actix/actix-web/blob/master/MIGRATION.md
-actix-web = "3"
+actix-web = { version = "3", features = ["rustls"] }
 actix-rt = "1"
 actix-files = "0.5"
 actix-cors = "0.5"

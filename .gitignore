@@ -9,3 +9,4 @@ server/*.json
 .env
 frontend/dist
 server/public
+tmp
