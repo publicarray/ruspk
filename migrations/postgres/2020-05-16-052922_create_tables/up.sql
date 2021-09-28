@@ -192,7 +192,7 @@ CREATE TABLE build (
     publisher_user_id BIGINT,
     checksum VARCHAR(32),
     extract_size INT,
-    path VARCHAR(100) NOT NULL,
+    path VARCHAR(100) NOT NULL UNIQUE,
     md5 VARCHAR(32),
     insert_date timestamp NOT NULL,
     active BOOLEAN,

@@ -21,7 +21,7 @@ pub struct DbVersion {
     pub dependencies: Option<String>,
     pub conf_dependencies: Option<String>,
     pub conflicts: Option<String>,
-    pub conf_conflicts: Option<String>,
+    pub install_dep_packages: Option<String>,
     pub install_wizard: Option<bool>,
     pub upgrade_wizard: Option<bool>,
     pub startable: Option<bool>,

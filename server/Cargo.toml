@@ -47,6 +47,9 @@ bcrypt = "0.10.1"
 pgp = "0.7.2"
 md5 = "0.7.0"
 async-tar = "0.4"
+tar = "0.4" # use regular tar until flate2 supports async-std
+# flate2 = { version = "1.0", features = ["tokio", "rust_backend"] }
+flate2 = "1.0"
 futures = "0.3.5"
 async-std = "1.8.0"
 #sanitize-filename = "0.3.0"
@@ -69,6 +72,7 @@ serde = "1"
 serde_derive = "1"
 serde_with = "1.6"
 serde_qs = "0.8"
+toml = "0.5"
 
 # percent encode / url encoding
 percent-encoding = "2"
@@ -78,3 +82,6 @@ chrono = { version = "0.4", features = ["serde"] }
 
 evmap = "10"
 evmap-derive = "0.2.0"
+
+
+# https://crates.io/crates/semver

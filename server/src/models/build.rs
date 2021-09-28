@@ -23,7 +23,7 @@ pub struct DbBuild {
     pub checksum: Option<String>,
     pub extract_size: Option<i32>,
     pub path: String,
-    pub md5: Option<String>,
+    pub md5: Option<String>, // should be removed
     pub insert_date: NaiveDateTime,
     pub active: Option<bool>,
 }
@@ -55,40 +55,100 @@ pub struct Build {
     pub active: Option<bool>,
 }
 
-impl DbBuild {
-    pub fn create_build(conn: &Connection) -> QueryResult<DbBuild> {
-        // firmware
-        let fw_build = 41890;
-        let fw_version = "7.0";
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Info {
+    pub package: String,
+    pub version: String, // "1.2.3-0001"
+    pub os_min_ver: String, // X.Y-Z "7.0-40000"
+    pub description: String,
+    pub arch: String, //space separated list "x86_64 alpine"
+    pub maintainer: String,
 
-        //package
-        let package_name = "Jellyfin";
+    pub displayname: Option<String>,
+    pub displayname_fre: Option<String>,
+    pub description_fre: Option<String>,
+    pub maintainer_url: Option<String>,
+    pub distributor: Option<String>,
+    pub distributor_url: Option<String>,
+    pub support_url: Option<String>,
+    pub support_center: Option<bool>,
+    pub model: Option<String>, //space separated list "synology_bromolow_3612xs synology_cedarview_rs812rp+"
+    pub exclude_arch: Option<String>, //space separated list "bromolow cedarview"
+    pub checksum: Option<String>,
+    pub adminport: Option<String>, // 0~65536
+    pub adminurl: Option<String>,  // "/web"
+    pub adminprotocol: Option<String>, // "http"
+    pub dsmuidir: Option<String>, // "ui"
+    pub dsmappname: Option<String>, // "SYNO.SDS.PhotoStation"
+    pub dsmapppage: Option<String>, // "SYNO.SDS.AdminCenter.Application"
+    pub dsmapplaunchname: Option<String>, // "SYNO.SDS.AdminCenter.Application"
+    pub checkport: Option<bool>,
+    pub startable: Option<bool>,
+    pub ctl_stop: Option<bool>,
+    pub ctl_uninstall: Option<bool>,
+    pub precheckstartstop: Option<bool>,
+    pub helpurl: Option<String>,
+    pub beta: Option<bool>,
+    pub report_url: Option<String>,
+    pub install_reboot: Option<bool>,
+    pub install_dep_packages: Option<String>, // "packageA>2.2.2:packageB"
+    pub install_conflict_packages: Option<String>, // "packageA>2.2.2:packageB"
+    pub install_break_packages: Option<String>, // "packageA>2.2.2:packageB"
+    pub install_replace_packages: Option<String>, // "packageA>2.2.2:packageB"
+    pub install_dep_services: Option<String>, // "apache-web ssh"
+    pub start_dep_services: Option<String>, // "apache-web ssh"
+    pub extractsize: Option<String>, // usize "253796"
+    pub support_conf_folder: Option<bool>,
+    pub install_type: Option<String>, // "system"
+    pub silent_install: Option<bool>,
+    pub silent_upgrade: Option<bool>,
+    pub silent_uninstall: Option<bool>,
+    pub auto_upgrade_from: Option<String>, // "2.0"
+    pub offline_install: Option<bool>, // disable listing the package on the server, but allow manual install
+    pub thirdparty: Option<bool>,
+    pub os_max_ver: Option<String>, // X.Y-Z "7.0-40000"
+    pub support_move: Option<bool>,
+    pub exclude_model: Option<String>, // "synology_cedarview_713+ synology_kvmx64_virtualdsm"
+    pub use_deprecated_replace_mechanism: Option<bool>,
+    pub install_on_cold_storage: Option<bool>,
+
+    pub changelog: Option<String>, // SynoCommunity only
+}
+
+impl DbBuild {
+    pub fn create_build(conn: &Connection, info: Info) -> QueryResult<DbBuild> {
+        let info_clone = info.clone();
+        let pkg_ver: Vec<&str> = info_clone.version.split("-").collect();
+        let fw_min_ver: Vec<&str> = info_clone.os_min_ver.split("-").collect();
+        let fw_max_ver: Vec<&str> = info_clone.os_max_ver.unwrap_or_default().split("-").collect();
+        let architectures: Vec<&str> = info_clone.arch.split(" ").collect();
+        // firmware
+        let fw_build:i32 = fw_min_ver[1].parse().unwrap(); // todo change data type to usize
+        let fw_version = fw_min_ver[0];
 
         // version
-        let revision = 12;
-        let upstream_version = "1.2.3";
-        let changelog = "";
-        let report_url = "";
-        let distributor = "";
-        let distributor_url = "";
-        let maintainer = "";
-        let maintainer_url = "";
-        let dependencies = "";
+        let upstream_version = pkg_ver[0];
+        let revision: Dbu32 = pkg_ver[1].parse().unwrap();
+
         let conf_dependencies = "";
         let conflicts = "";
         let conf_conflicts = "";
         let install_wizard = false;
         let upgrade_wizard = false;
-        let startable = false;
-        let license = "";
 
         // build
-        // let publisher_user_id = 152;// from api key
-        let publisher_user_id = 0; // from api key
-        let checksum = "";
-        let md5 = "";
-        let extract_size = 0;
-        let path = ".spk";
+        let publisher_user_id = 152;// fixme from api key
+
+        let path = format!("{}/{}/{}.v{}.f{}[{}].spk", info.package, revision, info.package, revision, fw_build, architectures.join("-"));
+        debug!("{}", path);
+
+        let mut extractsize: Option<i32> = None;
+        let t_extractsize = info_clone.extractsize.unwrap_or_default().parse::<i32>().unwrap_or_default();
+        if t_extractsize > 0 {
+            extractsize = Some(t_extractsize);
+        }
+
+        //return Ok(DbBuild {id:1, version_id:1, firmware_id:1, publisher_user_id: None, checksum: None, extract_size: None, path, md5: None, insert_date: NaiveDateTime::from_timestamp(0, 42_000_000), active: Some(false)});
 
         //////
         conn.build_transaction().read_write().run(|| {
@@ -100,7 +160,7 @@ impl DbBuild {
 
             // package create if not available?
             let package_id = package::table
-                .filter(package::name.eq(package_name))
+                .filter(package::name.eq(info.package))
                 .select(package::id)
                 .first::<DbId>(conn)?;
             // let new_package = (package::name.eq(package_name), package::insert_date.eq(dsl::noq));
@@ -124,20 +184,20 @@ impl DbBuild {
                         version::package_id.eq(package_id),
                         version::ver.eq(revision),
                         version::upstream_version.eq(upstream_version),
-                        version::changelog.eq(changelog),
-                        version::report_url.eq(report_url),
-                        version::distributor.eq(distributor),
-                        version::distributor_url.eq(distributor_url),
-                        version::maintainer.eq(maintainer),
-                        version::maintainer_url.eq(maintainer_url),
-                        version::dependencies.eq(dependencies),
-                        version::conf_dependencies.eq(conf_dependencies),
-                        version::conflicts.eq(conflicts),
-                        version::conf_conflicts.eq(conf_conflicts),
-                        version::install_wizard.eq(install_wizard),
-                        version::upgrade_wizard.eq(upgrade_wizard),
-                        version::startable.eq(startable),
-                        version::license.eq(license),
+                        version::changelog.eq(info.changelog),
+                        version::report_url.eq(info.report_url),
+                        version::distributor.eq(info.distributor),
+                        version::distributor_url.eq(info.distributor_url),
+                        version::maintainer.eq(info.maintainer),
+                        version::maintainer_url.eq(info.maintainer_url),
+                        version::dependencies.eq(info.install_dep_packages),
+                        version::conf_dependencies.eq(info.install_conflict_packages),
+                        // version::conflicts.eq(conflicts),
+                        // version::conf_conflicts.eq(conf_conflicts),
+                        // version::install_wizard.eq(install_wizard),
+                        // version::upgrade_wizard.eq(upgrade_wizard),
+                        version::startable.eq(info.startable),
+                        // version::license.eq(license),
                         version::insert_date.eq(dsl::now),
                     );
 
@@ -152,13 +212,20 @@ impl DbBuild {
                 build::version_id.eq(version_id),
                 build::firmware_id.eq(firmware_id),
                 build::publisher_user_id.eq(publisher_user_id),
-                build::checksum.eq(checksum),
-                build::extract_size.eq(extract_size),
-                build::path.eq(path),
-                build::md5.eq(md5),
+                build::checksum.eq(info.checksum),
+                build::extract_size.eq(extractsize),
+                build::path.eq(path.clone()),
+                // build::md5.eq(md5),
                 build::insert_date.eq(dsl::now),
                 build::active.eq(false),
             );
+
+            // stop duplicate builds where the path is yet set to UNIQUE in the database.
+            let exists:i64 = build::table.filter(build::path.eq(path.clone())).count().get_result(conn)?;
+            if exists > 0 { // fixme: do proper error handling
+                debug!("The file {} already exists in the database", path);
+                return Err(diesel::result::Error::NotFound);
+            }
 
             let build = diesel::insert_into(build::table)
                 .values(&new_build)
