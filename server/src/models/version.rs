@@ -65,6 +65,10 @@ impl DbVersion {
 
     pub fn delete_version(conn: &Connection, id: DbId) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
+            let build_ids = build::table.filter(build::version_id.eq(id)).select(build::id).load::<DbId>(conn)?;
+            for build_id in build_ids {
+                diesel::delete(build_architecture::table.filter(build_architecture::build_id.eq(build_id))).execute(conn)?;
+            }
             let builds = diesel::delete(build::table.filter(build::version_id.eq(id))).execute(conn)?;
             let versions = diesel::delete(version::table.filter(version::id.eq(id))).execute(conn)?;
             Ok(builds + versions) // number of rows effected
