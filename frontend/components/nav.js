@@ -7,6 +7,10 @@ export default function Nav() {
                 <a className="block py-1 text-gray-700 hover:underline">Admin</a>
             </Link> */}
 
+            <Link href="/admin/user/">
+                <a className="block py-1 text-gray-700 hover:underline">User</a>
+            </Link>
+
             <Link href="/admin/architecture/">
                 <a className="block py-1 text-gray-700 hover:underline">Architecture</a>
             </Link>

@@ -6,7 +6,7 @@ use actix_web::{get, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 
 /// retrieve all users
-#[get("/users")]
+#[get("/user")]
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let (limit, offset) = utils::paginate_qs(req.query_string());
     let conn = data.pool.get().expect("couldn't get db connection from pool");
