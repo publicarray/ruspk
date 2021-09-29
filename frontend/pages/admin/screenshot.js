@@ -6,12 +6,13 @@ import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import { formatImage, postJsonForm } from '../../utils';
 
-export default function ScreenshotPage({data}) {
+export default function ScreenshotPage() {
     const url = `http://127.0.0.1:8080/api/screenshot`
     let [isOpen, setIsOpen] = useState(false);
+    const [data, setData] = useState([]);
+
     let fileInput
     async function handleSubmit(event) {
-        // event.target.files[0]
         let response = await postJsonForm(url, event, []);
         console.log(response);
         setIsOpen(false);
@@ -34,7 +35,7 @@ export default function ScreenshotPage({data}) {
     return (
         <Layout>
             <h1>Screenshot</h1>
-            <TablePaginate columns={columns} url={url}></TablePaginate>
+            <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
             <Button type="button" onClick={openModal}>
                 Add Screenshot
             </Button>

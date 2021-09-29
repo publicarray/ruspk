@@ -6,34 +6,44 @@ import TablePaginate from "../../components/table-paginate";
 import { Dialog } from "@headlessui/react";
 import { formatBoolean, formatArray } from '../../utils';
 import { useRouter } from 'next/router'
+import { Switch } from '@headlessui/react'
+import { useState, useEffect } from 'react';
 
 export default function BuildPage() {
     const router = useRouter()
     const url = `http://127.0.0.1:8080/api/build`
-    // let edit = async function (row) {
-    //     console.log("edit", row)
-    //     const response = await fetch(`${url}/${row.values.id}`, {
-    //         method: "PUT",
-    //         headers: {
-    //           "Content-type": "application/json; charset=UTF-8",
-    //         },
-    //         body: JSON.stringify(row.values),
-    //     });
-    //     let data = await response.json()
-    //     console.log("delete-return", data)
-    // }
+    const [data, setData] = useState([]);
 
-    let del = async function (row, data) {
-        console.log("deleting", row)
-        const response = await fetch(`${url}/${row.values.id}`, {
-            method: "DELETE",
-        });
-        console.log("response", response)
+    let toggleActivation = async function (enabled, setEnabled, index, data) {
+        let active = data[index].active ? false : true
+        const response = await fetch(`${url}/active`, {
+            method: "PUT",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify({id: data[index].id, active: active}),
+        })
+
         if (response.ok) {
             let response_data = await response.json()
-            console.log("response", response_data)
-            data.splice(row.index, 1) // update table
-            router.push("/admin/build", undefined, {shallow: true}) // force refresh of internal data
+            data[index].active = response_data.active
+            setEnabled(response_data.active)
+            setData(data)
+        }
+    }
+
+    let del = async function (index, data) {
+        const response = await fetch(`${url}/${data[index].id}`, {
+            method: "DELETE",
+        });
+
+        if (response.ok) {
+            let data_copy = [...data];
+            data_copy.splice(index, 1)
+            setData(data_copy);
+
+            // data.splice(index, 1) // update table
+            // router.push("/admin/build", undefined, {shallow: true}) // force refresh of internal data
         }
     }
 
@@ -46,18 +56,33 @@ export default function BuildPage() {
         { Header: 'Firmware', accessor: 'firmware',},
         { Header: 'Publisher', accessor: 'publisher',},
         { Header: 'Insert Date', accessor: 'insert_date',},
-        { Header: 'Active', accessor: 'active', Cell: ({ value }) => formatBoolean(value) },
+        { Header: 'Active', accessor: 'active',
+        Cell: (props) => {
+            const [enabled, setEnabled] = useState(props.value)
+            return (
+                <Switch
+                    checked={enabled}
+                    onChange={() => toggleActivation(enabled, setEnabled, props.row.index, props.data)}
+                    className={`${
+                        enabled ? 'bg-blue-600' : 'bg-gray-200'
+                    } relative inline-flex items-center h-6 rounded-full w-11`}
+                    >
+                    <span className="sr-only">Toggle Activation</span>
+                    <span
+                        className={`${
+                        enabled ? 'translate-x-6' : 'translate-x-1'
+                        } inline-block w-4 h-4 transform bg-white rounded-full`}
+                    />
+                </Switch>
+            )}
+        },
         {
             Header: "Actions",
             accessor: "actions",
             Cell: (props) => {
-                const row = props.row;
                 return (
                     <div>
-                        {/* <span onClick={() => edit(row)}>
-                            <i className="far fa-edit action mr-2">Edit</i>
-                        </span> */}
-                        <span onClick={i => del(row, props.data)}>
+                        <span onClick={() => del(props.row.index, props.data)}>
                             <DeleteBtn></DeleteBtn>
                         </span>
                     </div>
@@ -69,7 +94,7 @@ export default function BuildPage() {
     return (
         <Layout>
             <h1>Build</h1>
-            <TablePaginate columns={columns} url={url}></TablePaginate>
+            <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
             <Button>Add Build</Button>
         </Layout>
     );

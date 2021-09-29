@@ -1,6 +1,6 @@
-use crate::models::*;
+use crate::{DbId, models::*};
 use crate::{AppData, DbConn};
-use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse};
+use actix_web::{Error, HttpRequest, HttpResponse, delete, get, post, put, web};
 use anyhow::Result;
 extern crate serde_derive;
 extern crate serde_qs as qs;
@@ -115,6 +115,27 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbBuild::delete_build(&conn, id))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            HttpResponse::InternalServerError().finish()
+        })?;
+
+    Ok(HttpResponse::Ok().json(response))
+}
+
+
+#[derive(Deserialize)]
+pub struct BuildActive {
+    id: DbId,
+    active: bool
+}
+
+// #[put("/build")]
+#[put("/build/active")]
+pub async fn active(post_data: web::Json<BuildActive>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::active(&conn, post_data.id, post_data.active))
         .await
         .map_err(|e| {
             debug!("{}", e);

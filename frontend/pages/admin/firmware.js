@@ -8,6 +8,7 @@ import { postJsonForm } from "../../utils";
 export default function FirmwarePage() {
     const url = `http://127.0.0.1:8080/api/firmware`
     let [isOpen, setIsOpen] = useState(false);
+    const [data, setData] = useState([]);
 
     async function handleSubmit(event) {
         let response = await postJsonForm(url, event, []);
@@ -28,7 +29,7 @@ export default function FirmwarePage() {
     return (
         <Layout>
             <h1>Firmware</h1>
-            <TablePaginate columns={columns} url={url}></TablePaginate>
+            <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
             <Button type="button" onClick={openModal}>
                 Add Firmware
             </Button>

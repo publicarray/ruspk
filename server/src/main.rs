@@ -145,7 +145,7 @@ async fn main() -> std::io::Result<()> {
             .allow_any_origin()
             .allow_any_header()
             .send_wildcard()
-            .allowed_methods(vec!["GET", "POST"])
+            .allowed_methods(vec!["GET", "POST", "DELETE", "PUT"])
             .max_age(3600);
         App::new()
             .wrap(cors)
@@ -170,6 +170,7 @@ async fn main() -> std::io::Result<()> {
                     .service(build::get_all)
                     .service(build::post)
                     .service(build::delete)
+                    .service(build::active)
                     .service(build::delete_id)
                     .service(architecture::post)
                     .service(architecture::delete)

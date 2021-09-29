@@ -330,4 +330,9 @@ impl DbBuild {
             Ok(diesel::delete(build::table.filter(build::id.eq(id))).execute(conn)?)
         })
     }
+
+    pub fn active(conn: &Connection, id: DbId, active: bool) -> QueryResult<DbBuild> {
+        // must return `active` value from DB
+        Ok(diesel::update(build::table.filter(build::id.eq(id))).set(build::active.eq(active)).get_result(conn)?)
+    }
 }

@@ -6,9 +6,10 @@ import { Dialog } from "@headlessui/react";
 import Model from "../../components/model";
 import { postJsonForm } from "../../utils";
 
-export default function PackagePage({data}) {
+export default function PackagePage() {
     const url = `http://127.0.0.1:8080/api/package`
     let [isOpen, setIsOpen] = useState(false);
+    const [data, setData] = useState([]);
 
     async function handleSubmit(event) {
         let response = await postJsonForm(url, event, []);
@@ -36,7 +37,7 @@ export default function PackagePage({data}) {
     return (
         <Layout>
             <h1>Package</h1>
-            <TablePaginate columns={columns} url={url}></TablePaginate>
+            <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
             <Button type="button" onClick={openModal}>Add Package</Button>
             <Model
                 isOpen={isOpen}

@@ -1,21 +1,37 @@
-import { useTable } from 'react-table'
+import { useTable, useAsyncDebounce } from 'react-table'
 import { fetchJson } from "../utils";
 import useSWR from 'swr'
 import React from 'react';
 
 // https://react-table.tanstack.com/
-export default function Table({pageIndex, columns, url}) {
+export default function Table(props) {
+    let pageIndex = props.pageIndex;
     if (!pageIndex || pageIndex <= 0) {
         pageIndex = 1
     }
 
-    let { data, error } = useSWR(`${url}?page=${pageIndex}&size=15`, fetchJson);
+    let pageSize = 15
+    let sortBy = ""
+    let filters = ""
+
+    let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJson);
     if (error) {
         console.error(error)
     }
-    if (!data) {
-        data = []
+
+    // for the preload table
+    if (!props.setData) {
+        return <></>;
     }
+
+    // only update when the data changes
+    React.useEffect(() => {
+        if (!data) {
+            props.setData([])
+        } else {
+            props.setData(data)
+        }
+    }, [data])
 
     const {
         getTableProps,
@@ -24,10 +40,9 @@ export default function Table({pageIndex, columns, url}) {
         rows,
         prepareRow,
     } = useTable({
-            columns,
-            data,
-        },
-    )
+        columns: props.columns,
+        data: props.data,
+    })
 
     return (
         <div className="flex overflow-x-auto">

@@ -14,12 +14,14 @@ export default function ArchitecturePage() {
         { Header: "Email", accessor: "email" },
         { Header: "Active", accessor: row => formatBoolean(row.active) },
         { Header: "Confirmed", accessor: "confirmed_at" },
-    ];
+    ]
+
+    const [data, setData] = useState([]);
 
     return (
         <Layout>
             <h1>Users</h1>
-            <TablePaginate columns={columns} url={url}></TablePaginate>
+            <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
         </Layout>
     );
 }

@@ -9,22 +9,16 @@ import { formatBoolean } from '../../utils';
 import { postJsonForm } from "../../utils";
 import { useRouter } from 'next/router'
 
-export default function VersionPage({data}) {
+export default function VersionPage() {
     const url = `http://127.0.0.1:8080/api/version`
     const router = useRouter()
-    // const data = [
-    //     { id: 1, package: "python38", version: "3.8.11", revision: "4", beta: "false", services: "", insert_date: "2021-08-31 22:42:37.109035", all_builds_active: "true", install_wizard: "false", upgrade_wizard: "false", startable: "false"  },
-    // ];
+    const [data, setData] = useState([]);
 
     let del = async function (row, data) {
-        console.log("deleting", row)
         const response = await fetch(`${url}/${row.values.id}`, {
             method: "DELETE",
         });
-        console.log("response", response)
         if (response.ok) {
-            let response_data = await response.json()
-            console.log("response", response_data)
             data.splice(row.index, 1) // update table
             router.push("/admin/version", undefined, {shallow: true}) // force refresh of internal data
         }
@@ -64,7 +58,7 @@ export default function VersionPage({data}) {
     return (
         <Layout>
             <h1>Version</h1>
-            <TablePaginate columns={columns} url={url}></TablePaginate>
+            <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
         </Layout>
     );
 }

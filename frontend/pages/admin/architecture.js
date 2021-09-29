@@ -7,11 +7,11 @@ import { postJsonForm } from "../../utils";
 
 export default function ArchitecturePage() {
     const url = `http://127.0.0.1:8080/api/architecture`;
-    let [isOpen, setIsOpen] = useState(false);
+    const [data, setData] = useState([]);
 
+    let [isOpen, setIsOpen] = useState(false);
     async function handleSubmit(event) {
         let response = await postJsonForm(url, event, []);
-        console.log(response);
         setIsOpen(false);
     }
 
@@ -27,7 +27,7 @@ export default function ArchitecturePage() {
     return (
         <Layout>
             <h1>Architecture</h1>
-            <TablePaginate columns={columns} url={url}></TablePaginate>
+            <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
             <Button type="button" onClick={openModal}>
                 Add Architecture
             </Button>
