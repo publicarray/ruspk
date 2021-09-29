@@ -6,8 +6,8 @@ export default function Layout({ children }) {
     return (
         <div className="">
             <Head>
-                <title>Synocommunity</title>
-                {/* <link rel="icon" href="/favicon.ico" /> */}
+                <title>SynoCommunity</title>
+                <link rel="icon" href="/static/favicon.ico" />
             </Head>
 
             <main className="flex flex-col w-full flex-1 md:px-20">
