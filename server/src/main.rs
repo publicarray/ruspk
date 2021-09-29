@@ -170,14 +170,17 @@ async fn main() -> std::io::Result<()> {
                     .service(build::get_all)
                     .service(build::post)
                     .service(build::delete)
+                    .service(build::delete_id)
                     .service(architecture::post)
                     .service(architecture::delete)
                     .service(architecture::get_all)
                     .service(firmware::get_all)
                     .service(version::get_all)
+                    .service(version::delete)
+                    .service(version::delete_id)
                     .service(screenshot::get_all)
                     .service(package::get_all)
-                    .service(package::post),
+                    .service(package::post)
             )
             .service(
                 web::scope("/admin").service(
