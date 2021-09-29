@@ -3,12 +3,14 @@ export const fetchJson = (url) => fetch(url).then((res) => res.json())
 
 // table formats
 export function formatBoolean(data) {
-    if ( data === true ) {
-        return "Yes"
-    } else if (data === false) {
-        return "No"
+    switch (data) {
+        case true:
+            return "Yes"
+        case false:
+            return "No"
+        default:
+            return "-"
     }
-    return "-"
 }
 
 export function formatArray(array) {
