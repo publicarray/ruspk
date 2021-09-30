@@ -95,7 +95,6 @@ export default function BuildPage() {
         <Layout>
             <h1>Build</h1>
             <TablePaginate columns={columns} url={url} data={data} setData={setData}></TablePaginate>
-            <Button>Add Build</Button>
         </Layout>
     );
 }

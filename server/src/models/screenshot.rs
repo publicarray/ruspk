@@ -35,7 +35,8 @@ impl DbScreenshot {
             .expect("Error loading screenshots")
     }
 
-    pub fn delete_screenshot(conn: &Connection, id: DbId) -> QueryResult<usize> {
+    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
+        // todo remove file
         let result = diesel::delete(screenshot::table.filter(screenshot::id.eq(id))).execute(conn)?;
         Ok(result)
     }

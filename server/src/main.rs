@@ -187,17 +187,22 @@ async fn main() -> std::io::Result<()> {
                     .service(version::delete)
                     .service(version::delete_id)
                     .service(screenshot::get_all)
+                    // .service(screenshot::post)
+                    .service(screenshot::delete)
+                    .service(screenshot::delete_id)
                     .service(package::get_all)
                     .service(package::post)
-            )
-            .service(
-                web::scope("/admin").service(
-                    fs::Files::new("/", "frontend/dist/admin")
-                        .index_file("index.html")
-                        .prefer_utf8(true),
-                ),
+                    .service(package::delete)
+                    .service(package::delete_id)
             )
             .service(fs::Files::new("/", &*STORAGE_PATH))
+            // .service(
+            //     web::scope("/admin").service(
+            //         fs::Files::new("/", "frontend/dist/admin")
+            //             .index_file("index.html")
+            //             .prefer_utf8(true),
+            //     ),
+            // )
             // .service(
             //     fs::Files::new("/", "frontend/dist")
             //         .index_file("index.html")

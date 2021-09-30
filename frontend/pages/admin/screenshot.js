@@ -5,6 +5,7 @@ import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import { formatImage, postJsonForm } from '../../utils';
+import DeleteBtn from "../../components/delete-btn";
 
 export default function ScreenshotPage() {
     const url = `http://127.0.0.1:8080/api/screenshot`
@@ -30,6 +31,19 @@ export default function ScreenshotPage() {
         { Header: 'ID', accessor: 'id' },
         { Header: 'Package', accessor: 'package' },
         { Header: 'Image', accessor: 'path', Cell: ({ value }) => formatImage(value)},
+        {
+            Header: "Actions",
+            accessor: "actions",
+            Cell: (props) => {
+                return (
+                    <div>
+                        <span onClick={() => del(props.row.index, props.data)}>
+                            <DeleteBtn></DeleteBtn>
+                        </span>
+                    </div>
+                );
+            },
+        }
     ];
 
     return (

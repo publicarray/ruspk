@@ -128,7 +128,7 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::delete_build(&conn, post_data.id))
+    let response = web::block(move || DbBuild::delete(&conn, post_data.id))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -141,7 +141,7 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 #[delete("/build/{id}")]
 pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::delete_build(&conn, id))
+    let response = web::block(move || DbBuild::delete(&conn, id))
         .await
         .map_err(|e| {
             debug!("{}", e);

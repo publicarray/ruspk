@@ -47,14 +47,14 @@ impl DbArchitecture {
         Ok(architecture_id)
     }
 
-    pub fn create_architecture(conn: &Connection, code: String) -> QueryResult<DbArchitecture> {
+    pub fn create(conn: &Connection, code: String) -> QueryResult<DbArchitecture> {
         let arch = diesel::insert_into(architecture::table)
             .values(&architecture::code.eq(code))
             .get_result::<DbArchitecture>(conn)?;
         Ok(arch)
     }
 
-    pub fn delete_architecture(conn: &Connection, id: DbId) -> QueryResult<usize> {
+    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
         // todo remove everything else linked to the architecture
         let result = diesel::delete(architecture::table.filter(architecture::id.eq(id))).execute(conn)?;
         Ok(result)

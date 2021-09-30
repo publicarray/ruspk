@@ -31,7 +31,7 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 #[post("/architecture")]
 pub async fn post(architecture: web::Json<NewArchitecture>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::create_architecture(&conn, architecture.code.clone()))
+    let response = web::block(move || DbArchitecture::create(&conn, architecture.code.clone()))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -45,7 +45,7 @@ pub async fn post(architecture: web::Json<NewArchitecture>, data: web::Data<AppD
 #[delete("/architecture")]
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::delete_architecture(&conn, post_data.id))
+    let response = web::block(move || DbArchitecture::delete(&conn, post_data.id))
         .await
         .map_err(|e| {
             debug!("{}", e);

@@ -29,7 +29,9 @@ export default function VersionPage() {
         { Header: 'Package', accessor: 'package' },
         { Header: 'Upstream Version', accessor: 'upstream_version' },
         { Header: 'Revision', accessor: 'revision' },
-        { Header: 'Beta', accessor: 'beta' },
+        { Header: 'Beta', accessor: row => {
+            return row.report_url ? "Yes" : "No"
+        }},
         // { Header: 'Services', accessor: 'services' },
         { Header: 'Insert Date', accessor: 'insert_date' },
         { Header: 'All Builds Active', accessor: row => formatBoolean(row.all_builds_active) },

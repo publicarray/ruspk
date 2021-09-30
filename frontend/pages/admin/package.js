@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import Model from "../../components/model";
 import { postJsonForm } from "../../utils";
+import DeleteBtn from "../../components/delete-btn";
 
 export default function PackagePage() {
     const url = `http://127.0.0.1:8080/api/package`
@@ -22,16 +23,41 @@ export default function PackagePage() {
     }
 
 
+    let del = async function (index, data) {
+        const response = await fetch(`${url}/${data[index].id}`, {
+            method: "DELETE",
+        });
+
+        if (response.ok) {
+            let data_copy = [...data];
+            data_copy.splice(index, 1)
+            setData(data_copy);
+        }
+    }
+
     // const data = [
     //     { id: 1, name: "bitlbee", author: "Diaoul", maintainers: "", insert_date: "2015-01-28 22:00:44.967691" },
     // ];
 
     const columns = [
-        { Header: 'ID', accessor: 'id',},
-        { Header: 'Name', accessor: 'name',},
-        { Header: 'Author', accessor: 'author',}, // author_user_id
+        { Header: 'ID', accessor: 'id'},
+        { Header: 'Name', accessor: 'name'},
+        { Header: 'Author', accessor: 'author'}, // author_user_id
         // { Header: 'Maintainers', accessor: 'maintainers',},
-        { Header: 'Insert Date', accessor: 'insert_date',},
+        { Header: 'Insert Date', accessor: 'insert_date'},
+        {
+            Header: "Actions",
+            accessor: "actions",
+            Cell: (props) => {
+                return (
+                    <div>
+                        <span onClick={() => del(props.row.index, props.data)}>
+                            <DeleteBtn></DeleteBtn>
+                        </span>
+                    </div>
+                );
+            },
+        }
     ];
 
     return (

@@ -35,7 +35,7 @@ pub struct Version {
     pub package: String,
     pub upstream_version: String,
     pub revision: Dbu32,
-    // beta
+    pub report_url: Option<String>,
     pub insert_date: NaiveDateTime,
     // all active
     pub install_wizard: Option<bool>,
@@ -54,7 +54,8 @@ impl DbVersion {
                 version::id,
                 package::name,
                 version::upstream_version,
-                version::ver,
+                version::ver, // revision
+                version::report_url, // beta //fix me: convert to bool
                 version::insert_date,
                 version::install_wizard,
                 version::upgrade_wizard,
@@ -63,7 +64,7 @@ impl DbVersion {
             .load::<Version>(conn)
     }
 
-    pub fn delete_version(conn: &Connection, id: DbId) -> QueryResult<usize> {
+    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
             let build_ids = build::table.filter(build::version_id.eq(id)).select(build::id).load::<DbId>(conn)?;
             for build_id in build_ids {

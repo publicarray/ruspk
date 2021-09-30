@@ -51,7 +51,7 @@ impl DbPackage {
         Ok(package)
     }
 
-    pub fn delete_package(conn: &Connection, id: i32) -> QueryResult<usize> {
+    pub fn delete(conn: &Connection, id: i32) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
             let builds = diesel::delete(build::table.filter(
                 build::version_id.eq_any(version::table.filter(version::package_id.eq(id)).select(version::id)),

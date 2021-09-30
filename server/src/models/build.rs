@@ -324,7 +324,7 @@ impl DbBuild {
         Ok(builds)
     }
 
-    pub fn delete_build(conn: &Connection, id: DbId) -> QueryResult<usize> {
+    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
             diesel::delete(build_architecture::table.filter(build_architecture::build_id.eq(id))).execute(conn)?;
             Ok(diesel::delete(build::table.filter(build::id.eq(id))).execute(conn)?)
