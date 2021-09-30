@@ -64,7 +64,7 @@ export default function BuildPage() {
                     checked={enabled}
                     onChange={() => toggleActivation(enabled, setEnabled, props.row.index, props.data)}
                     className={`${
-                        enabled ? 'bg-blue-600' : 'bg-gray-200'
+                        enabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
                     } relative inline-flex items-center h-6 rounded-full w-11`}
                     >
                     <span className="sr-only">Toggle Activation</span>
