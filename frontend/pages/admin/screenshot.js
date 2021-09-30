@@ -57,6 +57,7 @@ export default function ScreenshotPage() {
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 title="Insert Architecture"
+                buttons={<Button className="" type="submit">Save</Button>}
             >
                 <form onSubmit={handleSubmit}>
                     <label className="block">
@@ -77,7 +78,6 @@ export default function ScreenshotPage() {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         ></input>
                     </label>
-                    <Button className="my-5" type="submit">Submit Query</Button>
                 </form>
             </Model>
         </Layout>
