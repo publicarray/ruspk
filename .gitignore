@@ -10,3 +10,4 @@ server/*.json
 frontend/dist
 server/public
 tmp
+packages/*
