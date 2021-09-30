@@ -1,4 +1,4 @@
-import Layout from "../../components/layout";
+import Layout from "../../components/layout-admin";
 import Model from "../../components/model";
 import Button from "../../components/button";
 import TablePaginate from "../../components/table-paginate";
