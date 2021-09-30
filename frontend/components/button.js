@@ -1,6 +1,8 @@
 export default function Button({className, children, onClick}) {
     return (
-        <button onClick={onClick} className={`${className} py-3 px-6 text-white rounded-lg bg-blue-500 shadow-lg block md:inline-block hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50`}>{children}</button>
+        <button onClick={onClick} className={`${className} py-3 px-6
+        text-white rounded-lg bg-blue-500 hover:bg-blue-700 dark:bg-blue-800 dark:hover:bg-blue-900 focus:ring-blue-600
+        shadow-lg block md:inline-block focus:outline-none focus:ring-2 focus:ring-opacity-50`}>{children}</button>
     );
 }
 

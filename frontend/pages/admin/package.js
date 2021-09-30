@@ -68,7 +68,8 @@ export default function PackagePage() {
             <Model
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
-                title="Insert Firmware"
+                title="Insert Package"
+                buttons={<Button className="" type="submit">Submit Query</Button>}
             >
                 <form onSubmit={handleSubmit}>
                     <label className="block">
@@ -94,10 +95,8 @@ export default function PackagePage() {
                             <option value="mango">Mango</option>
                         </select>
                     </label>
-                    <Button className="my-5" type="submit">Submit Query</Button>
                 </form>
             </Model>
-            <Button>Edit Package</Button>
         </Layout>
     );
 }

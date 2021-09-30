@@ -4,7 +4,7 @@ export default function IndexPage({ postList }) {
   return (
     <main>
       <Head>
-        <title>Synocommunity</title>
+        <title>SynoCommunity</title>
       </Head>
     </main>
   )

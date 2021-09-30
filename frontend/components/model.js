@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import Button from "./button";
+import Button from "./close-btn";
 
 // https://headlessui.dev/react/dialog
 export default function Model({ isOpen, setIsOpen, title, description, children, buttons, close = "Cancel" }) {
@@ -45,7 +45,7 @@ export default function Model({ isOpen, setIsOpen, title, description, children,
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <div className="flex flex-col h-full justify-between max-w-lg m-auto transform bg-white shadow-m rounded-3xl">
+                            <div className="flex flex-col h-full justify-between max-w-lg m-auto transform bg-white dark:bg-gray-900 dark:text-white shadow-m rounded-3xl">
                                 <header className="p-6 mb-4 text-xl font-medium leading-6 text-white bg-gray-700 rounded-t-2xl">
                                     <Dialog.Title as="h3">
                                         { title }
@@ -53,18 +53,18 @@ export default function Model({ isOpen, setIsOpen, title, description, children,
                                 </header>
                                 <main className="px-6">
                                     {description &&
-                                        <Dialog.Description className="mb-2 text-gray-700">
+                                        <Dialog.Description className="mb-2 text-gray-700 dark:text-gray-200">
                                             { description }
                                         </Dialog.Description>
                                     }
                                     {children &&
-                                        <div className="mb-2 text-gray-700">
+                                        <div className="mb-2 text-gray-700 dark:text-gray-200">
                                             { children }
                                         </div>
                                     }
                                 </main>
-                                <footer className="p-6 mt-4 bg-gray-100 flex justify-end rounded-b-2xl">
-                                    <Button onClick={closeModal} className="mr-4 bg-gray-500 hover:bg-gray-700">{close}</Button>
+                                <footer className="p-6 mt-4 bg-gray-100 dark:bg-gray-800 flex justify-end rounded-b-2xl">
+                                    <Button onClick={closeModal} className="mr-4">{close}</Button>
                                     { buttons }
                                 </footer>
                             </div>
