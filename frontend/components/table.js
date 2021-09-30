@@ -60,7 +60,7 @@ export default function Table(props) {
                         <thead>
                             {
                                 headerGroups.map(headerGroup => (
-                                    <tr className="bg-gray-200 text-black dark:bg-gray-600 dark:text-white uppercase text-sm leading-normal" {...headerGroup.getHeaderGroupProps()}>
+                                    <tr className="bg-gray-200 text-black dark:bg-black dark:text-gray-300 uppercase text-sm leading-normal" {...headerGroup.getHeaderGroupProps()}>
                                         {
                                             headerGroup.headers.map(column => (
                                                 <th className="py-3 px-6 text-left" {...column.getHeaderProps()}>{column.render('Header')}</th>
@@ -70,7 +70,7 @@ export default function Table(props) {
                                 ))
                             }
                         </thead>
-                        <tbody className="text-gray-700 dark:text-gray-200 text-sm" {...getTableBodyProps()}>
+                        <tbody className="text-gray-700 dark:text-gray-300 text-sm" {...getTableBodyProps()}>
                             {rows.map(row => {
                                 prepareRow(row)
                                 return (
