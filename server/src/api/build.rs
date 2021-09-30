@@ -5,10 +5,12 @@ use anyhow::Result;
 extern crate serde_derive;
 extern crate serde_qs as qs;
 use crate::utils;
-use async_std::prelude::*;
+use async_std::{io, prelude::*};
 use async_tar::Archive;
 use futures::StreamExt;
 use async_std::path::Path;
+use crate::STORAGE_TYPE;
+use crate::STORAGE_PATH;
 
 fn db_get_build(conn: &DbConn, limit: i64, offset: i64) -> Result<Vec<Build>> {
     Ok(DbBuild::find_all(conn, limit, offset)?)
@@ -37,7 +39,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 #[post("/build")]
 pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     // read post data / file
-    let filepath = format!("./tmp/{}", "temp.spk"); // fix me (temp name then move /upload file to cdn)
+    let tmp_dir = tempfile::TempDir::new()?;
+    let filepath = tmp_dir.path().join("temp.spk"); // fix me (temp name then move /upload file to cdn)
     let mut f = async_std::fs::File::create(filepath.clone()).await?;
 
     while let Some(chunk) = body.next().await {
@@ -85,6 +88,30 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
 
     // serialise info file to a struct
     let info: Info = toml::from_str(&info_contents).map_err(|_| actix_web::error::ParseError::Incomplete)?;
+
+    // move file
+    if *STORAGE_TYPE == "filesystem" && *STORAGE_PATH != "" {
+        // path / package name / package revision
+        let file_path_str = format!("{}/{}/{}", &*STORAGE_PATH, info.package, info.version.split("-").collect::<Vec<&str>>()[1]);
+        let file_path = Path::new(&file_path_str);
+        if let Err(e) =  async_std::fs::create_dir_all(file_path).await {
+            if e.kind() != io::ErrorKind::AlreadyExists {
+                panic!("{:?}", e)
+            }
+        }
+
+        let new_filepath = file_path.join(format!(
+            "{}.v{}.f{}[{}].spk",
+            info.package,
+            info.version.split("-").collect::<Vec<&str>>()[1], // package revision
+            info.os_min_ver.split("-").collect::<Vec<&str>>()[1], // firmware build
+            info.arch.replace(" ", "-")
+        ));
+
+        debug!("rename: {:?}->{:?}", filepath, new_filepath);
+        //async_std::fs::rename(filepath, new_filepath).await?; // /tmp is in memory (tmpfs) and therefore a different filesystem
+        async_std::fs::copy(filepath, new_filepath).await?;
+    }
 
     // serialise info file to a struct & save info into database
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");

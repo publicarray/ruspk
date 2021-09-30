@@ -84,6 +84,12 @@ lazy_static! {
 
     #[derive(Copy, Clone, Debug)]
     pub static ref CACHE_TTL: String = std::env::var("CACHE_TTL").unwrap_or_else(|_| "600".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref STORAGE_TYPE: String = std::env::var("STORAGE_TYPE").unwrap_or_else(|_| "filesystem".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref STORAGE_PATH: String = std::env::var("STORAGE_PATH").unwrap_or_else(|_| "packages".to_string());
 }
 
 // Cache Type
@@ -168,6 +174,7 @@ async fn main() -> std::io::Result<()> {
                     .service(user::get_all)
                     .service(user::delete)
                     .service(build::get_all)
+                    // .service(build::search)
                     .service(build::post)
                     .service(build::delete)
                     .service(build::active)
@@ -190,11 +197,12 @@ async fn main() -> std::io::Result<()> {
                         .prefer_utf8(true),
                 ),
             )
-            .service(
-                fs::Files::new("/", "frontend/dist")
-                    .index_file("index.html")
-                    .prefer_utf8(true),
-            )
+            .service(fs::Files::new("/", &*STORAGE_PATH))
+            // .service(
+            //     fs::Files::new("/", "frontend/dist")
+            //         .index_file("index.html")
+            //         .prefer_utf8(true),
+            // )
     })
     .bind(&bind)?
     .run()

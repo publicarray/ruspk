@@ -15,6 +15,9 @@ export default function Table(props) {
     let filters = ""
 
     let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJson);
+    let isLoading = !error && !data;
+    let isError = !error;
+
     if (error) {
         console.error(error)
     }
