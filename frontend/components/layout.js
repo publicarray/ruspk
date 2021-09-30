@@ -7,7 +7,7 @@ export default function Layout({ children }) {
         <>
             <Head>
                 <title>SynoCommunity</title>
-                <link rel="icon" href="/static/favicon.ico" />
+                <link rel="icon" href="/favicon.ico" />
             </Head>
 
             <div className="flex min-h-screen flex-col w-full dark:bg-gray-800 dark:text-white">
