@@ -20,6 +20,21 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
     Ok(HttpResponse::Ok().json(response))
 }
 
+/// get package by slug
+#[get("/package/{name}")]
+pub async fn get(web::Path(package_name): web::Path<String>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+
+    let conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbPackage::find(&conn, package_name))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            HttpResponse::InternalServerError().finish()
+        })?;
+
+    Ok(HttpResponse::Ok().json(response))
+}
+
 #[derive(Deserialize, Clone)]
 pub struct PostPackage {
     name: String,

@@ -190,6 +190,7 @@ async fn main() -> std::io::Result<()> {
                     .service(screenshot::delete)
                     .service(screenshot::delete_id)
                     .service(package::get_all)
+                    .service(package::get)
                     .service(package::post)
                     .service(package::delete)
                     .service(package::delete_id),
