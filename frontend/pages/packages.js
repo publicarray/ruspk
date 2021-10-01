@@ -11,12 +11,14 @@ export default function Packages(props) {
     let { data, error } = useSWR(`${url}`, fetchJson);
     let isLoading = !error && !data;
     let isError = !error;
-
-    if (error) {
+    if (isError) {
         console.error(error)
     }
     if (isLoading) {
         return <p>Loading...</p>
+    }
+    if (data == undefined) {
+        data = []
     }
 
     return (
