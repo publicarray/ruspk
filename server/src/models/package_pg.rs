@@ -22,8 +22,12 @@ pub struct DbPackage {
 #[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
 pub struct Package {
     pub id: i32,
-    pub author: String,
+    pub author: Option<String>,
     pub name: String,
+    pub displayname: Option<String>,
+    pub description: String,
+    pub version: String,
+    pub revision: i32,
     pub insert_date: Option<NaiveDateTime>,
 }
 
@@ -33,8 +37,11 @@ impl DbPackage {
             .order(package::id.desc())
             .limit(limit)
             .offset(offset)
-            .inner_join(user::table)
-            .select((package::id, user::username, package::name, package::insert_date))
+            .left_join(user::table)
+            .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(1)))) // todo get max version
+            .left_join(displayname::table.on(displayname::version_id.eq(version::id).and(displayname::language_id.eq(1))))
+            .inner_join(description::table.on(description::version_id.eq(version::id).and(description::language_id.eq(1))))
+            .select((package::id, user::username.nullable(), package::name, displayname::name.nullable(), description::desc, version::upstream_version, version::ver, package::insert_date))
             .load::<Package>(conn)
     }
 
@@ -66,6 +73,7 @@ impl DbPackage {
         })
     }
 
+    // NAS api
     pub fn get_packages(
         lang: &str,
         arch: &str,

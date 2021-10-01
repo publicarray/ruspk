@@ -34,13 +34,11 @@ export default function Packages(props) {
                                     query: { name: row.name },
                                 }}>
                                 <a>
-                                    <h2 className="text-2xl whitespace-nowrap text-center mb-2">{row.name}</h2>
-                                    {/* <h2 className="text-2xl whitespace-nowrap text-center">{row.displayname}</h2> */}
+                                    <h2 className="text-2xl whitespace-nowrap text-center mb-2">{row.displayname}</h2>
                                     <img className="rounded-xl mx-auto mb-2" src="https://images.placeholders.dev/?width=100&height=100&bgColor=%23313131" alt={row.name} />
-                                    {/* <p className="text-center text-gray-500 text-sm">{row.version}</p> */}
-                                    <p className="text-center text-gray-500 dark:text-gray-400 text-sm">v1.0.0-3</p>
+                                    <p className="text-center text-gray-500 dark:text-gray-400 text-sm">v{row.version}-{row.revision}</p>
                                     {/* <p className="mb-2">{row.author}</p> */}
-                                    <p className="mb-2">Ad nisi nulla nisi enim qui sint ullamco officia deserunt. Pariatur elit Lorem dolore ipsum est id non. Aliquip adipisicing sit ut ullamco in ea ut. Cillum labore qui cupidatat dolor est amet incididunt ea nostrud.</p>
+                                    <p className="mb-2">{row.description}</p>
                                 </a>
                             </Link>
                         </div>

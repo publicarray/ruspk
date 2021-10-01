@@ -33,6 +33,8 @@ pub struct DbVersion {
 pub struct Version {
     pub id: DbId,
     pub package: String,
+    pub displayname: String,
+    pub description: String,
     pub upstream_version: String,
     pub revision: Dbu32,
     pub report_url: Option<String>,
@@ -49,10 +51,14 @@ impl DbVersion {
             .order(version::id.desc())
             .limit(limit)
             .offset(offset)
+            .inner_join(displayname::table.on(displayname::version_id.eq(version::id).and(displayname::language_id.eq(1))))
+            .inner_join(description::table.on(description::version_id.eq(version::id).and(description::language_id.eq(1))))
             .inner_join(package::table)
             .select((
                 version::id,
                 package::name,
+                displayname::name,
+                description::desc,
                 version::upstream_version,
                 version::ver, // revision
                 version::report_url, // beta //fix me: convert to bool

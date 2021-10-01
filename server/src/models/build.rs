@@ -226,7 +226,7 @@ impl DbBuild {
                 build::active.eq(false),
             );
 
-            // stop duplicate builds where the path is yet set to UNIQUE in the database.
+            // prevent duplicate builds where the path is not yet set to UNIQUE in the database.
             let exists: i64 = build::table
                 .filter(build::path.eq(path.clone()))
                 .count()
