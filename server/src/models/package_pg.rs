@@ -66,6 +66,35 @@ impl DbPackage {
             .load::<Package>(conn)
     }
 
+    pub fn find(conn: &Connection, package_name: String) -> QueryResult<Package> {
+        // should be version
+        package::table
+            .filter(package::name.eq(package_name))
+            .left_join(user::table)
+            .inner_join(version::table)
+            .left_join(
+                displayname::table.on(displayname::version_id
+                    .eq(version::id)
+                    .and(displayname::language_id.eq(1))),
+            )
+            .inner_join(
+                description::table.on(description::version_id
+                    .eq(version::id)
+                    .and(description::language_id.eq(1))),
+            )
+            .select((
+                package::id,
+                user::username.nullable(),
+                package::name,
+                displayname::name.nullable(),
+                description::desc,
+                version::upstream_version,
+                version::ver,
+                package::insert_date,
+            ))
+            .first::<Package>(conn)
+    }
+
     pub fn create_package(conn: &Connection, author_id: Option<i32>, name: String) -> QueryResult<DbPackage> {
         let new_package = (
             package::author_user_id.eq(author_id),

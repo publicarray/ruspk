@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 export default function Packages(props) {
 
-    const url = `http://127.0.0.1:8080/api/package`
+    const url = `http://127.0.0.1:8080/api/package?size=60`
 
     let { data, error } = useSWR(`${url}`, fetchJson);
     let isLoading = !error && !data;
