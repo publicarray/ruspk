@@ -1,4 +1,4 @@
-use crate::{schema::*, Connection, DbId};
+use crate::{Connection, DbId, schema::*, utils};
 use diesel::prelude::*;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
@@ -10,9 +10,10 @@ pub struct DbFirmware {
 }
 
 impl DbFirmware {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<DbFirmware>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<DbFirmware>> {
         firmware::table
             .order(firmware::build.desc())
+            .filter(firmware::version.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
             .load::<DbFirmware>(conn)

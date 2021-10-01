@@ -174,7 +174,6 @@ async fn main() -> std::io::Result<()> {
                     .service(user::get_all)
                     .service(user::delete)
                     .service(build::get_all)
-                    // .service(build::search)
                     .service(build::post)
                     .service(build::delete)
                     .service(build::active)
@@ -193,21 +192,21 @@ async fn main() -> std::io::Result<()> {
                     .service(package::get_all)
                     .service(package::post)
                     .service(package::delete)
-                    .service(package::delete_id)
+                    .service(package::delete_id),
             )
             .service(fs::Files::new("/", &*STORAGE_PATH))
-            // .service(
-            //     web::scope("/admin").service(
-            //         fs::Files::new("/", "frontend/dist/admin")
-            //             .index_file("index.html")
-            //             .prefer_utf8(true),
-            //     ),
-            // )
-            // .service(
-            //     fs::Files::new("/", "frontend/dist")
-            //         .index_file("index.html")
-            //         .prefer_utf8(true),
-            // )
+        // .service(
+        //     web::scope("/admin").service(
+        //         fs::Files::new("/", "frontend/dist/admin")
+        //             .index_file("index.html")
+        //             .prefer_utf8(true),
+        //     ),
+        // )
+        // .service(
+        //     fs::Files::new("/", "frontend/dist")
+        //         .index_file("index.html")
+        //         .prefer_utf8(true),
+        // )
     })
     .bind(&bind)?
     .run()

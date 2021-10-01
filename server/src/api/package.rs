@@ -2,19 +2,15 @@ use crate::models::*;
 use crate::utils;
 use crate::DbId;
 use crate::{AppData, DbConn};
-use actix_web::{get, post, delete, web, Error, HttpRequest, HttpResponse};
+use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
-
-fn db_get_packages(conn: &DbConn, limit: i64, offset: i64) -> Result<Vec<Package>> {
-    Ok(DbPackage::find_all(conn, limit, offset)?)
-}
 
 /// retrieve all packages
 #[get("/package")]
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let (limit, offset) = utils::paginate_qs(req.query_string());
+    let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || db_get_packages(&conn, limit, offset))
+    let response = web::block(move || DbPackage::find_all(&conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -60,12 +56,10 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 #[delete("/package/{id}")]
 pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::delete(&conn, id))
-        .await
-        .map_err(|e| {
-            debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        })?;
+    let response = web::block(move || DbPackage::delete(&conn, id)).await.map_err(|e| {
+        debug!("{}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
 
     Ok(HttpResponse::Ok().json(response))
 }

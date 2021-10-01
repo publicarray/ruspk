@@ -8,9 +8,9 @@ use anyhow::Result;
 /// retrieve all users
 #[get("/user")]
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let (limit, offset) = utils::paginate_qs(req.query_string());
+    let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || User::find_all(&conn, limit, offset))
+    let response = web::block(move || User::find_all(&conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);

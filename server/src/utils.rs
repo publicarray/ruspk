@@ -28,23 +28,30 @@ pub struct Paginate {
     pub size: Option<i64>,
 }
 
+pub fn fuzzy_search(q: &str) -> String {
+    let replaced = q.replace(" ", "%");
+    format!("%{}%", replaced)
+}
 /// retrieve HTTP GET Parameters for pagination
 extern crate serde_derive;
 extern crate serde_qs as qs;
-pub fn paginate_qs(query_str: &str) -> (i64, i64) {
+pub fn handle_query_parameters(query_str: &str) -> (i64, i64, String) {
     #[derive(Debug, PartialEq, Deserialize, Serialize)]
     struct Parameters {
         page: Option<i64>,
         size: Option<i64>,
+        q: Option<String>,
     }
 
-    // if strings are found use defaults
+    // if strings are not found use defaults
     let params: Parameters = qs::from_str(query_str).unwrap_or(Parameters {
         page: Some(0),
         size: Some(20),
+        q: Some(" ".to_string()),
     });
     let mut offset = params.page.unwrap_or(1); //defaults if not provided
     let mut limit = params.size.unwrap_or(20); //defaults if not provided
+    let query = params.q.unwrap_or(" ".to_string()); //defaults if not provided
 
     // check fot negatives
     if offset <= 0 {
@@ -57,5 +64,5 @@ pub fn paginate_qs(query_str: &str) -> (i64, i64) {
         limit = 60
     }
 
-    (limit, (offset - 1) * limit)
+    (limit, (offset - 1) * limit, query)
 }

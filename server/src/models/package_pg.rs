@@ -1,4 +1,4 @@
-use crate::models::DbArchitecture;
+use crate::{models::DbArchitecture, utils};
 use crate::models::DbLanguage;
 use crate::schema::*;
 use crate::Connection;
@@ -32,16 +32,37 @@ pub struct Package {
 }
 
 impl DbPackage {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Package>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Package>> {
         package::table
             .order(package::id.desc())
+            .filter(package::name.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
             .left_join(user::table)
-            .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(1)))) // todo get max version
-            .left_join(displayname::table.on(displayname::version_id.eq(version::id).and(displayname::language_id.eq(1))))
-            .inner_join(description::table.on(description::version_id.eq(version::id).and(description::language_id.eq(1))))
-            .select((package::id, user::username.nullable(), package::name, displayname::name.nullable(), description::desc, version::upstream_version, version::ver, package::insert_date))
+            .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(1))))
+            // .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(
+            //     version::filter(version::package_id.eq(package::id)).select(max(version::ver)))))
+            // )
+            .left_join(
+                displayname::table.on(displayname::version_id
+                    .eq(version::id)
+                    .and(displayname::language_id.eq(1))),
+            )
+            .inner_join(
+                description::table.on(description::version_id
+                    .eq(version::id)
+                    .and(description::language_id.eq(1))),
+            )
+            .select((
+                package::id,
+                user::username.nullable(),
+                package::name,
+                displayname::name.nullable(),
+                description::desc,
+                version::upstream_version,
+                version::ver,
+                package::insert_date,
+            ))
             .load::<Package>(conn)
     }
 

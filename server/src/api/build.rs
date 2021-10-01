@@ -1,31 +1,27 @@
-use crate::{DbId, models::*};
+use crate::{models::*, DbId};
 use crate::{AppData, DbConn};
-use actix_web::{Error, HttpRequest, HttpResponse, delete, get, post, put, web};
+use actix_web::{delete, get, post, put, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 extern crate serde_derive;
 extern crate serde_qs as qs;
 use crate::utils;
+use crate::STORAGE_PATH;
+use crate::STORAGE_TYPE;
+use async_std::path::Path;
 use async_std::{io, prelude::*};
 use async_tar::Archive;
 use futures::StreamExt;
-use async_std::path::Path;
-use crate::STORAGE_TYPE;
-use crate::STORAGE_PATH;
-
-fn db_get_build(conn: &DbConn, limit: i64, offset: i64) -> Result<Vec<Build>> {
-    Ok(DbBuild::find_all(conn, limit, offset)?)
-}
 
 #[get("/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let (limit, offset) = utils::paginate_qs(req.query_string());
+    let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
     // let (q_limit, q_offset) = utils::paginate_qs(req.query_string());
     // let limit = json_data.size.unwrap_or(q_limit);
     // let offset = json_data.page.unwrap_or(q_offset);
 
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || db_get_build(&conn, limit, offset))
+    let response = web::block(move || DbBuild::find_all(&conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -92,9 +88,14 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
     // move file
     if *STORAGE_TYPE == "filesystem" && *STORAGE_PATH != "" {
         // path / package name / package revision
-        let file_path_str = format!("{}/{}/{}", &*STORAGE_PATH, info.package, info.version.split("-").collect::<Vec<&str>>()[1]);
+        let file_path_str = format!(
+            "{}/{}/{}",
+            &*STORAGE_PATH,
+            info.package,
+            info.version.split("-").collect::<Vec<&str>>()[1]
+        );
         let file_path = Path::new(&file_path_str);
-        if let Err(e) =  async_std::fs::create_dir_all(file_path).await {
+        if let Err(e) = async_std::fs::create_dir_all(file_path).await {
             if e.kind() != io::ErrorKind::AlreadyExists {
                 panic!("{:?}", e)
             }
@@ -115,12 +116,13 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
 
     // serialise info file to a struct & save info into database
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::create_build(&conn, info, install_wizard, uninstall_wizard, upgrade_wizard))
-        .await
-        .map_err(|e| {
-            debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        })?;
+    let response =
+        web::block(move || DbBuild::create_build(&conn, info, install_wizard, uninstall_wizard, upgrade_wizard))
+            .await
+            .map_err(|e| {
+                debug!("{}", e);
+                HttpResponse::InternalServerError().finish()
+            })?;
     Ok(HttpResponse::Ok().json(response))
 }
 
@@ -141,21 +143,18 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 #[delete("/build/{id}")]
 pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::delete(&conn, id))
-        .await
-        .map_err(|e| {
-            debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        })?;
+    let response = web::block(move || DbBuild::delete(&conn, id)).await.map_err(|e| {
+        debug!("{}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
 
     Ok(HttpResponse::Ok().json(response))
 }
 
-
 #[derive(Deserialize)]
 pub struct BuildActive {
     id: DbId,
-    active: bool
+    active: bool,
 }
 
 // #[put("/build")]

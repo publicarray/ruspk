@@ -1,4 +1,4 @@
-use crate::models::BuildArchitecture;
+use crate::{models::BuildArchitecture, utils};
 use crate::models::DbArchitecture;
 use crate::models::DbFirmware;
 use crate::models::DbVersion;
@@ -117,7 +117,13 @@ pub struct Info {
 }
 
 impl DbBuild {
-    pub fn create_build(conn: &Connection, info: Info, install_wizard: bool, uninstall_wizard: bool, upgrade_wizard: bool) -> QueryResult<DbBuild> {
+    pub fn create_build(
+        conn: &Connection,
+        info: Info,
+        install_wizard: bool,
+        uninstall_wizard: bool,
+        upgrade_wizard: bool,
+    ) -> QueryResult<DbBuild> {
         let info_clone = info.clone();
         let pkg_ver: Vec<&str> = info_clone.version.split("-").collect();
         let fw_min_ver: Vec<&str> = info_clone.os_min_ver.split("-").collect();
@@ -244,14 +250,14 @@ impl DbBuild {
             // todo optimise
             for arch in architectures {
                 let architecture_id = architecture::table
-                .filter(architecture::code.eq(arch))
-                .select(architecture::id)
-                .first::<DbId>(conn)?;
+                    .filter(architecture::code.eq(arch))
+                    .select(architecture::id)
+                    .first::<DbId>(conn)?;
 
                 diesel::insert_into(build_architecture::table)
                     .values((
                         build_architecture::architecture_id.eq(architecture_id),
-                        build_architecture::build_id.eq(build.id)
+                        build_architecture::build_id.eq(build.id),
                     ))
                     .execute(conn)?;
             }
@@ -274,7 +280,7 @@ impl DbBuild {
         }
     }
 
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Build>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Build>> {
         // https://github.com/ChristophWurst/diesel_many_to_many/
         // https://www.reddit.com/r/rust/comments/frkta2/manytomany_relationships_in_diesel_does_anybody/
         // https://stackoverflow.com/questions/52279553/what-is-the-standard-pattern-to-relate-three-tables-many-to-many-relation-with
@@ -283,6 +289,7 @@ impl DbBuild {
         // https://docs.diesel.rs/1.4.x/diesel/associations/index.html
         let builds_tmp = build::table
             .order(build::id.desc())
+            .filter(package::name.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
             .inner_join(version::table.inner_join(package::table))
@@ -333,6 +340,8 @@ impl DbBuild {
 
     pub fn active(conn: &Connection, id: DbId, active: bool) -> QueryResult<DbBuild> {
         // must return `active` value from DB
-        Ok(diesel::update(build::table.filter(build::id.eq(id))).set(build::active.eq(active)).get_result(conn)?)
+        Ok(diesel::update(build::table.filter(build::id.eq(id)))
+            .set(build::active.eq(active))
+            .get_result(conn)?)
     }
 }

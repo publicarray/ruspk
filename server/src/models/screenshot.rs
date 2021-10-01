@@ -1,4 +1,4 @@
-use crate::schema::*;
+use crate::{schema::*, utils};
 use crate::Connection;
 use crate::DbId;
 use diesel::prelude::*;
@@ -18,9 +18,10 @@ pub struct Screenshot {
 }
 
 impl DbScreenshot {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Screenshot>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Screenshot>> {
         screenshot::table
             .order(screenshot::id.desc())
+            .filter(package::name.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
             .inner_join(package::table)

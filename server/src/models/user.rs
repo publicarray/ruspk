@@ -1,4 +1,4 @@
-use crate::schema::*;
+use crate::{schema::*, utils};
 use crate::Connection;
 use crate::DbId;
 use chrono::NaiveDateTime;
@@ -26,9 +26,10 @@ pub struct User {
 }
 
 impl User {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<User>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<User>> {
         user::table
             .order(user::id.desc())
+            .filter(user::username.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
             .select((user::id, user::username, user::email, user::active, user::confirmed_at))

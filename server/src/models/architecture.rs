@@ -1,4 +1,4 @@
-use crate::schema::*;
+use crate::{schema::*, utils};
 use crate::Connection;
 use crate::DbId;
 use anyhow::{Context, Result};
@@ -17,12 +17,12 @@ pub struct NewArchitecture {
 }
 
 impl DbArchitecture {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<DbArchitecture>> {
+    pub fn find_all( conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<DbArchitecture>> {
         architecture::table
             .order(architecture::id.desc())
+            .filter(architecture::code.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
-            // .order(id.asc())
             .load::<DbArchitecture>(conn)
     }
 

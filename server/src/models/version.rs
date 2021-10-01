@@ -1,4 +1,4 @@
-use crate::models::DbPackage;
+use crate::{models::DbPackage, utils};
 use crate::schema::*;
 use crate::Connection;
 use crate::{DbId, Dbu32};
@@ -46,13 +46,22 @@ pub struct Version {
 }
 
 impl DbVersion {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Version>> {
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Version>> {
         version::table
             .order(version::id.desc())
+            .filter(displayname::name.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
-            .inner_join(displayname::table.on(displayname::version_id.eq(version::id).and(displayname::language_id.eq(1))))
-            .inner_join(description::table.on(description::version_id.eq(version::id).and(description::language_id.eq(1))))
+            .inner_join(
+                displayname::table.on(displayname::version_id
+                    .eq(version::id)
+                    .and(displayname::language_id.eq(1))),
+                )
+            .inner_join(
+                description::table.on(description::version_id
+                    .eq(version::id)
+                    .and(description::language_id.eq(1))),
+            )
             .inner_join(package::table)
             .select((
                 version::id,
@@ -60,7 +69,7 @@ impl DbVersion {
                 displayname::name,
                 description::desc,
                 version::upstream_version,
-                version::ver, // revision
+                version::ver,        // revision
                 version::report_url, // beta //fix me: convert to bool
                 version::insert_date,
                 version::install_wizard,
@@ -72,9 +81,13 @@ impl DbVersion {
 
     pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
-            let build_ids = build::table.filter(build::version_id.eq(id)).select(build::id).load::<DbId>(conn)?;
+            let build_ids = build::table
+                .filter(build::version_id.eq(id))
+                .select(build::id)
+                .load::<DbId>(conn)?;
             for build_id in build_ids {
-                diesel::delete(build_architecture::table.filter(build_architecture::build_id.eq(build_id))).execute(conn)?;
+                diesel::delete(build_architecture::table.filter(build_architecture::build_id.eq(build_id)))
+                    .execute(conn)?;
             }
             let builds = diesel::delete(build::table.filter(build::version_id.eq(id))).execute(conn)?;
             let versions = diesel::delete(version::table.filter(version::id.eq(id))).execute(conn)?;
