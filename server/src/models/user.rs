@@ -1,6 +1,6 @@
-use crate::{schema::*, utils};
 use crate::Connection;
 use crate::DbId;
+use crate::{schema::*, utils};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]

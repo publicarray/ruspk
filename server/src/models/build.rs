@@ -1,4 +1,3 @@
-use crate::{models::BuildArchitecture, utils};
 use crate::models::DbArchitecture;
 use crate::models::DbFirmware;
 use crate::models::DbVersion;
@@ -6,6 +5,7 @@ use crate::schema::*;
 use crate::Connection;
 use crate::DbId;
 use crate::Dbu32;
+use crate::{models::BuildArchitecture, utils};
 use chrono::NaiveDateTime;
 use diesel::dsl;
 use diesel::prelude::*;

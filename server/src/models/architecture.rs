@@ -1,6 +1,6 @@
-use crate::{schema::*, utils};
 use crate::Connection;
 use crate::DbId;
+use crate::{schema::*, utils};
 use anyhow::{Context, Result};
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
@@ -17,7 +17,12 @@ pub struct NewArchitecture {
 }
 
 impl DbArchitecture {
-    pub fn find_all( conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<DbArchitecture>> {
+    pub fn find_all(
+        conn: &Connection,
+        limit: i64,
+        offset: i64,
+        search_term: String,
+    ) -> QueryResult<Vec<DbArchitecture>> {
         architecture::table
             .order(architecture::id.desc())
             .filter(architecture::code.ilike(utils::fuzzy_search(&search_term)))

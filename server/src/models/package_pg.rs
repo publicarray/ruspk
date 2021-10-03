@@ -1,7 +1,7 @@
-use crate::{models::DbArchitecture, utils};
 use crate::models::DbLanguage;
 use crate::schema::*;
 use crate::Connection;
+use crate::{models::DbArchitecture, utils};
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
 use diesel::dsl;

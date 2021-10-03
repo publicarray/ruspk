@@ -1,6 +1,6 @@
-use crate::{models::DbPackage, utils};
 use crate::schema::*;
 use crate::Connection;
+use crate::{models::DbPackage, utils};
 use crate::{DbId, Dbu32};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
@@ -56,7 +56,7 @@ impl DbVersion {
                 displayname::table.on(displayname::version_id
                     .eq(version::id)
                     .and(displayname::language_id.eq(1))),
-                )
+            )
             .inner_join(
                 description::table.on(description::version_id
                     .eq(version::id)

@@ -1,4 +1,4 @@
-use crate::{Connection, DbId, schema::*, utils};
+use crate::{schema::*, utils, Connection, DbId};
 use diesel::prelude::*;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
