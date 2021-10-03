@@ -71,6 +71,9 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
         if f.path().unwrap() == Path::new("WIZARD_UIFILES/upgrade_uifile") {
             upgrade_wizard = true;
         }
+        if f.path().unwrap() == Path::new("PACKAGE_ICON_256.PNG") {
+            f.unpack_in(tmp_dir.path()).await?;
+        }
     }
 
     // convert to booleans hack
@@ -84,7 +87,7 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
 
     // serialise info file to a struct
     let info: Info = toml::from_str(&info_contents).map_err(|_| actix_web::error::ParseError::Incomplete)?;
-
+    let icon256path = tmp_dir.path().join("PACKAGE_ICON_256.PNG");
     // move file
     if *STORAGE_TYPE == "filesystem" && *STORAGE_PATH != "" {
         // path / package name / package revision
@@ -112,6 +115,7 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
         debug!("rename: {:?}->{:?}", filepath, new_filepath);
         //async_std::fs::rename(filepath, new_filepath).await?; // /tmp is in memory (tmpfs) and therefore a different filesystem
         async_std::fs::copy(filepath, new_filepath).await?;
+        async_std::fs::copy(icon256path, file_path.join("PACKAGE_ICON_256.PNG")).await?;
     }
 
     // serialise info file to a struct & save info into database

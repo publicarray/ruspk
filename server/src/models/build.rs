@@ -168,17 +168,18 @@ impl DbBuild {
         //////
         conn.build_transaction().read_write().run(|| {
             let firmware_id = firmware::table
-                .filter(firmware::build.eq(fw_build))
-                .filter(firmware::version.eq(fw_version))
+                .filter(firmware::build.eq(&fw_build))
+                .filter(firmware::version.eq(&fw_version))
                 .select(firmware::id)
                 .first::<DbId>(conn)?;
 
             // package create if not available?
             let package_id = package::table
-                .filter(package::name.eq(info.package))
+                .filter(package::name.eq(&info.package))
                 .select(package::id)
                 .first::<DbId>(conn)?;
 
+            // check if version already exists
             let t_version_id = version::table
                 .filter(version::package_id.eq(package_id))
                 .filter(version::ver.eq(revision))
@@ -195,28 +196,55 @@ impl DbBuild {
                         version::package_id.eq(package_id),
                         version::ver.eq(revision),
                         version::upstream_version.eq(upstream_version),
-                        version::changelog.eq(info.changelog),
-                        version::report_url.eq(info.report_url),
-                        version::distributor.eq(info.distributor),
-                        version::distributor_url.eq(info.distributor_url),
-                        version::maintainer.eq(info.maintainer),
-                        version::maintainer_url.eq(info.maintainer_url),
-                        version::dependencies.eq(info.install_dep_packages),
-                        version::conf_dependencies.eq(info.install_conflict_packages),
-                        // version::conflicts.eq(conflicts),
-                        // version::conf_conflicts.eq(conf_conflicts),
-                        version::install_wizard.eq(install_wizard),
-                        // version::uninstall_wizard.eq(uninstall_wizard),
-                        version::upgrade_wizard.eq(upgrade_wizard),
-                        version::startable.eq(info.startable),
-                        // version::license.eq(license),
+                        version::changelog.eq(&info.changelog),
+                        version::report_url.eq(&info.report_url),
+                        version::distributor.eq(&info.distributor),
+                        version::distributor_url.eq(&info.distributor_url),
+                        version::maintainer.eq(&info.maintainer),
+                        version::maintainer_url.eq(&info.maintainer_url),
+                        version::dependencies.eq(&info.install_dep_packages),
+                        version::conf_dependencies.eq(&info.install_conflict_packages),
+                        // version::conflicts.eq(&conflicts),
+                        // version::conf_conflicts.eq(&conf_conflicts),
+                        version::install_wizard.eq(&install_wizard),
+                        // version::uninstall_wizard.eq(&uninstall_wizard),
+                        version::upgrade_wizard.eq(&upgrade_wizard),
+                        version::startable.eq(&info.startable),
+                        // version::license.eq(&license),
                         version::insert_date.eq(dsl::now),
                     );
 
-                    diesel::insert_into(version::table)
+                    let version_id = diesel::insert_into(version::table)
                         .values(&new_version)
                         .returning(version::id)
-                        .get_result::<DbId>(conn)?
+                        .get_result::<DbId>(conn)?;
+
+                    // Insert package name
+                    // fallback to package name
+                    let displayname_str = match info.displayname {
+                        Some(name) => name,
+                        None => info.package,
+                    };
+                    let new_displayname = (
+                        displayname::version_id.eq(version_id),
+                        displayname::language_id.eq(1),
+                        displayname::name.eq(displayname_str),
+                    );
+                    diesel::insert_into(displayname::table)
+                        .values(&new_displayname)
+                        .execute(conn)?;
+
+                    // Insert description
+                    let new_description = (
+                        description::version_id.eq(version_id),
+                        description::language_id.eq(1),
+                        description::desc.eq(info.description),
+                    );
+                    diesel::insert_into(description::table)
+                        .values(&new_description)
+                        .execute(conn)?;
+
+                    version_id
                 }
             };
 
@@ -226,17 +254,14 @@ impl DbBuild {
                 build::publisher_user_id.eq(publisher_user_id),
                 build::checksum.eq(info.checksum),
                 build::extract_size.eq(extractsize),
-                build::path.eq(path.clone()),
+                build::path.eq(&path),
                 // build::md5.eq(md5),
                 build::insert_date.eq(dsl::now),
                 build::active.eq(false),
             );
 
             // prevent duplicate builds where the path is not yet set to UNIQUE in the database.
-            let exists: i64 = build::table
-                .filter(build::path.eq(path.clone()))
-                .count()
-                .get_result(conn)?;
+            let exists: i64 = build::table.filter(build::path.eq(&path)).count().get_result(conn)?;
             if exists > 0 {
                 // fixme: do proper error handling
                 debug!("The file {} already exists in the database", path);

@@ -125,3 +125,7 @@ RUST_LOG="warn" target/release/ruspk
 yarn --cwd frontend export -o dist
 cargo publish
 ```
+
+Optimised build (**not** used for benchmarks and no measurable improvement):
+
+`RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo build --release`
