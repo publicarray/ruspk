@@ -1,12 +1,12 @@
 import Layout from "../components/layout";
 import Head from 'next/head'
 import useSWR from 'swr'
-import { fetchJson } from "../utils";
+import { fetchJson, API, API_VER, CDN } from "../utils";
 import Link from 'next/link'
 
 export default function Packages(props) {
 
-    const url = `http://127.0.0.1:8080/api/package?size=60`
+    const url = `${API}/${API_VER}/package?size=60`
 
     let { data, error } = useSWR(`${url}`, fetchJson);
     let isLoading = !error && !data;
@@ -37,7 +37,8 @@ export default function Packages(props) {
                                 }}>
                                 <a>
                                     <h2 className="text-2xl whitespace-nowrap text-center mb-2">{row.displayname}</h2>
-                                    <img className="rounded-xl mx-auto mb-2" src="https://images.placeholders.dev/?width=100&height=100&bgColor=%23313131" alt={row.name} />
+                                    <img className="rounded-xl mx-auto mb-2" src={`${CDN}/${row.name}/${row.revision}/icon256.png`} alt={row.name} />
+                                    {/* <img className="rounded-xl mx-auto mb-2" src="https://images.placeholders.dev/?width=100&height=100&bgColor=%23313131" alt={row.name} /> */}
                                     <p className="text-center text-gray-500 dark:text-gray-400 text-sm">v{row.version}-{row.revision}</p>
                                     {/* <p className="mb-2">{row.author}</p> */}
                                     <p className="mb-2">{row.description}</p>

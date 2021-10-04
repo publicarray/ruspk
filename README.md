@@ -95,6 +95,10 @@ yarn --cwd frontend dev
 # rustup override unset
 ```
 
+### Debugging
+
+`RUST_BACKTRACE=1 CACHE_TTL=0 RUST_LOG="warn,ruspk=trace,actix_web=info,actix_server=info" cargo run`
+
 ## lint
 
 ```sh
@@ -129,3 +133,5 @@ cargo publish
 Optimised build (**not** used for benchmarks and no measurable improvement):
 
 `RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo build --release`
+
+<https://github.com/image-rs/image>

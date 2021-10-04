@@ -1,6 +1,11 @@
 // retrieve data
 export const fetchJson = (url) => fetch(url).then((res) => res.json())
 
+// Endpoint
+export const API = "http://127.0.0.1:8080"
+export const API_VER = "api"
+export const CDN = "http://127.0.0.1:8080"
+
 // table formats
 export function formatBoolean(data) {
     switch (data) {

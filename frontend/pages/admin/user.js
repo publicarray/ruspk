@@ -3,11 +3,11 @@ import Model from "../../components/model";
 import Button from "../../components/button";
 import TablePaginate from "../../components/table-paginate";
 import { useState } from "react";
-import { postJsonForm } from "../../utils";
+import { postJsonForm,API, API_VER } from "../../utils";
 import { formatBoolean } from '../../utils';
 
 export default function ArchitecturePage() {
-    const url = `http://127.0.0.1:8080/api/user`;
+    const url = `${API}/${API_VER}/user`;
     const columns = [
         { Header: "ID", accessor: "id" },
         { Header: "Username", accessor: "username" },

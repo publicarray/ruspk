@@ -4,14 +4,14 @@ import Button from "../../components/button";
 import DeleteBtn from "../../components/delete-btn";
 import TablePaginate from "../../components/table-paginate";
 import { Dialog } from "@headlessui/react";
-import { formatBoolean, formatArray } from '../../utils';
+import { formatBoolean, formatArray,API, API_VER } from '../../utils';
 import { useRouter } from 'next/router'
 import { Switch } from '@headlessui/react'
 import { useState, useEffect } from 'react';
 
 export default function BuildPage() {
     const router = useRouter()
-    const url = `http://127.0.0.1:8080/api/build`
+    const url = `${API}/${API_VER}/build`
     const [data, setData] = useState([]);
 
     let toggleActivation = async function (enabled, setEnabled, index, data) {

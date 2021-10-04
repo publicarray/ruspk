@@ -4,11 +4,11 @@ import TablePaginate from "../../components/table-paginate";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import Model from "../../components/model";
-import { postJsonForm } from "../../utils";
+import { postJsonForm, API, API_VER } from "../../utils";
 import DeleteBtn from "../../components/delete-btn";
 
 export default function PackagePage() {
-    const url = `http://127.0.0.1:8080/api/package`
+    const url = `${API}/${API_VER}/package`
     let [isOpen, setIsOpen] = useState(false);
     const [data, setData] = useState([]);
 

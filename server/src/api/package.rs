@@ -1,23 +1,68 @@
-use crate::models::*;
+use crate::{CacheValue, models::*};
 use crate::utils;
 use crate::DbId;
 use crate::{AppData, DbConn};
-use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse};
+use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse, error::BlockingError};
 use anyhow::Result;
+use std::sync::Arc;
+use std::time::Instant;
+use crate::{CACHE_TTL};
 
 /// retrieve all packages
 #[get("/package")]
-pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, HttpResponse> {
     let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::find_all(&conn, limit, offset, q))
-        .await
-        .map_err(|e| {
-            debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        })?;
 
-    Ok(HttpResponse::Ok().json(response))
+    let now = Instant::now();
+    let cache_r = &data.cache_r;
+    let key = format!("{}{}{}", &limit, &offset, &q);
+
+    // return from cache
+    if let Some(value) = cache_r.get_one(&key) {
+        trace!("HIT {}ms", now.elapsed().as_millis());
+        debug!("cache age {}", value.insert_time.elapsed().as_secs());
+        if value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL) {
+            return Ok(HttpResponse::Ok()
+                .content_type("application/json")
+                .body(&*value.http_response));
+        }
+    }
+
+    // prepare response (cache miss)
+    let conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbPackage::find_all(&conn, limit, offset, q)).await;
+    trace!("MISS {}ms", now.elapsed().as_millis());
+    match response {
+        Ok(packages) => {
+            let http_response = serde_json::to_string(&packages).unwrap();
+            let value = CacheValue {
+                http_response: Arc::new(http_response),
+                insert_time: Arc::new(Instant::now()),
+            };
+            let cache_w_arc = Arc::clone(&data.cache_w);
+            let mut cache_w = cache_w_arc.lock().unwrap();
+            if cache_r.get(&key).map(|rs| rs.len()) == None {
+                cache_w.insert(key, value);
+            } else {
+                cache_w.update(key, value);
+            }
+            cache_w.refresh();
+            Ok(HttpResponse::Ok().json(&packages))
+        }
+        Err(err) => {
+            trace!("{}", err);
+            match err {
+                BlockingError::Error(err) => match err.downcast_ref::<diesel::result::Error>().unwrap() {
+                    diesel::result::Error::NotFound => {
+                        debug!("{}", err);
+                        Err(HttpResponse::NotFound().finish())
+                    }
+                    _ => Err(HttpResponse::InternalServerError().finish()),
+                },
+                BlockingError::Canceled => Err(HttpResponse::InternalServerError().finish()),
+            }
+        }
+    }
 }
 
 /// get package by slug

@@ -163,12 +163,12 @@ async fn main() -> std::io::Result<()> {
                 keyring: public_key.clone(),
             }))
             .wrap(middleware::Logger::default())
-            .service(web::resource("/hello").route(web::get().to(routes::index)))
-            .service(web::resource("/hello/{name}").route(web::get().to(routes::index)))
+            //.service(web::resource("/hello").route(web::get().to(routes::index)))
+            //.service(web::resource("/hello/{name}").route(web::get().to(routes::index)))
             .service(web::resource("/nas").route(web::get().to(routes::syno)))
             .service(web::resource("/nas").route(web::post().to(routes::syno)))
-            .service(web::resource("/package").route(web::get().to(routes::list_packages)))
-            .service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
+            //.service(web::resource("/package").route(web::get().to(routes::list_packages)))
+            //.service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
             .service(
                 web::scope("/api")
                     .service(user::get_all)

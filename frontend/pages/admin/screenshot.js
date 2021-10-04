@@ -4,11 +4,11 @@ import TablePaginate from "../../components/table-paginate";
 import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
-import { formatImage, postJsonForm } from '../../utils';
+import { formatImage, postJsonForm, API, API_VER } from '../../utils';
 import DeleteBtn from "../../components/delete-btn";
 
 export default function ScreenshotPage() {
-    const url = `http://127.0.0.1:8080/api/screenshot`
+    const url = `${API}/${API_VER}/screenshot`
     let [isOpen, setIsOpen] = useState(false);
     const [data, setData] = useState([]);
 

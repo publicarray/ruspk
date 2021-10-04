@@ -3,10 +3,10 @@ import Button from "../../components/button";
 import TablePaginate from "../../components/table-paginate";
 import { useState } from "react";
 import Model from "../../components/model";
-import { postJsonForm } from "../../utils";
+import { postJsonForm,API, API_VER } from "../../utils";
 
 export default function FirmwarePage() {
-    const url = `http://127.0.0.1:8080/api/firmware`
+    const url = `${API}/${API_VER}/firmware`
     let [isOpen, setIsOpen] = useState(false);
     const [data, setData] = useState([]);
 

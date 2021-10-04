@@ -115,7 +115,7 @@ pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Resul
         debug!("rename: {:?}->{:?}", filepath, new_filepath);
         //async_std::fs::rename(filepath, new_filepath).await?; // /tmp is in memory (tmpfs) and therefore a different filesystem
         async_std::fs::copy(filepath, new_filepath).await?;
-        async_std::fs::copy(icon256path, file_path.join("PACKAGE_ICON_256.PNG")).await?;
+        async_std::fs::copy(icon256path, file_path.join("icon256.png")).await?;
     }
 
     // serialise info file to a struct & save info into database

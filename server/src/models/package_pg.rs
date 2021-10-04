@@ -4,7 +4,7 @@ use crate::Connection;
 use crate::{models::DbArchitecture, utils};
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
-use diesel::dsl;
+use diesel::dsl::{self, max};
 use diesel::prelude::*;
 use diesel::query_builder::SqlQuery;
 use diesel::sql_query;
@@ -20,7 +20,7 @@ pub struct DbPackage {
 }
 
 #[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
-pub struct Package {
+pub struct TmpPackage {
     pub id: i32,
     pub author: Option<String>,
     pub name: String,
@@ -31,9 +31,21 @@ pub struct Package {
     pub insert_date: Option<NaiveDateTime>,
 }
 
+#[derive(Serialize, Deserialize, Queryable, Debug, Clone)]
+pub struct Package {
+    pub id: i32,
+    pub author: Option<String>,
+    pub name: String,
+    pub displayname: Option<String>,
+    pub description: String,
+    pub version: String, // Latest version
+    pub revision: i32, // Latest revision
+    pub insert_date: Option<NaiveDateTime>,
+}
+
 impl DbPackage {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Package>> {
-        package::table
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> Result<Vec<Package>> {
+        let tmp_packages = package::table
             .order(package::id.desc())
             .filter(package::name.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
@@ -63,7 +75,32 @@ impl DbPackage {
                 version::ver,
                 package::insert_date,
             ))
-            .load::<Package>(conn)
+            .load::<Package>(conn)?;
+
+
+            // this loop is costly. fixme
+            let mut packages:Vec<Package> = vec![];
+            for package in tmp_packages {
+                let tmp_latest_revision = version::table
+                    .filter(version::package_id.eq(package.id))
+                    .select(max(version::ver))
+                    .first::<Option<i32>>(conn)?;
+                let latest_revision = tmp_latest_revision.unwrap();
+
+                let latest_upstream_version = version::table
+                    .filter(version::package_id.eq(package.id))
+                    .filter(version::ver.eq(latest_revision))
+                    .select(version::upstream_version)
+                    .first::<String>(conn)?;
+
+                packages.push(Package {
+                    revision: latest_revision,
+                    version: latest_upstream_version,
+                    ..package
+                });
+            }
+
+            Ok(packages)
     }
 
     pub fn find(conn: &Connection, package_name: String) -> QueryResult<Package> {

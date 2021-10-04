@@ -22,7 +22,7 @@ export default function IndexPage() {
                     <p className="mb-4">Join us on Discord! <a href="https://discord.gg/nnN9fgE7EF" title="Discord"><img className="inline hover:scale-110 transition" src="https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge" alt="Join Discord Button"/></a></p>
                     <p className="mb-4">Only packages that are modified to be compatible with DSM7 by the associated developers can execute on DSM7.0. If not,the package cannot be able to function after upgrading from DSM6.2 to DSM7.0.</p>
                 </div>
-                <div id="summary" class="flex text-center">
+                <div id="summary" className="flex text-center">
                     <div className="m-4">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-40 w-40 mx-auto" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z" clipRule="evenodd" />

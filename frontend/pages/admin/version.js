@@ -5,12 +5,12 @@ import TablePaginate from "../../components/table-paginate";
 import Model from "../../components/model";
 import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
-import { formatBoolean } from '../../utils';
+import { formatBoolean, API, API_VER } from '../../utils';
 import { postJsonForm } from "../../utils";
 import { useRouter } from 'next/router'
 
 export default function VersionPage() {
-    const url = `http://127.0.0.1:8080/api/version`
+    const url = `${API}/${API_VER}/version`
     const router = useRouter()
     const [data, setData] = useState([]);
 
