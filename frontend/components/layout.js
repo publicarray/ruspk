@@ -11,7 +11,7 @@ export default function Layout({ children }) {
             </Head>
 
             <div className="flex min-h-screen flex-col w-full dark:bg-gray-800 dark:text-white">
-                <nav className="flex flex-wrap flex-row justify-between md:items-center md:space-x-4 py-6 px-6 relative bg-gray-200 dark:bg-gray-900 w-full md:px-20">
+                <nav className="flex flex-wrap flex-row justify-between md:items-center md:space-x-4 py-6 px-6 relative bg-gray-100 dark:bg-gray-900 w-full md:px-20">
                     <Link href="/">
                         <a className="block text-gray-400 dark:text-gray-200 text-xl lg:text-2xl font-bold cursor-pointer"><span className="text-blue-600 dark:text-blue-400">Syno</span>Community</a>
                     </Link>

@@ -10,7 +10,7 @@ export default function IndexPage() {
             <main className="text-gray-700 dark:text-gray-300 max-w-6xl mx-auto mt-4">
                 <div className="text-xl">
                     <h1 className="text-4xl text-gray-900 dark:text-gray-100 mb-4">Packages for Synology NAS</h1>
-                    <p className="mb-4">SynoCommunity provides packages for Synology-branded NAS devices. <br></br> Packages are provided for <em>free</em> and made by developers on their free time. See how you can <a className="text-blue-500 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-500 0 hover:underline" href="#contribute">contribute</a>.</p>
+                    <p className="mb-4">SynoCommunity provides packages for Synology-branded NAS devices. <br></br> Packages are provided for <em>free</em> and made by developers on their free time. See how you can <a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="#contribute">contribute</a>.</p>
                     <p className="mb-4">Bandwidth and content delivery is generously provided and sponsored by
                         <a href="https://www.fastly.com/" title="Fastly">
                             <svg xmlns="http://www.w3.org/2000/svg"className="w-16 mx-1 inline hover:scale-110 transition" viewBox="0 0 1709 735" alt="Fastly">
@@ -29,7 +29,7 @@ export default function IndexPage() {
                         </svg>
                         <h2 className="text-3xl my-2">Easy Install</h2>
                         <p>From our server to your NAS in a few clicks. Once our repository is added, you will be able to install packages directly from the Package Center</p>
-                        <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-500 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#easy-install" role="button">View details &raquo;</a></p>
+                        <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-600 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#easy-install" role="button">View details &raquo;</a></p>
                     </div>
                     <div lassName="m-4">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-40 w-40 mx-auto" viewBox="0 0 20 20" fill="currentColor">
@@ -37,7 +37,7 @@ export default function IndexPage() {
                         </svg>
                         <h2 className="text-3xl my-2">Bleeding Edge</h2>
                         <p>We provide frequent updates to our packages so you can enjoy new features of your favorite softwares. Our packages aim to be compatible with the latest version of Synology DSM upon official release.</p>
-                        <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-500 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#bleeding-edge" role="button">View details &raquo;</a></p>
+                        <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-600 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#bleeding-edge" role="button">View details &raquo;</a></p>
                     </div>
                     <div lassName="m-4">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-40 w-40 mx-auto" viewBox="0 0 20 20" fill="currentColor">
@@ -45,7 +45,7 @@ export default function IndexPage() {
                         </svg>
                         <h2 className="text-3xl my-2">Open Source</h2>
                         <p>Our cross-compilation framework is open source and allows you to rebuild packages from scratch easily. This ensures maximum security and maintainability.</p>
-                        <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-500 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#open-source" role="button">View details &raquo;</a></p>
+                        <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-600 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#open-source" role="button">View details &raquo;</a></p>
                     </div>
                 </div>
                 <div id="easy-install" className="my-10 text-sm">
@@ -55,11 +55,11 @@ export default function IndexPage() {
                         </svg>
                         Easy Install
                     </h2>
-                    <h4 className="text-xl my-2">Step 1</h4>
+                    <h3 className="text-xl my-2">Step 1</h3>
                     <p>Log into your NAS as administrator and go to <strong>Main Menu &rarr; Package Center &rarr; Settings</strong> and set Trust Level to <em>Synology Inc. and trusted publishers</em>.</p>
-                    <h4 className="text-xl my-2">Step 2</h4>
+                    <h3 className="text-xl my-2">Step 2</h3>
                     <p>In the <strong>Package Sources</strong> tab, click <strong>Add</strong>, type <em>SynoCommunity</em> as <strong>Name</strong> and <em><code>https://packages.synocommunity.com/</code></em> as <strong>Location</strong> and then press <strong>OK</strong> to validate.</p>
-                    <h4 className="text-xl my-2">Step 3</h4>
+                    <h3 className="text-xl my-2">Step 3</h3>
                     <p>Go back to the <strong>Package Center</strong> and enjoy SynoCommunity's packages in the <strong>Community</strong> tab.</p>
                 </div>
                 <div id="bleeding-edge" className="my-10 text-sm">
@@ -78,9 +78,9 @@ export default function IndexPage() {
                         </svg>
                         Open Source
                     </h2>
-                    <p className="mb-4"><a className="text-blue-500 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-500 0 hover:underline" href="https://github.com/SynoCommunity">SynoCommunity</a>'s packages are built with <a className="text-blue-500 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-500 0 hover:underline" href="https://github.com/SynoCommunity/spksrc">spksrc</a>, a cross-compilation framework dedicated to build packages for Synology NAS.</p>
+                    <p className="mb-4"><a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity">SynoCommunity</a>'s packages are built with <a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity/spksrc">spksrc</a>, a cross-compilation framework dedicated to build packages for Synology NAS.</p>
                     <h3 id="contribute" className="text-xl my-2">Contribute</h3>
-                    <p>We welcome package related bug reports, patches and feature requests on our <a className="text-blue-500 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-500 0 hover:underline" href="https://github.com/SynoCommunity/spksrc/issues">issue tracker</a>. You can also support us by donating to our contributors.</p>
+                    <p>We welcome package related bug reports, patches and feature requests on our <a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity/spksrc/issues">issue tracker</a>. You can also support us by donating to our contributors.</p>
                 </div>
             </main>
         </Layout>

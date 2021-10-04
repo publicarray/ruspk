@@ -54,7 +54,7 @@ export default function PackageDetail(props) {
                 <title>SynoCommunity</title>
             </Head>
             <div className="flex">
-                <img className="rounded-xl mb-2" src={`${CDN}/${pkg.name}/${latestRevision}/icon256.png`} alt="" />
+                <img className="rounded-xl mb-2" src={`${CDN}/${pkg.name}/${latestRevision}/icon256.png`} with="256" height="256" alt="" />
                 <div className="my-4">
                     <h1 className="mb-2 text-4xl">{pkg.displayname}</h1>
                     <p>Author: {pkg.author}</p>
