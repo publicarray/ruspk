@@ -54,7 +54,7 @@ export default function PackageDetail(props) {
                 <title>SynoCommunity</title>
             </Head>
             <h1 className="text-4xl">{pkg.displayname}</h1>
-            <img className="rounded-xl mb-2" src={`${CDN}/${pkg.name}/${latestRevision}/icon256.png`} />
+            <img className="rounded-xl mb-2" src={`${CDN}/${pkg.name}/${latestRevision}/icon256.png`} alt="" />
             <p>Author: {pkg.author}</p>
             <p>Description: {pkg.description}</p>
             <p>Version: {pkg.version}-{pkg.revision}</p>
