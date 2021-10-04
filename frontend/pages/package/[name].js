@@ -5,6 +5,7 @@ import useSWR from 'swr'
 import { fetchJson, API, API_VER, CDN } from "../../utils";
 import Link from 'next/link'
 import React, {useState, useEffect} from 'react';
+import Image from '../../components/image'
 
 export default function PackageDetail(props) {
     const router = useRouter()
@@ -79,7 +80,7 @@ export default function PackageDetail(props) {
                 <title>SynoCommunity</title>
             </Head>
             <div className="flex">
-                <img className="rounded-xl mb-2" src={`${CDN}/${_package.name}/${latestRevision}/icon256.png`} with="256" height="256" alt="" />
+                <Image className="rounded-xl mb-2" src={`${CDN}/${_package.name}/${latestRevision}/icon256.png`} width="256" height="256" alt="" />
                 <div className="my-4">
                     <h1 className="mb-2 text-4xl">{_package.displayname}</h1>
                     <p>Author: {_package.author}</p>
