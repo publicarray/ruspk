@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ThemeChanger from "./theme-changer"
 
 export default function Nav() {
     return (
@@ -34,6 +35,7 @@ export default function Nav() {
             <Link href="/admin/build/">
                 <a className="block py-1  hover:underline">Build</a>
             </Link>
+            <ThemeChanger></ThemeChanger>
         </div>
     );
 }
