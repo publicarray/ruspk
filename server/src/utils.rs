@@ -60,8 +60,8 @@ pub fn handle_query_parameters(query_str: &str) -> (i64, i64, String) {
     if limit <= 0 {
         limit = 1
     // check that query is reasonable and does not overload the database
-    } else if limit > 60 {
-        limit = 60
+    } else if limit > 100 {
+        limit = 100
     }
 
     (limit, (offset - 1) * limit, query)

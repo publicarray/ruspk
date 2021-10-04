@@ -50,9 +50,9 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
             Ok(HttpResponse::Ok().json(&packages))
         }
         Err(err) => {
-            trace!("{}", err);
+            error!("{}", err);
             match err {
-                BlockingError::Error(err) => match err.downcast_ref::<diesel::result::Error>().unwrap() {
+                BlockingError::Error(err) => match err {
                     diesel::result::Error::NotFound => {
                         debug!("{}", err);
                         Err(HttpResponse::NotFound().finish())

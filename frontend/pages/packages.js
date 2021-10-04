@@ -3,10 +3,14 @@ import Head from 'next/head'
 import useSWR from 'swr'
 import { fetchJson, API, API_VER, CDN } from "../utils";
 import Link from 'next/link'
+import { useState } from "react";
+import Button from "../components/button";
 
 export default function Packages(props) {
 
-    const url = `${API}/${API_VER}/package?size=60`
+    const [pageIndex, setPageIndex] = useState(1);
+    const url = `${API}/${API_VER}/package?page=${pageIndex}&size=60`
+    // const url = `${API}/${API_VER}/package?page=${pageIndex}&size=50&q=${query}`
 
     let { data, error } = useSWR(`${url}`, fetchJson);
     let isLoading = !error && !data;
@@ -36,9 +40,8 @@ export default function Packages(props) {
                                     query: { name: row.name },
                                 }}>
                                 <a>
-                                    <h2 className="text-2xl whitespace-nowrap text-center mb-2">{row.displayname}</h2>
-                                    <img className="rounded-xl mx-auto mb-2" src={`${CDN}/${row.name}/${row.revision}/icon256.png`} alt={row.name} />
-                                    {/* <img className="rounded-xl mx-auto mb-2" src="https://images.placeholders.dev/?width=100&height=100&bgColor=%23313131" alt={row.name} /> */}
+                                    <h2 className="text-2xl text-center mb-2">{row.displayname}</h2>
+                                    <img className="rounded-xl mx-auto mb-2" src={`${CDN}/${row.name}/${row.revision}/icon256.png`} title={row.name} alt=""/>
                                     <p className="text-center text-gray-500 dark:text-gray-400 text-sm">v{row.version}-{row.revision}</p>
                                     {/* <p className="mb-2">{row.author}</p> */}
                                     <p className="mb-2">{row.description}</p>
@@ -48,6 +51,10 @@ export default function Packages(props) {
                     )
                 })}
             </main>
+            <div className="flex mb-4">
+                <Button className="mr-auto" onClick={() => setPageIndex(pageIndex - 1)}>Previous</Button>
+                <Button className="ml-auto" onClick={() => setPageIndex(pageIndex + 1)}>Next</Button>
+            </div>
         </Layout>
   )
 }

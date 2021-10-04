@@ -1,4 +1,4 @@
-use crate::models::DbLanguage;
+use crate::{DbId, models::DbLanguage};
 use crate::schema::*;
 use crate::Connection;
 use crate::{models::DbArchitecture, utils};
@@ -44,63 +44,60 @@ pub struct Package {
 }
 
 impl DbPackage {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> Result<Vec<Package>> {
-        let tmp_packages = package::table
-            .order(package::id.desc())
+    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Package>> {
+
+        let package_ids = package::table
+            .order(package::name)
             .filter(package::name.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
-            .left_join(user::table)
-            .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(1))))
-            // .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(
-            //     version::filter(version::package_id.eq(package::id)).select(max(version::ver)))))
-            // )
-            .left_join(
-                displayname::table.on(displayname::version_id
-                    .eq(version::id)
-                    .and(displayname::language_id.eq(1))),
-            )
-            .inner_join(
-                description::table.on(description::version_id
-                    .eq(version::id)
-                    .and(description::language_id.eq(1))),
-            )
-            .select((
-                package::id,
-                user::username.nullable(),
-                package::name,
-                displayname::name.nullable(),
-                description::desc,
-                version::upstream_version,
-                version::ver,
-                package::insert_date,
-            ))
-            .load::<Package>(conn)?;
+            .select(package::id).load::<DbId>(conn)?;
+        let mut packages:Vec<Package> = vec![];
 
+        for id in package_ids {
+            let tmp_latest_revision = version::table
+                .filter(version::package_id.eq(id))
+                .select(max(version::ver))
+                .load::<Option<i32>>(conn)?;
 
-            // this loop is costly. fixme
-            let mut packages:Vec<Package> = vec![];
-            for package in tmp_packages {
-                let tmp_latest_revision = version::table
-                    .filter(version::package_id.eq(package.id))
-                    .select(max(version::ver))
-                    .first::<Option<i32>>(conn)?;
-                let latest_revision = tmp_latest_revision.unwrap();
+            if tmp_latest_revision.len() == 1 {
+                let latest_revision = match tmp_latest_revision[0] {
+                    Some(rev) => rev,
+                    _ => {
+                        warn!("Package ID:{} does not have a version {:?}. ignoring.", id, tmp_latest_revision);
+                        continue
+                    }
+                };
 
-                let latest_upstream_version = version::table
-                    .filter(version::package_id.eq(package.id))
-                    .filter(version::ver.eq(latest_revision))
-                    .select(version::upstream_version)
-                    .first::<String>(conn)?;
-
-                packages.push(Package {
-                    revision: latest_revision,
-                    version: latest_upstream_version,
-                    ..package
-                });
+                let package = package::table.filter(package::id.eq(id))
+                .left_join(user::table)
+                .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(latest_revision))))
+                .left_join(
+                    displayname::table.on(displayname::version_id
+                        .eq(version::id)
+                        .and(displayname::language_id.eq(1))),
+                )
+                .inner_join(
+                    description::table.on(description::version_id
+                        .eq(version::id)
+                        .and(description::language_id.eq(1))),
+                )
+                .select((
+                    package::id,
+                    user::username.nullable(),
+                    package::name,
+                    displayname::name.nullable(),
+                    description::desc,
+                    version::upstream_version,
+                    version::ver,
+                    package::insert_date,
+                ))
+                .first::<Package>(conn)?;
+                packages.push(package);
             }
+        }
 
-            Ok(packages)
+        Ok(packages)
     }
 
     pub fn find(conn: &Connection, package_name: String) -> QueryResult<Package> {

@@ -93,7 +93,7 @@ pub async fn syno(
             Ok(HttpResponse::Ok().json(&packages))
         }
         Err(err) => {
-            trace!("{}", err);
+            error!("{:?}", err);
             match err {
                 BlockingError::Error(err) => match err.downcast_ref::<diesel::result::Error>().unwrap() {
                     diesel::result::Error::NotFound => {
