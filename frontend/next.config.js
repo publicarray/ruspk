@@ -1,6 +1,7 @@
 
 module.exports = {
     images: {
+        loader: 'custom',
         domains: [
             'localhost',
             '127.0.0.1',
