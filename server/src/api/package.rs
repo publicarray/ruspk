@@ -1,12 +1,12 @@
-use crate::{CacheValue, models::*};
 use crate::utils;
 use crate::DbId;
+use crate::CACHE_TTL;
+use crate::{models::*, CacheValue};
 use crate::{AppData, DbConn};
-use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse, error::BlockingError};
+use actix_web::{delete, error::BlockingError, get, post, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 use std::sync::Arc;
 use std::time::Instant;
-use crate::{CACHE_TTL};
 
 /// retrieve all packages
 #[get("/package")]

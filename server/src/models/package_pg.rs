@@ -1,7 +1,7 @@
-use crate::{DbId, models::DbLanguage};
 use crate::schema::*;
 use crate::Connection;
 use crate::{models::DbArchitecture, utils};
+use crate::{models::DbLanguage, DbId};
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
 use diesel::dsl::{self, max};
@@ -39,20 +39,20 @@ pub struct Package {
     pub displayname: Option<String>,
     pub description: String,
     pub version: String, // Latest version
-    pub revision: i32, // Latest revision
+    pub revision: i32,   // Latest revision
     pub insert_date: Option<NaiveDateTime>,
 }
 
 impl DbPackage {
     pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Package>> {
-
         let package_ids = package::table
             .order(package::name)
             .filter(package::name.ilike(utils::fuzzy_search(&search_term)))
             .limit(limit)
             .offset(offset)
-            .select(package::id).load::<DbId>(conn)?;
-        let mut packages:Vec<Package> = vec![];
+            .select(package::id)
+            .load::<DbId>(conn)?;
+        let mut packages: Vec<Package> = vec![];
 
         for id in package_ids {
             let tmp_latest_revision = version::table
@@ -60,18 +60,30 @@ impl DbPackage {
                 .select(max(version::ver))
                 .load::<Option<i32>>(conn)?;
 
-            if tmp_latest_revision.len() == 1 {
-                let latest_revision = match tmp_latest_revision[0] {
-                    Some(rev) => rev,
-                    _ => {
-                        warn!("Package ID:{} does not have a version {:?}. ignoring.", id, tmp_latest_revision);
-                        continue
-                    }
-                };
+            // there should only be one result
+            if tmp_latest_revision.len() != 1 {
+                continue;
+            };
 
-                let package = package::table.filter(package::id.eq(id))
+            let latest_revision = match tmp_latest_revision[0] {
+                Some(rev) => rev,
+                _ => {
+                    warn!(
+                        "Package ID:{} does not have a version {:?}. ignoring.",
+                        id, tmp_latest_revision
+                    );
+                    continue;
+                }
+            };
+
+            let package = package::table
+                .filter(package::id.eq(id))
                 .left_join(user::table)
-                .inner_join(version::table.on(version::package_id.eq(package::id).and(version::ver.eq(latest_revision))))
+                .inner_join(
+                    version::table.on(version::package_id
+                        .eq(package::id)
+                        .and(version::ver.eq(latest_revision))),
+                )
                 .left_join(
                     displayname::table.on(displayname::version_id
                         .eq(version::id)
@@ -93,8 +105,7 @@ impl DbPackage {
                     package::insert_date,
                 ))
                 .first::<Package>(conn)?;
-                packages.push(package);
-            }
+            packages.push(package);
         }
 
         Ok(packages)
