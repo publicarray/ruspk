@@ -105,7 +105,7 @@ export default function PackageDetail(props) {
                                         {build.revision == version.revision &&
                                             <>{build.architectures.map( arch =>
                                                 <a key={`${build.id}-${arch}`}
-                                                    className="px-3 py-1 bg-gray-800 text-white rounded-full"
+                                                    className="px-3 py-1 m-1 bg-gray-800 text-white dark:text-gray-100 dark:bg-black rounded-full hover:bg-gray-700 dark:hover:bg-gray-700 dark:hover:text-white"
                                                     href={`${CDN}/${_package.name}/${version.revision}/${_package.name}.v${version.revision}.f${build.firmware.split('-')[1]}[${build.architectures.join('-')}].spk`}>{arch}</a>
                                             )}</>
                                         }
