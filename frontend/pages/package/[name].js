@@ -10,10 +10,12 @@ export default function PackageDetail(props) {
     const router = useRouter()
     const { name } = router.query;
 
-    let [pkg, setPkg] = useState({})
+    let [_package, setPackage] = useState({})
     let [versions, setVersions] = useState({})
+    let [builds, setBuilds] = useState({})
     let [isPkgLoading, setPkgLoading] = useState(true)
     let [isVerLoading, setVerLoading] = useState(true)
+    let [isBuildsLoading, setBuildsLoading] = useState(true)
     let [latestRevision, setLatestRevision] = useState(1)
 
     React.useEffect(() => {
@@ -22,12 +24,12 @@ export default function PackageDetail(props) {
         }
         fetch(`${API}/${API_VER}/package/${name}`).then(response => {
             response.json().then(r => {
-                setPkg(r)
+                setPackage(r)
                 setPkgLoading(false)
             })
         });
         fetch(`${API}/${API_VER}/version?q=${name}`).then(response => {
-            response.json().then(r=>{
+            response.json().then(r => {
                 setVersions(r)
                 let latestRev = 1;
                 r.forEach(ver => {
@@ -39,12 +41,35 @@ export default function PackageDetail(props) {
                 setVerLoading(false)
             })
         })
+        fetch(`${API}/${API_VER}/build?q=${name}`).then(response => {
+            response.json().then(r => {
+                console.log(r);
+                // https://gist.github.com/robmathers/1830ce09695f759bf2c4df15c29dd22d
+                r = r.reduce(
+                    (a, x) => {
+                        let firmware = x['firmware'].split('-')[0] // strip build number (6.1-1234 -> 6.1)
+                        let firmware_major = firmware.split('.')[0] + ".x" // format as 6.x
+                        if (firmware < 3) { // needs to be updated when new versions are released
+                            firmware_major = "SRM " + firmware_major + ":" // SRM 1.x:
+                        } else {
+                            firmware_major = "DSM " + firmware_major + ":" // DSM 6.x:
+                        }
+                        a[firmware_major] = a[firmware_major] || [];
+                        a[firmware_major].push(x);
+                        return a;
+                    },
+                    []
+                )
+                setBuilds(r)
+                setBuildsLoading(false)
+            })
+        })
     }, [name])
     // let pkg_resp = useSWR(`${API}/${API_VER}/package/${name}`, fetchJson);
     // let ver_resp = useSWR(`${API}/${API_VER}/version?q=${name}`, fetchJson);
     // let build_resp = useSWR(`${API}/${API_VER}/build/${name}`, fetchJson);
 
-    if (isPkgLoading || isVerLoading) {
+    if (isPkgLoading || isVerLoading || isBuildsLoading) {
         return <p>Loading...</p>
     }
 
@@ -54,24 +79,41 @@ export default function PackageDetail(props) {
                 <title>SynoCommunity</title>
             </Head>
             <div className="flex">
-                <img className="rounded-xl mb-2" src={`${CDN}/${pkg.name}/${latestRevision}/icon256.png`} with="256" height="256" alt="" />
+                <img className="rounded-xl mb-2" src={`${CDN}/${_package.name}/${latestRevision}/icon256.png`} with="256" height="256" alt="" />
                 <div className="my-4">
-                    <h1 className="mb-2 text-4xl">{pkg.displayname}</h1>
-                    <p>Author: {pkg.author}</p>
-                    <p dangerouslySetInnerHTML={{ __html: pkg.description }}></p>
+                    <h1 className="mb-2 text-4xl">{_package.displayname}</h1>
+                    <p>Author: {_package.author}</p>
+                    <p dangerouslySetInnerHTML={{ __html: _package.description }}></p>
                     {/* <p>Version: {pkg.version}-{pkg.revision}</p> */}
                     {/* <p>Date: {pkg.insert_date}</p> */}
                 </div>
             </div>
             <div>
-                {versions.map(row => { return (<div key={row.id}>
+                {versions.map(version => { return (<div key={version.id}>
+                    <hr></hr>
                     <div className="my-2">
-                        <h3 className="font-bold text-xl">Version <span className="font-medium">{row.upstream_version}-{row.revision}</span></h3>
-                        <p className="mb-2" dangerouslySetInnerHTML={{ __html: row.changelog }}></p>
+                        <h3 className="font-bold text-xl">Version <span className="font-medium">{version.upstream_version}-{version.revision}</span></h3>
+                        <p className="mb-2" dangerouslySetInnerHTML={{ __html: version.changelog }}></p>
                         <h3 className="font-bold text-xl">Date</h3>
-                        <p className="mb-2">{row.insert_date}</p>
+                        <p className="mb-2">{version.insert_date}</p>
                         <h3 className="font-bold text-xl">Downloads / Architectures / Builds</h3>
-                        <p className="mb-2">builds</p>
+                        {Object.entries(builds).map(([k,v],i) => { return (
+                            <div key={i}>
+                                <p>{k}</p>
+                                <p className="flex flex-wrap">{v.map(build => { return (
+                                    <>
+                                        {build.revision == version.revision &&
+                                            <>{build.architectures.map( arch =>
+                                                <a key={`${build.id}-${arch}`}
+                                                    className="px-3 py-1 bg-gray-800 text-white rounded-full"
+                                                    href={`${CDN}/${_package.name}/${version.revision}/${_package.name}.v${version.revision}.f${build.firmware.split('-')[1]}[${build.architectures.join('-')}].spk`}>{arch}</a>
+                                            )}</>
+                                        }
+                                    </>
+                                )})}
+                                </p>
+                            </div>
+                        )})}
                     </div>
                 </div>)})}
             </div>
