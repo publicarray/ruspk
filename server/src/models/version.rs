@@ -37,6 +37,7 @@ pub struct Version {
     pub description: String,
     pub upstream_version: String,
     pub revision: Dbu32,
+    pub changelog: Option<String>,
     pub report_url: Option<String>,
     pub insert_date: NaiveDateTime,
     // all active
@@ -70,6 +71,7 @@ impl DbVersion {
                 description::desc,
                 version::upstream_version,
                 version::ver,        // revision
+                version::changelog,
                 version::report_url, // beta //fix me: convert to bool
                 version::insert_date,
                 version::install_wizard,

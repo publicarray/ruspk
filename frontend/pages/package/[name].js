@@ -53,17 +53,26 @@ export default function PackageDetail(props) {
             <Head>
                 <title>SynoCommunity</title>
             </Head>
-            <h1 className="text-4xl">{pkg.displayname}</h1>
-            <img className="rounded-xl mb-2" src={`${CDN}/${pkg.name}/${latestRevision}/icon256.png`} alt="" />
-            <p>Author: {pkg.author}</p>
-            <p>Description: {pkg.description}</p>
-            <p>Version: {pkg.version}-{pkg.revision}</p>
-            <p>Date: {pkg.insert_date}</p>
-            <br></br>
+            <div className="flex">
+                <img className="rounded-xl mb-2" src={`${CDN}/${pkg.name}/${latestRevision}/icon256.png`} alt="" />
+                <div className="my-4">
+                    <h1 className="mb-2 text-4xl">{pkg.displayname}</h1>
+                    <p>Author: {pkg.author}</p>
+                    <p dangerouslySetInnerHTML={{ __html: pkg.description }}></p>
+                    {/* <p>Version: {pkg.version}-{pkg.revision}</p> */}
+                    {/* <p>Date: {pkg.insert_date}</p> */}
+                </div>
+            </div>
             <div>
                 {versions.map(row => { return (<div key={row.id}>
-                    <p>Version: {row.upstream_version}-{row.revision}</p>
-                    <p>Date: {row.insert_date}</p>
+                    <div className="my-2">
+                        <h3 className="font-bold text-xl">Version <span className="font-medium">{row.upstream_version}-{row.revision}</span></h3>
+                        <p className="mb-2" dangerouslySetInnerHTML={{ __html: row.changelog }}></p>
+                        <h3 className="font-bold text-xl">Date</h3>
+                        <p className="mb-2">{row.insert_date}</p>
+                        <h3 className="font-bold text-xl">Downloads / Architectures / Builds</h3>
+                        <p className="mb-2">builds</p>
+                    </div>
                 </div>)})}
             </div>
             <br></br>

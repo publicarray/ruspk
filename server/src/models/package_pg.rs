@@ -69,7 +69,7 @@ impl DbPackage {
                 Some(rev) => rev,
                 _ => {
                     warn!(
-                        "Package ID:{} does not have a version {:?}. ignoring.",
+                        "Package ID:{} does not have a version {:?}. ignoring.", // todo fix this for the admin view
                         id, tmp_latest_revision
                     );
                     continue;
@@ -100,8 +100,8 @@ impl DbPackage {
                     package::name,
                     displayname::name.nullable(),
                     description::desc,
-                    version::upstream_version,
-                    version::ver,
+                    version::upstream_version, //nop
+                    version::ver, // nop
                     package::insert_date,
                 ))
                 .first::<Package>(conn)?;
