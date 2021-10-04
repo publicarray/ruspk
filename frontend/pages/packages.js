@@ -31,14 +31,14 @@ export default function Packages(props) {
                 <title>SynoCommunity</title>
             </Head>
 
-            <main className="flex flex-wrap">
+            <main className="flex flex-wrap overflow-x-hidden">
                 {data.map(row => {
                     return (
                         <Link href={{
                                 pathname: '/package/[name]',
                                 query: { name: row.name },
                             }}>
-                            <a key={row.name} className="text-black bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-900 dark:hover:bg-gray-700 p-4 m-2 flex-auto rounded-md w-64">
+                            <a key={row.name} className="text-black bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-900 dark:hover:bg-gray-700 p-4 m-2 flex-auto rounded-md md:w-64">
                                 <div>
                                     <h2 className="text-2xl text-center mb-2">{row.displayname}</h2>
                                     <img className="rounded-xl mx-auto mb-2" src={`${CDN}/${row.name}/${row.revision}/icon256.png`} with="256" height="256" title={row.name} alt=""/>
