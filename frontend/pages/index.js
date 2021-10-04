@@ -1,4 +1,5 @@
 import Layout from "../components/layout";
+import Image from "../components/image";
 import Head from 'next/head'
 
 export default function IndexPage() {
@@ -19,7 +20,7 @@ export default function IndexPage() {
                             </svg>
                         </a>
                      .</p>
-                    <p className="mb-4">Join us on Discord! <a href="https://discord.gg/nnN9fgE7EF" title="Discord"><img className="inline hover:scale-110 transition" width="194" hight="28" src="https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge" alt="Join Discord Button"/></a></p>
+                    <p className="mb-4">Join us on Discord! <a href="https://discord.gg/nnN9fgE7EF" title="Discord"><img className="inline filter hover:scale-110 hover:brightness-125 transition" width="194" height="28" src="https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge" alt="Join Discord Button"/></a></p>
                     <p className="mb-4">Only packages that are modified to be compatible with DSM7 by the associated developers can execute on DSM7.0. If not,the package cannot be able to function after upgrading from DSM6.2 to DSM7.0.</p>
                 </div>
                 <div id="summary" className="flex text-center md:flex-row flex-col">
@@ -31,7 +32,7 @@ export default function IndexPage() {
                         <p>From our server to your NAS in a few clicks. Once our repository is added, you will be able to install packages directly from the Package Center</p>
                         <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-600 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#easy-install" role="button">View details &raquo;</a></p>
                     </div>
-                    <div lassName="m-4">
+                    <div className="m-4">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-40 w-40 mx-auto" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                         </svg>
@@ -39,7 +40,7 @@ export default function IndexPage() {
                         <p>We provide frequent updates to our packages so you can enjoy new features of your favorite softwares. Our packages aim to be compatible with the latest version of Synology DSM upon official release.</p>
                         <p><a className="py-2 px-4 my-2 inline-block text-sm text-blue-600 hover:bg-blue-700  dark:text-blue-400 hover:text-white border border-blue-500 hover:border-blue-700 rounded-lg" href="#bleeding-edge" role="button">View details &raquo;</a></p>
                     </div>
-                    <div lassName="m-4">
+                    <div className="m-4">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-40 w-40 mx-auto" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                         </svg>

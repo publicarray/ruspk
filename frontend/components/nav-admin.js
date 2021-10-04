@@ -3,39 +3,45 @@ import ThemeChanger from "./theme-changer"
 
 export default function Nav() {
     return (
-        <div className="md:flex justify-around space-x-4 text-gray-700 dark:text-gray-300">
-            {/* <Link href="/admin">
-                <a className="block py-1  hover:underline">Admin</a>
-            </Link> */}
-
-            <Link href="/admin/user/">
-                <a className="block py-1  hover:underline">User</a>
+        <nav className="flex flex-wrap md:flex-row justify-between md:items-center md:space-x-4 py-6 px-6 relative">
+            <Link href="/admin">
+                <a className="block text-xl lg:text-2xl font-bold cursor-pointer">Admin</a>
             </Link>
 
-            <Link href="/admin/architecture/">
-                <a className="block py-1  hover:underline">Architecture</a>
-            </Link>
+            <div className="flex md:flex-row flex-wrap text-gray-700 dark:text-gray-300">
+                <Link href="/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">Home</a>
+                </Link>
 
-            <Link href="/admin/firmware/">
-                <a className="block py-1  hover:underline">Firmware</a>
-            </Link>
+                <Link href="/admin/user/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">User</a>
+                </Link>
 
-            <Link href="/admin/screenshot/">
-                <a className="block py-1  hover:underline">Screenshot</a>
-            </Link>
+                <Link href="/admin/architecture/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">Architecture</a>
+                </Link>
 
-            <Link href="/admin/package/">
-                <a className="block py-1  hover:underline">Package</a>
-            </Link>
+                <Link href="/admin/firmware/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">Firmware</a>
+                </Link>
 
-            <Link href="/admin/version/">
-                <a className="block py-1  hover:underline">Version</a>
-            </Link>
+                <Link href="/admin/screenshot/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">Screenshot</a>
+                </Link>
 
-            <Link href="/admin/build/">
-                <a className="block py-1  hover:underline">Build</a>
-            </Link>
-            <ThemeChanger></ThemeChanger>
-        </div>
+                <Link href="/admin/package/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">Package</a>
+                </Link>
+
+                <Link href="/admin/version/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">Version</a>
+                </Link>
+
+                <Link href="/admin/build/">
+                    <a className="leading-loose md:h-12 px-4 py-2 rounded-lg transition-all hover:bg-gray-200 dark:hover:bg-gray-700">Build</a>
+                </Link>
+                <ThemeChanger></ThemeChanger>
+            </div>
+        </nav>
     );
 }

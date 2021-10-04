@@ -19,20 +19,19 @@ const toBase64 = (str) =>
     ? Buffer.from(str).toString('base64')
     : window.btoa(str)
 
-const Image = ({src, alt = "", title = "", width, height, quality = 90, layout}) => (
-    <div>
-        <NextImage
-            alt={alt}
-            title={title}
-            src={src}
-            placeholder="blur"
-            blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(width, height))}`}
-            width={width}
-            height={height}
-            quality={quality}
-            layout={layout}
-        />
-    </div>
+const Image = ({src, className, alt = "", title = "", width, height, quality = 90, layout}) => (
+    <NextImage
+        className={className}
+        alt={alt}
+        title={title}
+        src={src}
+        placeholder="blur"
+        blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(width, height))}`}
+        width={width}
+        height={height}
+        quality={quality}
+        layout={layout}
+    />
 )
 
 export default Image

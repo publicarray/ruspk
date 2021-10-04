@@ -26,8 +26,9 @@ export function formatArray(array) {
     return str += array[array.length -1]
 }
 
+import Image from "./components/image"
 export function formatImage(url, alt, title) {
-    return <img src={url} alt={alt} title={title}></img>
+    return <Image src={`${CDN}/${url}`} alt={alt} title={title} width="100" height="100"/>
 }
 
 // send data

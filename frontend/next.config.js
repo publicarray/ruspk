@@ -4,7 +4,8 @@ module.exports = {
         domains: [
             'localhost',
             '127.0.0.1',
-            '127.0.0.1:8080'
+            '127.0.0.1:8080',
+            'img.shields.io'
         ]
     }
 }
