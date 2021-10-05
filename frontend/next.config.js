@@ -1,6 +1,8 @@
 
 module.exports = {
+    poweredByHeader: false,
     images: {
+        reactStrictMode: true,
         loader: 'custom',
         domains: [
             'localhost',
