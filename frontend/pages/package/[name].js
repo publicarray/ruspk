@@ -77,48 +77,49 @@ export default function PackageDetail(props) {
     return (
         <Layout>
             <Head>
-                <title>SynoCommunity</title>
+                <title>SynoCommunity - {_package.name}</title>
             </Head>
-            <div className="flex">
-                <Image className="rounded-xl mb-2" src={`${CDN}/${_package.name}/${latestRevision}/icon256.png`} width="256" height="256" alt="" />
-                <div className="my-4">
-                    <h1 className="mb-2 text-4xl">{_package.displayname}</h1>
-                    <p>Author: {_package.author}</p>
-                    <p dangerouslySetInnerHTML={{ __html: _package.description }}></p>
-                    {/* <p>Version: {pkg.version}-{pkg.revision}</p> */}
-                    {/* <p>Date: {pkg.insert_date}</p> */}
+            <div className="max-w-6xl mx-auto">
+                <div className="flex">
+                    <Image className="rounded-xl mb-2" src={`${CDN}/${_package.name}/${latestRevision}/icon256.png`} width="256" height="256" alt="" />
+                    <div className="my-4">
+                        <h1 className="mb-2 text-4xl">{_package.displayname}</h1>
+                        <p>Author: {_package.author}</p>
+                        <p dangerouslySetInnerHTML={{ __html: _package.description }}></p>
+                        {/* <p>Version: {pkg.version}-{pkg.revision}</p> */}
+                        {/* <p>Date: {pkg.insert_date}</p> */}
+                    </div>
                 </div>
-            </div>
-            <div>
-                {versions.map(version => { return (<div key={version.id}>
-                    <hr></hr>
-                    <div className="my-2">
-                        <h3 className="font-bold text-xl">Version <span className="font-medium">{version.upstream_version}-{version.revision}</span></h3>
-                        <p className="mb-2" dangerouslySetInnerHTML={{ __html: version.changelog }}></p>
-                        <h3 className="font-bold text-xl">Date</h3>
-                        <p className="mb-2">{version.insert_date}</p>
-                        <h3 className="font-bold text-xl">Downloads / Architectures / Builds</h3>
-                        {Object.entries(builds).map(([k,v],i) => { return (
-                            <div key={i}>
-                                <p>{k}</p>
-                                <p className="flex flex-wrap">{v.map(build => { return (
-                                    <>
-                                        {build.revision == version.revision &&
-                                            <>{build.architectures.map( arch =>
-                                                <a key={`${build.id}-${arch}`}
+                <div>
+                    {versions.map(version => { return (<div key={version.id}>
+                        <hr className="dark:border-gray-600"></hr>
+                        <div className="my-2">
+                            <h3 className="font-bold text-xl">Version <span className="font-medium">{version.upstream_version}-{version.revision}</span></h3>
+                            <p className="mb-2" dangerouslySetInnerHTML={{ __html: version.changelog }}></p>
+                            <h3 className="font-bold text-xl">Date</h3>
+                            <p className="mb-2">{version.insert_date}</p>
+                            <h3 className="font-bold text-xl">Downloads / Architectures / Builds</h3>
+                            {Object.entries(builds).map(([k,v],i) => { return (
+                                <div key={i}>
+                                    <p>{k}</p>
+                                    <p className="flex flex-wrap">{v.map(build => { return (
+                                        <>
+                                            {build.revision == version.revision &&
+                                                <>{build.architectures.map( arch =>
+                                                    <a key={`${build.id}-${arch}`}
                                                     className="px-3 py-1 m-1 bg-gray-800 text-white dark:text-gray-100 dark:bg-black rounded-full hover:bg-gray-700 dark:hover:bg-gray-700 dark:hover:text-white"
                                                     href={`${CDN}/${_package.name}/${version.revision}/${_package.name}.v${version.revision}.f${build.firmware.split('-')[1]}[${build.architectures.join('-')}].spk`}>{arch}</a>
-                                            )}</>
-                                        }
-                                    </>
-                                )})}
-                                </p>
-                            </div>
-                        )})}
-                    </div>
-                </div>)})}
+                                                    )}</>
+                                                }
+                                        </>
+                                    )})}
+                                    </p>
+                                </div>
+                            )})}
+                        </div>
+                    </div>)})}
+                </div>
             </div>
-            <br></br>
         </Layout>
   )
 }

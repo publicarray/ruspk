@@ -3,9 +3,11 @@ import ThemeChanger from "./theme-changer"
 
 export default function Nav() {
     return (
-        <nav className="flex flex-wrap md:flex-row justify-between md:items-center md:space-x-4 py-6 px-6 relative">
+        <nav className="bg-gray-100 dark:bg-gray-900 flex flex-wrap md:flex-row justify-between md:items-center md:space-x-4 py-6 px-6 relative">
             <Link href="/admin">
-                <a className="block text-xl lg:text-2xl font-bold cursor-pointer">Admin</a>
+                <a className="block text-xl lg:text-2xl font-bold cursor-pointer">
+                    <span className="text-blue-600 dark:text-blue-400">Syno</span><span className="text-gray-500 dark:text-gray-200">Community</span> - Admin
+                </a>
             </Link>
 
             <div className="flex md:flex-row flex-wrap text-gray-700 dark:text-gray-300">

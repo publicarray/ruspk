@@ -14,8 +14,9 @@ const shimmer = (w, h) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`
 
-const bypassLoader = ({ src, width, quality }) => {
-    return `${src}`
+const staticLoader = ({ src, width, quality }) => {
+    let {hostname, pathname} = (new URL(src));
+    return `https://cdn.statically.io/img/${hostname}/f=auto,w=${width},q=${quality}/${pathname}`
 }
 
 const toBase64 = (str) =>
@@ -35,7 +36,8 @@ const Image = ({src, className, alt = "", title = "", width, height, quality = 9
         height={height}
         quality={quality}
         layout={layout}
-        loader={bypassLoader}
+        // loader={staticLoader}
+        unoptimized={true}
     />
 )
 

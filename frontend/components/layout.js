@@ -12,8 +12,7 @@ export default function Layout({ children }) {
 
             <div className="flex min-h-screen flex-col w-full dark:bg-gray-800 dark:text-white">
                 <Nav></Nav>
-
-                <div className="container mx-auto">
+                <div>
                     { children }
                 </div>
             </div>

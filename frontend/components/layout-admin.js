@@ -10,7 +10,7 @@ export default function Layout({ children }) {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <div className="flex min-h-screen flex-col w-full flex-1 md:px-20 dark:bg-gray-800 dark:text-white">
+            <div className="flex min-h-screen flex-col w-full dark:bg-gray-800 dark:text-white">
                 <Nav></Nav>
                 <div className="container mx-auto">
                     { children }
