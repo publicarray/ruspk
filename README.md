@@ -1,10 +1,10 @@
-# spkrepo-rs
+# Synorepo-rs
 
 [![ruspk's current version badge](https://img.shields.io/crates/v/ruspk.svg)](https://crates.io/crates/ruspk)
 
-ruspk is a simple and fast synology repository server. It uses the existing database structure from [spkrepo](https://github.com/SynoCommunity/spkrepo)
+synorepo-rs is a super fast synology repository server. It uses the existing database structure from [spkrepo](https://github.com/SynoCommunity/spkrepo)
 
-Only the GET API for the synology devices is supported. You have to update the database yourself or run it in conjunction with spkrepo and a reverse proxy like nginx.
+Only postgres is supported at the moment.
 
 ## Install
 
