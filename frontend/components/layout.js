@@ -22,7 +22,7 @@ export default function Layout({ children }) {
                     <p>Re-Implementation by Sebastian Schmidt.</p>
                     <p>Designed by Antoine Bertin.</p>
                     <p>Maintained by <a className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:dark:text-blue-500  hover:underline" href="https://github.com/SynoCommunity?tab=members">SynoCommunity</a> with the help of <a className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:dark:text-blue-500  hover:underline" href="https://github.com/SynoCommunity/spksrc/graphs/contributors">contributors</a>.</p>
-                    <p>Code licensed under <a className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:dark:text-blue-500  hover:underline" href="https://github.com/SynoCommunity/spkrepo/blob/master/LICENSE" target="_blank">MIT</a>.</p>
+                    <p>Code licensed under <a className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:dark:text-blue-500  hover:underline" href="https://github.com/SynoCommunity/spkrepo/blob/master/LICENSE">MIT</a>.</p>
                 </div>
             </footer>
         </>

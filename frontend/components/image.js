@@ -14,6 +14,10 @@ const shimmer = (w, h) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`
 
+const bypassLoader = ({ src, width, quality }) => {
+    return `${src}`
+}
+
 const toBase64 = (str) =>
   typeof window === 'undefined'
     ? Buffer.from(str).toString('base64')
@@ -31,6 +35,7 @@ const Image = ({src, className, alt = "", title = "", width, height, quality = 9
         height={height}
         quality={quality}
         layout={layout}
+        loader={bypassLoader}
     />
 )
 
