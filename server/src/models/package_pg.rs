@@ -101,7 +101,7 @@ impl DbPackage {
                     displayname::name.nullable(),
                     description::desc,
                     version::upstream_version, //nop
-                    version::ver, // nop
+                    version::ver,              // nop
                     package::insert_date,
                 ))
                 .first::<Package>(conn)?;

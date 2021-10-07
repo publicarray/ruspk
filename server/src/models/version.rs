@@ -70,7 +70,7 @@ impl DbVersion {
                 displayname::name,
                 description::desc,
                 version::upstream_version,
-                version::ver,        // revision
+                version::ver, // revision
                 version::changelog,
                 version::report_url, // beta //fix me: convert to bool
                 version::insert_date,

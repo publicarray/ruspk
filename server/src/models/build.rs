@@ -294,12 +294,12 @@ impl DbBuild {
     fn b_create_build(b: BuildTmp, architectures: Vec<String>) -> Build {
         Build {
             id: b.id,
-            package: b.package.clone(),
-            upstream_version: b.upstream_version.clone(),
+            package: b.package,
+            upstream_version: b.upstream_version,
             revision: b.revision,
             architectures,
-            firmware: format!("{}-{}", b.firmware_version.clone(), b.firmware_build).to_string(),
-            publisher: b.publisher.clone(),
+            firmware: format!("{}-{}", b.firmware_version, b.firmware_build).to_string(),
+            publisher: b.publisher,
             insert_date: b.insert_date,
             active: b.active,
         }
