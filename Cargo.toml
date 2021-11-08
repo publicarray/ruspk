@@ -1,4 +1,4 @@
-cargo-features = ["strip"]
+# cargo-features = ["strip"]
 
 [workspace]
 members = [
@@ -8,4 +8,4 @@ members = [
 [profile.release]
 lto = true
 panic = "abort"
-strip = true
+# strip = true
