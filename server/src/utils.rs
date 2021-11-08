@@ -66,3 +66,27 @@ pub fn handle_query_parameters(query_str: &str) -> (i64, i64, String) {
 
     (limit, (offset - 1) * limit, query)
 }
+
+use crate::AppData;
+use models::User;
+use crate::models;
+use actix_web::{HttpRequest, http::header::Header, error, error::Error, web};
+use actix_web_httpauth::headers::authorization::Authorization;
+use actix_web_httpauth::headers::authorization::Basic;
+pub fn validate_api_key(req: &HttpRequest) -> Result<(), Error> {
+    let auth = Authorization::<Basic>::parse(req)?;
+    let credentials = auth.into_scheme();
+    let api_key = credentials.user_id();
+
+    let app_data = req.app_data::<web::Data<AppData>>().unwrap();
+    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let user = User::validate_api_key(&conn, api_key.to_string())
+        .map_err(|_| error::ErrorUnauthorized("\
+        {
+            \"message\": \"The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password), or your browser doesn't understand how to supply the credentials required.\"
+        }
+    "))?;
+
+    debug!("{:?}", user);
+    Ok(())
+}

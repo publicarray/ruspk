@@ -14,6 +14,7 @@ extern crate chrono;
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{middleware, web, App, HttpServer};
+
 use diesel::r2d2::{self, ConnectionManager};
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
@@ -107,6 +108,7 @@ pub struct AppData {
     keyring: String,
 }
 
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
@@ -154,6 +156,7 @@ async fn main() -> std::io::Result<()> {
             .allowed_methods(vec!["GET", "POST", "DELETE", "PUT"])
             .max_age(3600);
         App::new()
+            // .wrap(middleware::DefaultHeaders::new().header("X-Version", "0.2"))
             .wrap(cors)
             // set up DB pool to be used with web::Data<Pool> extractor
             .app_data(Data::new(AppData {
@@ -174,7 +177,7 @@ async fn main() -> std::io::Result<()> {
                     .service(user::get_all)
                     .service(user::delete)
                     .service(build::get_all)
-                    .service(build::post)
+                    .service(build::post) // spksrc POST endpoint
                     .service(build::delete)
                     .service(build::active)
                     .service(build::delete_id)

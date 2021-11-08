@@ -6,6 +6,6 @@ members = [
 ]
 
 [profile.release]
-lto = true
+# lto = true
 panic = "abort"
 # strip = true

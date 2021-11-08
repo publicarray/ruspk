@@ -33,7 +33,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 
 // todo optimisations
 #[post("/build")]
-pub async fn post(mut body: web::Payload, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+pub async fn post(req: HttpRequest, mut body: web::Payload, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    utils::validate_api_key(&req)?;
     // read post data / file
     let tmp_dir = tempfile::TempDir::new()?;
     let filepath = tmp_dir.path().join("temp.spk"); // fix me (temp name then move /upload file to cdn)

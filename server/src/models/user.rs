@@ -41,5 +41,11 @@ impl User {
         Ok(result)
     }
 
+    pub fn validate_api_key(conn: &Connection, key: String) -> QueryResult<User> {
+        user::table.filter(user::api_key.eq(key).and(user::active.eq(true)))
+            .select((user::id, user::username, user::email, user::active, user::confirmed_at))
+            .first::<User>(conn)
+    }
+
     // ToDo Roles, Permissions
 }
