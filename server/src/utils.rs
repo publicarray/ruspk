@@ -67,12 +67,12 @@ pub fn handle_query_parameters(query_str: &str) -> (i64, i64, String) {
     (limit, (offset - 1) * limit, query)
 }
 
-use crate::AppData;
-use models::User;
 use crate::models;
-use actix_web::{HttpRequest, http::header::Header, error, error::Error, web};
+use crate::AppData;
+use actix_web::{error, error::Error, http::header::Header, web, HttpRequest};
 use actix_web_httpauth::headers::authorization::Authorization;
 use actix_web_httpauth::headers::authorization::Basic;
+use models::User;
 pub fn validate_api_key(req: &HttpRequest) -> Result<(), Error> {
     let auth = Authorization::<Basic>::parse(req)?;
     let credentials = auth.into_scheme();

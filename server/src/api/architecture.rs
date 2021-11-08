@@ -1,6 +1,7 @@
 use crate::models::*;
 use crate::utils;
 use crate::AppData;
+use actix_identity::Identity;
 use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 
@@ -25,28 +26,46 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 
 /// add an architecture
 #[post("/architecture")]
-pub async fn post(architecture: web::Json<NewArchitecture>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::create(&conn, architecture.code.clone()))
-        .await
-        .map_err(|e| {
-            debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        })?;
+pub async fn post(
+    architecture: web::Json<NewArchitecture>,
+    auth: Identity,
+    data: web::Data<AppData>,
+) -> Result<HttpResponse, Error> {
+    debug!("{:?}", auth.identity());
+    if let Some(_auth) = auth.identity() {
+        let conn = data.pool.get().expect("couldn't get db connection from pool");
+        let response = web::block(move || DbArchitecture::create(&conn, architecture.code.clone()))
+            .await
+            .map_err(|e| {
+                debug!("{}", e);
+                HttpResponse::InternalServerError().finish()
+            })?;
 
-    Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(response))
+    } else {
+        Ok(HttpResponse::Unauthorized().finish())
+    }
 }
 
 /// delete an architecture by id
 #[delete("/architecture")]
-pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::delete(&conn, post_data.id))
-        .await
-        .map_err(|e| {
-            debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
-        })?;
+pub async fn delete(
+    post_data: web::Json<utils::IdType>,
+    auth: Identity,
+    app_data: web::Data<AppData>,
+) -> Result<HttpResponse, Error> {
+    debug!("{:?}", auth.identity());
+    if let Some(_auth) = auth.identity() {
+        let conn = app_data.pool.get().expect("couldn't get db connection from pool");
+        let response = web::block(move || DbArchitecture::delete(&conn, post_data.id))
+            .await
+            .map_err(|e| {
+                debug!("{}", e);
+                HttpResponse::InternalServerError().finish()
+            })?;
 
-    Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(response))
+    } else {
+        Ok(HttpResponse::Unauthorized().finish())
+    }
 }

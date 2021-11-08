@@ -13,6 +13,7 @@ extern crate chrono;
 
 use actix_cors::Cors;
 use actix_files as fs;
+use actix_identity::{CookieIdentityPolicy, Identity, IdentityService};
 use actix_web::{middleware, web, App, HttpServer};
 
 use diesel::r2d2::{self, ConnectionManager};
@@ -108,7 +109,6 @@ pub struct AppData {
     keyring: String,
 }
 
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
@@ -155,8 +155,18 @@ async fn main() -> std::io::Result<()> {
             .send_wildcard()
             .allowed_methods(vec!["GET", "POST", "DELETE", "PUT"])
             .max_age(3600);
+        let auth = IdentityService::new(
+            CookieIdentityPolicy::new(&[0; 64]) // key length
+                .name("auth-cookie")
+                //   .path("/")
+                //   .domain("")
+                //   .http_only(true)
+                .max_age(2592000) // 30 days
+                .secure(false),
+        );
         App::new()
             // .wrap(middleware::DefaultHeaders::new().header("X-Version", "0.2"))
+            .wrap(auth)
             .wrap(cors)
             // set up DB pool to be used with web::Data<Pool> extractor
             .app_data(Data::new(AppData {
@@ -172,6 +182,8 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/nas").route(web::post().to(routes::syno)))
             //.service(web::resource("/package").route(web::get().to(routes::list_packages)))
             //.service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
+            .service(auth::login)
+            .service(auth::logout)
             .service(
                 web::scope("/api")
                     .service(user::get_all)

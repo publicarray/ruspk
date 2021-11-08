@@ -42,8 +42,6 @@ r2d2 = "0.8"
 # Bundled SQLites
 libsqlite3-sys = { version = "0.22.2", features = ["bundled"], optional = true }
 
-bcrypt = "0.10.1"
-
 # OpenPHP - rpgp check signatures
 pgp = "0.7"
 md5 = "0.7"
@@ -65,6 +63,11 @@ actix-rt = "1"
 actix-files = "0.5"
 actix-cors = "0.5"
 actix-web-httpauth = "0.5"
+actix-identity = "0.3.1"
+
+bcrypt = "0.10"
+# argon2 = "0.3"
+# rand_core = { version = "0.6", features = ["std"] }
 
 # Serialization/Deserialization
 serde_json = "1"
