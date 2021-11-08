@@ -1,6 +1,6 @@
 use crate::models::*;
 use crate::utils;
-use crate::{AppData, DbConn};
+use crate::AppData;
 use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 

@@ -291,6 +291,7 @@ impl DbBuild {
         })
     }
 
+    /// Add Architectures as an array to build
     fn b_create_build(b: BuildTmp, architectures: Vec<String>) -> Build {
         Build {
             id: b.id,

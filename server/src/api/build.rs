@@ -1,5 +1,5 @@
 use crate::{models::*, DbId};
-use crate::{AppData, DbConn};
+use crate::AppData;
 use actix_web::{delete, get, post, put, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 extern crate serde_derive;

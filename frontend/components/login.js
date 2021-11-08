@@ -1,12 +1,15 @@
 import Link from "next/link";
 
-export default function Login() {
+export default function Login({ errorMessage, onSubmit }) {
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
         <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
             <h1 className="font-bold text-center text-2xl mb-5">Your Logo</h1>
             <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-            <div className="px-5 py-7">
+            <form onSubmit={onSubmit} className="px-5 py-7">
+
+                {errorMessage && <p className="text-red-500 font-bold pb-1">{errorMessage}</p>}
+
                 <label className="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
                 <input type="text" className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full" />
                 <label className="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
@@ -17,7 +20,7 @@ export default function Login() {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </button>
-            </div>
+            </form>
             <div className="py-5">
                 <div className="grid grid-cols-2 gap-1">
                 <div className="text-center sm:text-left whitespace-nowrap">
