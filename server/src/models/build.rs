@@ -121,13 +121,13 @@ impl DbBuild {
         conn: &Connection,
         info: Info,
         install_wizard: bool,
-        uninstall_wizard: bool,
+        _uninstall_wizard: bool,
         upgrade_wizard: bool,
     ) -> QueryResult<DbBuild> {
         let info_clone = info.clone();
         let pkg_ver: Vec<&str> = info_clone.version.split("-").collect();
         let fw_min_ver: Vec<&str> = info_clone.os_min_ver.split("-").collect();
-        let fw_max_ver: Vec<&str> = info_clone.os_max_ver.unwrap_or_default().split("-").collect();
+        let _fw_max_ver: Vec<&str> = info_clone.os_max_ver.unwrap_or_default().split("-").collect();
         let architectures: Vec<&str> = info_clone.arch.split(" ").collect();
         // firmware
         let fw_build: i32 = fw_min_ver[1].parse().unwrap(); // todo change data type to usize
@@ -137,9 +137,9 @@ impl DbBuild {
         let upstream_version = pkg_ver[0];
         let revision: Dbu32 = pkg_ver[1].parse().unwrap();
 
-        let conf_dependencies = "";
-        let conflicts = "";
-        let conf_conflicts = "";
+        let _conf_dependencies = "";
+        let _conflicts = "";
+        let _conf_conflicts = "";
 
         // build
         let publisher_user_id = 152; // fixme from api key

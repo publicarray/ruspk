@@ -13,7 +13,7 @@ extern crate chrono;
 
 use actix_cors::Cors;
 use actix_files as fs;
-use actix_identity::{CookieIdentityPolicy, Identity, IdentityService};
+use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware, web, App, HttpServer};
 
 use diesel::r2d2::{self, ConnectionManager};

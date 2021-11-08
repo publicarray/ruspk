@@ -4,9 +4,9 @@ use crate::{schema::*, utils};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 
-use bcrypt::{hash, verify, DEFAULT_COST};
+use bcrypt::{hash, verify};
 extern crate bcrypt;
-use anyhow::{Error, Result};
+use anyhow::{Result};
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
 #[table_name = "user"]
