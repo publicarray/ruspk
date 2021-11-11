@@ -1,7 +1,7 @@
 use actix_web::error::ErrorUnauthorized;
 use actix_web::Error;
 use chrono::{Duration, Utc};
-use jsonwebtoken::{self, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{self, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use lazy_static::lazy_static;
 
@@ -9,9 +9,9 @@ lazy_static! {
     #[derive(Copy, Clone, Debug)]
     pub static ref JWT_SECRET: String = std::env::var("JWT_SECRET")
         .unwrap_or_else(|_| generate_secret());
-    #[derive(Copy, Clone, Debug)]
+        #[derive(Copy, Clone, Debug)]
     pub static ref JWT_EXPIRATION_HOURS: i64 = std::env::var("JWT_EXPIRATION_HOURS")
-        .unwrap_or_else(|_| "24".to_string())
+        .unwrap_or_else(|_| "24".to_string()) // default to 1 day expiration time
         .parse::<i64>().expect("Expected a number in hours");
 }
 
@@ -20,10 +20,10 @@ use rand::distributions::{Alphanumeric};
 pub fn generate_secret() -> String {
     let mut rng = thread_rng();
     let s: String = (&mut rng).sample_iter(Alphanumeric)
-        .take(64) // secret length
+        .take(512/4) // secret length (512 bits / 4 [2 hex chars])
         .map(char::from)
         .collect();
-    trace!("{:?}", s);
+    trace!("secret {:?}", s);
     return s;
 }
 
@@ -46,8 +46,9 @@ impl Claims {
 
 /// Create a json web token (JWT)
 pub(crate) fn create_jwt(claims: Claims) -> Result<String, Error> {
+    let header = Header::new(Algorithm::HS512); // sha512 algorithm
     let encoding_key = EncodingKey::from_secret(JWT_SECRET.as_bytes());
-    jsonwebtoken::encode(&Header::default(), &claims, &encoding_key)
+    jsonwebtoken::encode(&header, &claims, &encoding_key)
         .map_err(|e| ErrorUnauthorized(e.to_string()))
 }
 
