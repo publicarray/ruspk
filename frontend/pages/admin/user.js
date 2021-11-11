@@ -2,11 +2,11 @@ import Layout from "../../components/layout-admin";
 import Model from "../../components/model";
 import Button from "../../components/button";
 import TablePaginate from "../../components/table-paginate";
-import { useState } from "react";
-import { postJsonForm,API, API_VER } from "../../utils";
+import { postJsonForm, API, API_VER } from "../../utils";
 import { formatBoolean } from '../../utils';
+import { useState } from "react";
 
-export default function ArchitecturePage() {
+export default function UserPage() {
     const url = `${API}/${API_VER}/user`;
     const columns = [
         { Header: "ID", accessor: "id" },

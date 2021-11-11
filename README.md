@@ -135,3 +135,5 @@ Optimised build (**not** used for benchmarks and no measurable improvement):
 `RUSTFLAGS="-C opt-level=3 -C debuginfo=0 -C target-cpu=native" cargo build --release`
 
 <https://github.com/image-rs/image>
+
+<https://tlakomy.com/the-truth-about-cookies-tokens-and-apis>
