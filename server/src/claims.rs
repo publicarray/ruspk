@@ -1,7 +1,7 @@
 use actix_web::error::ErrorUnauthorized;
 use actix_web::Error;
 use chrono::{Duration, Utc};
-use jsonwebtoken::{self, decode_header, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{self, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
