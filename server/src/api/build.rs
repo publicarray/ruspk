@@ -1,5 +1,5 @@
-use crate::AppData;
 use crate::{models::*, DbId};
+use crate::AppData;
 use actix_web::{delete, get, post, put, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 extern crate serde_derive;
@@ -7,11 +7,11 @@ extern crate serde_qs as qs;
 use crate::utils;
 use crate::STORAGE_PATH;
 use crate::STORAGE_TYPE;
-use actix_identity::Identity;
 use async_std::path::Path;
 use async_std::{io, prelude::*};
 use async_tar::Archive;
 use futures::StreamExt;
+use actix_web_grants::proc_macro::{has_any_role, has_permissions};
 
 #[get("/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
@@ -34,11 +34,7 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 
 // todo optimisations
 #[post("/build")]
-pub async fn post(
-    req: HttpRequest,
-    mut body: web::Payload,
-    app_data: web::Data<AppData>,
-) -> Result<HttpResponse, Error> {
+pub async fn post(req: HttpRequest, mut body: web::Payload, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     utils::validate_api_key(&req)?;
     // read post data / file
     let tmp_dir = tempfile::TempDir::new()?;
@@ -138,45 +134,29 @@ pub async fn post(
 
 #[delete("/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
-pub async fn delete(
-    post_data: web::Json<utils::IdType>,
-    auth: Identity,
-    app_data: web::Data<AppData>,
-) -> Result<HttpResponse, Error> {
-    debug!("{:?}", auth.identity());
-    if let Some(_auth) = auth.identity() {
-        let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-        let response = web::block(move || DbBuild::delete(&conn, post_data.id))
-            .await
-            .map_err(|e| {
-                debug!("{}", e);
-                HttpResponse::InternalServerError().finish()
-            })?;
-
-        Ok(HttpResponse::Ok().json(response))
-    } else {
-        Ok(HttpResponse::Unauthorized().finish())
-    }
-}
-
-#[delete("/build/{id}")]
-pub async fn delete_id(
-    web::Path(id): web::Path<i32>,
-    auth: Identity,
-    app_data: web::Data<AppData>,
-) -> Result<HttpResponse, Error> {
-    debug!("{:?}", auth.identity());
-    if let Some(_auth) = auth.identity() {
-        let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-        let response = web::block(move || DbBuild::delete(&conn, id)).await.map_err(|e| {
+#[has_any_role("ADMIN", "PACKAGE_DEV")]
+pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::delete(&conn, post_data.id))
+        .await
+        .map_err(|e| {
             debug!("{}", e);
             HttpResponse::InternalServerError().finish()
         })?;
 
-        Ok(HttpResponse::Ok().json(response))
-    } else {
-        Ok(HttpResponse::Unauthorized().finish())
-    }
+    Ok(HttpResponse::Ok().json(response))
+}
+
+#[delete("/build/{id}")]
+#[has_any_role("ADMIN", "PACKAGE_DEV")]
+pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::delete(&conn, id)).await.map_err(|e| {
+        debug!("{}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
+
+    Ok(HttpResponse::Ok().json(response))
 }
 
 #[derive(Deserialize)]
@@ -187,23 +167,15 @@ pub struct BuildActive {
 
 // #[put("/build")]
 #[put("/build/active")]
-pub async fn active(
-    post_data: web::Json<BuildActive>,
-    auth: Identity,
-    app_data: web::Data<AppData>,
-) -> Result<HttpResponse, Error> {
-    debug!("{:?}", auth.identity());
-    if let Some(_auth) = auth.identity() {
-        let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-        let response = web::block(move || DbBuild::active(&conn, post_data.id, post_data.active))
-            .await
-            .map_err(|e| {
-                debug!("{}", e);
-                HttpResponse::InternalServerError().finish()
-            })?;
+#[has_any_role("ADMIN", "PACKAGE_DEV", "DEV")]
+pub async fn active(post_data: web::Json<BuildActive>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::active(&conn, post_data.id, post_data.active))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            HttpResponse::InternalServerError().finish()
+        })?;
 
-        Ok(HttpResponse::Ok().json(response))
-    } else {
-        Ok(HttpResponse::Unauthorized().finish())
-    }
+    Ok(HttpResponse::Ok().json(response))
 }

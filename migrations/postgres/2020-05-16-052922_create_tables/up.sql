@@ -1,7 +1,7 @@
 CREATE TABLE "user" (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(50) NOT NULL,
-  email VARCHAR(254) NOT NULL,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(254) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   api_key VARCHAR(64) UNIQUE,
   github_access_token VARCHAR(255) UNIQUE,

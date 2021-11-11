@@ -73,10 +73,14 @@ pub struct DbPackageUserMaintainer {
     pub user_id: DbId,
 }
 
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
+#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
+#[belongs_to(DbRole, foreign_key = "role_id")]
+#[belongs_to(DbUser, foreign_key = "user_id")]
+#[belongs_to(User, foreign_key = "user_id")]
+#[belongs_to(UserWithKey, foreign_key = "user_id")]
 #[primary_key(user_id, role_id)]
 #[table_name = "user_role"]
-pub struct DbUserRole {
+pub struct UserRole {
     pub user_id: DbId,
     pub role_id: DbId,
 }

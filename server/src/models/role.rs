@@ -1,6 +1,6 @@
 use crate::schema::*;
 use crate::DbId;
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
+#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
 #[table_name = "role"]
 pub struct DbRole {
     pub id: DbId,
