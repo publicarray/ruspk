@@ -23,7 +23,7 @@ pub fn generate_secret() -> String {
         .take(64) // secret length
         .map(char::from)
         .collect();
-    dbg!(&s);
+    trace!("{:?}", s);
     return s;
 }
 

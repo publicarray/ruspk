@@ -177,10 +177,10 @@ async fn main() -> std::io::Result<()> {
             //.service(web::resource("/package").route(web::get().to(routes::list_packages)))
             //.service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
             .service(auth::login)
-            .service(auth::create_token)
             .service(
                 web::scope("/api")
-                    .wrap(auth)
+                .wrap(auth)
+                    // .service(auth::profile)
                     .service(user::get_all)
                     .service(user::delete)
                     .service(build::get_all)

@@ -11,7 +11,7 @@ use async_std::path::Path;
 use async_std::{io, prelude::*};
 use async_tar::Archive;
 use futures::StreamExt;
-use actix_web_grants::proc_macro::{has_any_role, has_permissions};
+use actix_web_grants::proc_macro::has_any_role;
 
 #[get("/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
@@ -134,7 +134,7 @@ pub async fn post(req: HttpRequest, mut body: web::Payload, app_data: web::Data<
 
 #[delete("/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
-#[has_any_role("ADMIN", "PACKAGE_DEV")]
+#[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbBuild::delete(&conn, post_data.id))
@@ -148,7 +148,7 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 }
 
 #[delete("/build/{id}")]
-#[has_any_role("ADMIN", "PACKAGE_DEV")]
+#[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbBuild::delete(&conn, id)).await.map_err(|e| {
@@ -167,7 +167,7 @@ pub struct BuildActive {
 
 // #[put("/build")]
 #[put("/build/active")]
-#[has_any_role("ADMIN", "PACKAGE_DEV", "DEV")]
+#[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn active(post_data: web::Json<BuildActive>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbBuild::active(&conn, post_data.id, post_data.active))

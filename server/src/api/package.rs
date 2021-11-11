@@ -7,7 +7,7 @@ use actix_web::{delete, error::BlockingError, get, post, web, Error, HttpRequest
 use anyhow::Result;
 use std::sync::Arc;
 use std::time::Instant;
-use actix_web_grants::proc_macro::{has_any_role, has_permissions};
+use actix_web_grants::proc_macro::has_any_role;
 
 /// retrieve all packages
 #[get("/package")]
@@ -88,7 +88,7 @@ pub struct PostPackage {
 
 /// create a new package
 #[post("/package")]
-#[has_any_role("ADMIN", "PACKAGE_DEV", "DEV")]
+#[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn post(post_data: web::Json<PostPackage>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbPackage::create_package(&conn, post_data.author_id, post_data.name.clone()))
@@ -102,7 +102,7 @@ pub async fn post(post_data: web::Json<PostPackage>, data: web::Data<AppData>) -
 }
 
 #[delete("/package")]
-#[has_any_role("ADMIN", "PACKAGE_DEV", "DEV")]
+#[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbPackage::delete(&conn, post_data.id))
@@ -116,7 +116,7 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 }
 
 #[delete("/package/{id}")]
-#[has_any_role("ADMIN", "PACKAGE_DEV", "DEV")]
+#[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbPackage::delete(&conn, id)).await.map_err(|e| {

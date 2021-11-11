@@ -3,7 +3,7 @@ use crate::utils;
 use crate::AppData;
 use actix_web::{get, post, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
-use actix_web_grants::proc_macro::{has_any_role, has_permissions};
+use actix_web_grants::proc_macro::has_any_role;
 
 /// retrieve all firmware
 #[get("/firmware")]
@@ -27,7 +27,7 @@ pub struct CreateFirmware {
 }
 
 #[post("/firmware")]
-#[has_any_role("ADMIN", "PACKAGE_DEV", "DEV")]
+#[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn post(post_data: web::Json<CreateFirmware>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = data.pool.get().expect("couldn't get db connection from pool");
     let response = web::block(move || DbFirmware::create(&conn, post_data.version.clone(), post_data.build))
