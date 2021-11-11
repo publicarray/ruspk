@@ -3,8 +3,8 @@ use crate::utils;
 use crate::AppData;
 use actix_web::delete;
 use actix_web::{get, web, Error, HttpRequest, HttpResponse};
-use anyhow::Result;
 use actix_web_grants::proc_macro::has_any_role;
+use anyhow::Result;
 
 /// retrieve all users
 #[get("/user")]

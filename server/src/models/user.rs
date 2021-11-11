@@ -1,12 +1,15 @@
-use crate::{Connection, models::{DbRole, UserRole}};
 use crate::DbId;
+use crate::{
+    models::{DbRole, UserRole},
+    Connection,
+};
 use crate::{schema::*, utils};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 
 use bcrypt::verify;
 extern crate bcrypt;
-use anyhow::{Result};
+use anyhow::Result;
 
 #[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
 #[table_name = "user"]
@@ -33,7 +36,8 @@ pub struct UserWithKey {
     pub confirmed_at: Option<NaiveDateTime>,
 }
 impl UserWithKey {
-    fn remove_password(&mut self) { // FixMe
+    fn remove_password(&mut self) {
+        // FixMe
         self.password = "".to_string();
     }
 }
@@ -85,14 +89,25 @@ impl User {
 
             let mut user = user::table
                 .filter(user::email.eq(email).and(user::active.eq(true)))
-                .select((user::id, user::username, user::password, user::email, user::active, user::api_key, user::confirmed_at))
+                .select((
+                    user::id,
+                    user::username,
+                    user::password,
+                    user::email,
+                    user::active,
+                    user::api_key,
+                    user::confirmed_at,
+                ))
                 .first::<UserWithKey>(conn)?;
             let valid = verify(password, &user.password)?;
             if valid {
-                user.remove_password();  //todo fix me
-                let roles = UserRole::belonging_to(&user).inner_join(role::table)
-                    .select((role::id, role::name, role::description)).load::<DbRole>(conn)?;
-                if roles.len() > 0 { // user has at least one role
+                user.remove_password(); //todo fix me
+                let roles = UserRole::belonging_to(&user)
+                    .inner_join(role::table)
+                    .select((role::id, role::name, role::description))
+                    .load::<DbRole>(conn)?;
+                if roles.len() > 0 {
+                    // user has at least one role
                     return Ok((user, roles));
                 }
             }
@@ -100,14 +115,25 @@ impl User {
             debug!("{:?}", username);
             let mut user = user::table
                 .filter(user::username.eq(username).and(user::active.eq(true)))
-                .select((user::id, user::username, user::password, user::email, user::active, user::api_key, user::confirmed_at))
+                .select((
+                    user::id,
+                    user::username,
+                    user::password,
+                    user::email,
+                    user::active,
+                    user::api_key,
+                    user::confirmed_at,
+                ))
                 .first::<UserWithKey>(conn)?;
             let valid = verify(password, &user.password)?;
             if valid {
                 user.remove_password(); //todo fix me
-                let roles = UserRole::belonging_to(&user).inner_join(role::table)
-                    .select((role::id, role::name, role::description)).load::<DbRole>(conn)?;
-                if roles.len() > 0 { // user has at least one role
+                let roles = UserRole::belonging_to(&user)
+                    .inner_join(role::table)
+                    .select((role::id, role::name, role::description))
+                    .load::<DbRole>(conn)?;
+                if roles.len() > 0 {
+                    // user has at least one role
                     return Ok((user, roles));
                 }
             }

@@ -1,5 +1,5 @@
-use crate::{models::*, DbId};
 use crate::AppData;
+use crate::{models::*, DbId};
 use actix_web::{delete, get, post, put, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 extern crate serde_derive;
@@ -7,11 +7,11 @@ extern crate serde_qs as qs;
 use crate::utils;
 use crate::STORAGE_PATH;
 use crate::STORAGE_TYPE;
+use actix_web_grants::proc_macro::has_any_role;
 use async_std::path::Path;
 use async_std::{io, prelude::*};
 use async_tar::Archive;
 use futures::StreamExt;
-use actix_web_grants::proc_macro::has_any_role;
 
 #[get("/api/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
@@ -33,8 +33,12 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 }
 
 // todo optimisations
-#[post("/build")]
-pub async fn post(req: HttpRequest, mut body: web::Payload, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+#[post("/api/build")]
+pub async fn post(
+    req: HttpRequest,
+    mut body: web::Payload,
+    app_data: web::Data<AppData>,
+) -> Result<HttpResponse, Error> {
     utils::validate_api_key(&req)?;
     // read post data / file
     let tmp_dir = tempfile::TempDir::new()?;

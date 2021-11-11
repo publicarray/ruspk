@@ -110,8 +110,6 @@ pub struct AppData {
     keyring: String,
 }
 
-
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
@@ -189,7 +187,7 @@ async fn main() -> std::io::Result<()> {
             // admin api
             .service(
                 web::scope("/api")
-                .wrap(auth)
+                    .wrap(auth)
                     // .service(auth::profile)
                     .service(user::get_all)
                     .service(user::delete)

@@ -1,9 +1,9 @@
 use actix_web::error::ErrorUnauthorized;
 use actix_web::Error;
 use chrono::{Duration, Utc};
-use jsonwebtoken::{self, Algorithm, DecodingKey, EncodingKey, Header, Validation, decode_header};
-use serde::{Deserialize, Serialize};
+use jsonwebtoken::{self, decode_header, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 
 lazy_static! {
     #[derive(Copy, Clone, Debug)]
@@ -15,12 +15,13 @@ lazy_static! {
         .parse::<i64>().expect("Expected a number in hours");
 }
 
+use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
-use rand::distributions::{Alphanumeric};
 pub fn generate_secret() -> String {
     let mut rng = thread_rng();
-    let s: String = (&mut rng).sample_iter(Alphanumeric)
-        .take(512/4) // secret length (512 bits / 4 [2 hex chars])
+    let s: String = (&mut rng)
+        .sample_iter(Alphanumeric)
+        .take(512 / 4) // secret length (512 bits / 4 [2 hex chars])
         .map(char::from)
         .collect();
     trace!("secret {:?}", s);
@@ -48,8 +49,7 @@ impl Claims {
 pub(crate) fn create_jwt(claims: Claims) -> Result<String, Error> {
     let header = Header::new(Algorithm::HS512); // sha512 algorithm
     let encoding_key = EncodingKey::from_secret(JWT_SECRET.as_bytes());
-    jsonwebtoken::encode(&header, &claims, &encoding_key)
-        .map_err(|e| ErrorUnauthorized(e.to_string()))
+    jsonwebtoken::encode(&header, &claims, &encoding_key).map_err(|e| ErrorUnauthorized(e.to_string()))
 }
 
 /// Decode a json web token (JWT)
