@@ -13,12 +13,17 @@ export default function Table(props) {
     let pageSize = 15
     let sortBy = ""
     let filters = ""
-    let { data, error } = undefined;
-    if (typeof window !== "undefined" && localStorage.getItem("jwt")) {
-        let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonAuth);
-    } else {
-        let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJson);
-    }
+    let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonAuth);
+    // console.log(typeof window !== "undefined", localStorage.getItem("jwt"))
+    // if (typeof window !== "undefined" && localStorage.getItem("jwt")) {
+    //     let t = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonAuth);
+    //     data = t.data;
+    //     error = t.error;
+    // } else {
+    //     let t = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJson);
+    //     data = t.data;
+    //     error = t.error;
+    // }
     let isLoading = !error && !data;
     let isError = !error;
 

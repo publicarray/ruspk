@@ -160,6 +160,7 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600);
         let auth = HttpAuthentication::bearer(auth::validator);
         App::new()
+            //.wrap(middleware::NormalizePath::default())
             // .wrap(middleware::DefaultHeaders::new().header("X-Version", "0.2"))
             .wrap(cors)
             // set up DB pool to be used with web::Data<Pool> extractor
@@ -177,14 +178,21 @@ async fn main() -> std::io::Result<()> {
             //.service(web::resource("/package").route(web::get().to(routes::list_packages)))
             //.service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
             .service(auth::login)
+            // home /packages
+            .service(package::get_all)
+            // home /package detail view
+            .service(package::get)
+            .service(version::get_all)
+            .service(build::get_all)
+            // spksrc POST new build/package api_key endpoint
+            .service(build::post)
+            // admin api
             .service(
                 web::scope("/api")
                 .wrap(auth)
                     // .service(auth::profile)
                     .service(user::get_all)
                     .service(user::delete)
-                    .service(build::get_all)
-                    .service(build::post) // spksrc POST endpoint
                     .service(build::delete)
                     .service(build::active)
                     .service(build::delete_id)
@@ -192,15 +200,12 @@ async fn main() -> std::io::Result<()> {
                     .service(architecture::delete)
                     .service(architecture::get_all)
                     .service(firmware::get_all)
-                    .service(version::get_all)
                     .service(version::delete)
                     .service(version::delete_id)
                     .service(screenshot::get_all)
                     // .service(screenshot::post)
                     .service(screenshot::delete)
                     .service(screenshot::delete_id)
-                    .service(package::get_all)
-                    .service(package::get)
                     .service(package::post)
                     .service(package::delete)
                     .service(package::delete_id),

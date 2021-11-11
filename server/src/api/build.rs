@@ -13,7 +13,7 @@ use async_tar::Archive;
 use futures::StreamExt;
 use actix_web_grants::proc_macro::has_any_role;
 
-#[get("/build")]
+#[get("/api/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
