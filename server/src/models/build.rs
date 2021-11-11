@@ -125,10 +125,10 @@ impl DbBuild {
         upgrade_wizard: bool,
     ) -> QueryResult<DbBuild> {
         let info_clone = info.clone();
-        let pkg_ver: Vec<&str> = info_clone.version.split("-").collect();
-        let fw_min_ver: Vec<&str> = info_clone.os_min_ver.split("-").collect();
-        let _fw_max_ver: Vec<&str> = info_clone.os_max_ver.unwrap_or_default().split("-").collect();
-        let architectures: Vec<&str> = info_clone.arch.split(" ").collect();
+        let pkg_ver: Vec<&str> = info_clone.version.split('-').collect();
+        let fw_min_ver: Vec<&str> = info_clone.os_min_ver.split('-').collect();
+        let _fw_max_ver: Vec<&str> = info_clone.os_max_ver.unwrap_or_default().split('-').collect();
+        let architectures: Vec<&str> = info_clone.arch.split(' ').collect();
         // firmware
         let fw_build: i32 = fw_min_ver[1].parse().unwrap(); // todo change data type to usize
         let fw_version = fw_min_ver[0];
@@ -299,7 +299,7 @@ impl DbBuild {
             upstream_version: b.upstream_version,
             revision: b.revision,
             architectures,
-            firmware: format!("{}-{}", b.firmware_version, b.firmware_build).to_string(),
+            firmware: format!("{}-{}", b.firmware_version, b.firmware_build),
             publisher: b.publisher,
             insert_date: b.insert_date,
             active: b.active,
@@ -360,14 +360,14 @@ impl DbBuild {
     pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
             diesel::delete(build_architecture::table.filter(build_architecture::build_id.eq(id))).execute(conn)?;
-            Ok(diesel::delete(build::table.filter(build::id.eq(id))).execute(conn)?)
+            diesel::delete(build::table.filter(build::id.eq(id))).execute(conn)
         })
     }
 
     pub fn active(conn: &Connection, id: DbId, active: bool) -> QueryResult<DbBuild> {
         // must return `active` value from DB
-        Ok(diesel::update(build::table.filter(build::id.eq(id)))
+        diesel::update(build::table.filter(build::id.eq(id)))
             .set(build::active.eq(active))
-            .get_result(conn)?)
+            .get_result(conn)
     }
 }

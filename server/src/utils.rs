@@ -51,7 +51,7 @@ pub fn handle_query_parameters(query_str: &str) -> (i64, i64, String) {
     });
     let mut offset = params.page.unwrap_or(1); //defaults if not provided
     let mut limit = params.size.unwrap_or(20); //defaults if not provided
-    let query = params.q.unwrap_or(" ".to_string()); //defaults if not provided
+    let query = params.q.unwrap_or_else(|| " ".to_string()); //defaults if not provided
 
     // check fot negatives
     if offset <= 0 {

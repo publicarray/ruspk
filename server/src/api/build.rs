@@ -95,13 +95,13 @@ pub async fn post(
     let info: Info = toml::from_str(&info_contents).map_err(|_| actix_web::error::ParseError::Incomplete)?;
     let icon256path = tmp_dir.path().join("PACKAGE_ICON_256.PNG");
     // move file
-    if *STORAGE_TYPE == "filesystem" && *STORAGE_PATH != "" {
+    if *STORAGE_TYPE == "filesystem" && !STORAGE_PATH.is_empty() {
         // path / package name / package revision
         let file_path_str = format!(
             "{}/{}/{}",
             &*STORAGE_PATH,
             info.package,
-            info.version.split("-").collect::<Vec<&str>>()[1]
+            info.version.split('-').collect::<Vec<&str>>()[1]
         );
         let file_path = Path::new(&file_path_str);
         if let Err(e) = async_std::fs::create_dir_all(file_path).await {
@@ -113,8 +113,8 @@ pub async fn post(
         let new_filepath = file_path.join(format!(
             "{}.v{}.f{}[{}].spk",
             info.package,
-            info.version.split("-").collect::<Vec<&str>>()[1], // package revision
-            info.os_min_ver.split("-").collect::<Vec<&str>>()[1], // firmware build
+            info.version.split('-').collect::<Vec<&str>>()[1], // package revision
+            info.os_min_ver.split('-').collect::<Vec<&str>>()[1], // firmware build
             info.arch.replace(" ", "-")
         ));
 

@@ -80,7 +80,7 @@ impl User {
         conn: &Connection,
         username: &Option<String>,
         email: &Option<String>,
-        password: &String,
+        password: &str,
     ) -> Result<(UserWithKey, Vec<DbRole>)> {
         // let hashed_password = hash(password, 12)?;
         // debug!("{:?}", hashed_password);
@@ -106,7 +106,7 @@ impl User {
                     .inner_join(role::table)
                     .select((role::id, role::name, role::description))
                     .load::<DbRole>(conn)?;
-                if roles.len() > 0 {
+                if !roles.is_empty() {
                     // user has at least one role
                     return Ok((user, roles));
                 }
@@ -132,13 +132,13 @@ impl User {
                     .inner_join(role::table)
                     .select((role::id, role::name, role::description))
                     .load::<DbRole>(conn)?;
-                if roles.len() > 0 {
+                if !roles.is_empty() {
                     // user has at least one role
                     return Ok((user, roles));
                 }
             }
         }
 
-        return Err(diesel::result::Error::NotFound.into());
+        Err(diesel::result::Error::NotFound.into())
     }
 }

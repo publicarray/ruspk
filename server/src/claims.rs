@@ -25,7 +25,7 @@ pub fn generate_secret() -> String {
         .map(char::from)
         .collect();
     trace!("secret {:?}", s);
-    return s;
+    s
 }
 
 #[derive(Debug, Serialize, Deserialize)]
