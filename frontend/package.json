@@ -1,4 +1,7 @@
 {
+  "engines" : {
+    "node" : ">=12.22.0"
+  },
   "private": true,
   "dependencies": {
     "@headlessui/react": "^1.4.1",
