@@ -44,7 +44,7 @@ pub async fn create_token(info: web::Json<Auth>,  data: web::Data<AppData>) -> R
     debug!("{:?}", user_info.username);
     debug!("{:?}", user_info.email);
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let user = web::block(move || User::login(&conn, &user_info.username, &user_info.email, &user_info.password))
+    let (user, roles) = web::block(move || User::login(&conn, &user_info.username, &user_info.email, &user_info.password))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -55,7 +55,8 @@ pub async fn create_token(info: web::Json<Auth>,  data: web::Data<AppData>) -> R
 
     // Create a JWT
     // let claims = Claims::new(user.username, user.permissions);
-    let claims = Claims::new(user.username, vec!["ROLE_ADMIN".to_string()]);
+    // let claims = Claims::new(user.username, vec!["ROLE_ADMIN".to_string()]);
+    let claims = Claims::new(user.username, roles);
     let jwt = claims::create_jwt(claims)?;
 
     // Return token for work with example handlers

@@ -77,7 +77,7 @@ impl User {
         username: &Option<String>,
         email: &Option<String>,
         password: &String,
-    ) -> Result<UserWithKey> {
+    ) -> Result<(UserWithKey, Vec<String>)> {
         // let hashed_password = hash(password, 12)?;
         // debug!("{:?}", hashed_password);
         if let Some(email) = email {
@@ -90,29 +90,22 @@ impl User {
             let valid = verify(password, &user.password)?;
             if valid {
                 user.remove_password();
+                // let roles = UserRole::belonging_to(&user).load::<UserRole>(conn)?;
 
-                // let roles = UserRole::belonging_to(&user).inner_join(role::table)
-                let roles = UserRole::belonging_to(&user)
-                    .load::<(i32, i32)>(conn)?;
-                    // .grouped_by(&user);
-                // let a = user
-                //     .into_iter()
-                //     .zip(roles)
-                //     .map(|(b, ba_a)| {
-                //         // move data from BuildTmp to Build struct
-                //         DbBuild::b_create_build(
-                //             b,
-                //             ba_a.into_iter()
-                //                 // drop BuildArchitecture and only get Architecture.code
-                //                 .map(|(_, a)| a.code)
-                //                 .collect::<Vec<_>>(),
-                //         )
-                //     })
-                //     .collect::<Vec<_>>();
+                // let roles = UserRole::belonging_to(&user).inner_join(role::table).load::<(UserRole, DbRole)>(conn)?;
+                let roles = UserRole::belonging_to(&user).inner_join(role::table)
+                    .select((role::id, role::name, role::description)).load::<DbRole>(conn)?;
+                // let roles = UserRole::belonging_to(&user).inner_join(user::table).load::<(UserRole, DbUser)>(conn)?;
+                dbg!(&roles);
 
-                dbg!(&roles );
-                if &roles.len() > &0 { // user has a role
-                    return Ok(user);
+                // [(role_ + role.name).to_uppercase()]
+                // let role_str = roles.into_iter().map(|x| "role_".to_owned() + x.name.as_str()).collect::<Vec<_>>();
+                let role_str = roles.into_iter().map(|x| ("role_".to_owned() + x.name.as_str()).to_uppercase()).collect::<Vec<_>>();
+                dbg!(&role_str);
+                // let me = "hi".to_string().concat("me".to_string());
+
+                if role_str.len() > 0 { // user has at least one role
+                    return Ok((user, role_str));
                 }
             }
         } else if let Some(username) = username {
@@ -124,7 +117,12 @@ impl User {
             let valid = verify(password, &user.password)?;
             if valid {
                 user.remove_password();
-                return Ok(user);
+                let roles = UserRole::belonging_to(&user).inner_join(role::table)
+                    .select((role::id, role::name, role::description)).load::<DbRole>(conn)?;
+                let role_str = roles.into_iter().map(|x| ("role_".to_owned() + x.name.as_str()).to_uppercase()).collect::<Vec<_>>();
+                if role_str.len() > 0 { // user has at least one role
+                    return Ok((user, role_str));
+                }
             }
         }
         // else error
