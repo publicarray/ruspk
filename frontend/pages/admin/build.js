@@ -20,6 +20,7 @@ export default function BuildPage() {
             method: "PUT",
             headers: {
               "Content-type": "application/json; charset=UTF-8",
+              'Authorization': 'Bearer ' + localStorage.getItem("jwt")
             },
             body: JSON.stringify({id: data[index].id, active: active}),
         })

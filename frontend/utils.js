@@ -45,7 +45,10 @@ export async function postJson(url, data) {
     const requestOptions = {
         method: "POST",
         // mode: "no-cors", // removes content-type header
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("jwt")
+        },
         body: JSON.stringify(data),
     };
 
