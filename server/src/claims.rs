@@ -20,7 +20,7 @@ use rand::distributions::{Alphanumeric};
 pub fn generate_secret() -> String {
     let mut rng = thread_rng();
     let s: String = (&mut rng).sample_iter(Alphanumeric)
-        .take(64)
+        .take(64) // secret length
         .map(char::from)
         .collect();
     dbg!(&s);
