@@ -84,6 +84,26 @@ pg_dump -U ruspk ruspk > ruspk.sql
 psql -U ruspk -d ruspk -f ruspk.sql
 ```
 
+Upgrade Database
+
+```sh
+paru -S postgresql-12-upgrade
+sudo systemctl stop postgresql
+sudo mv /var/lib/postgres/data /var/lib/postgres/olddata
+sudo mkdir /var/lib/postgres/data
+sudo chown postgres:postgres /var/lib/postgres/data
+sudo su postgres
+[postgres]$ initdb -D /var/lib/postgres/data
+[postgres]$ /opt/pgsql-13/bin/pg_ctl -D /var/lib/postgres/olddata/ start
+# sudo cp /usr/lib/postgresql/postgis-3.so /opt/pgsql-13/lib/ # Only if postgis installed
+[postgres]$ pg_dumpall -h /tmp -f /tmp/old_backup.sql
+[postgres]$ /opt/pgsql-13/bin/pg_ctl -D /var/lib/postgres/olddata/ stop
+sudo systemctl start postgresql # in a new terminal window
+[postgres]$ psql -f /tmp/old_backup.sql postgres
+sudo rm /tmp/old_backup.sql
+paru -Rns postgresql-12-upgrade
+```
+
 ## development
 
 ```sh
