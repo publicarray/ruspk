@@ -43,5 +43,17 @@
     ],
     "rust-analyzer.cargo.features": [
         "postgres"
+    ],
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "ruspk",
+            "database": "ruspk",
+            "username": "ruspk",
+            "password": "ruspk"
+        }
     ]
 }

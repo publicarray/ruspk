@@ -158,7 +158,8 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600);
         let auth = HttpAuthentication::bearer(auth::validator);
         App::new()
-            //.wrap(middleware::NormalizePath::default())
+            .wrap(middleware::NormalizePath::trim())
+            //.wrap(middleware::NormalizePath::new(middleware::TrailingSlash::Always))
             // .wrap(middleware::DefaultHeaders::new().header("X-Version", "0.2"))
             .wrap(cors)
             // set up DB pool to be used with web::Data<Pool> extractor

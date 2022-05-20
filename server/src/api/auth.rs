@@ -1,6 +1,6 @@
 use crate::AppData;
 use crate::{claims, models::*};
-use actix_web::{post, web, Error, HttpResponse};
+use actix_web::{error, post, web, Error, HttpResponse};
 use anyhow::Result;
 // use actix_web_grants::proc_macro::has_any_role;
 
@@ -45,7 +45,11 @@ pub async fn login(info: web::Json<Auth>, data: web::Data<AppData>) -> Result<Ht
             .await
             .map_err(|e| {
                 debug!("{}", e);
-                HttpResponse::Unauthorized().finish()
+                error::ErrorInternalServerError(e)
+            })?
+            .map_err(|e| {
+                debug!("{}", e);
+                error::ErrorInternalServerError(e)
             })?;
 
     // [(role_ + role.name).to_uppercase()]

@@ -1,5 +1,5 @@
 use crate::models::*;
-use actix_web::{error::BlockingError, web, Error, HttpRequest, HttpResponse, Responder};
+use actix_web::{error, error::BlockingError, web, Error, HttpRequest, HttpResponse, Responder};
 
 use crate::synopackagelist::*;
 use crate::{AppData, CacheValue, Db64, Db8, DbConn, DbId, CACHE_TTL};
@@ -29,10 +29,7 @@ pub struct SynoRequest {
     unique: Option<String>,                 // synology_apollolake_418play
 }
 
-pub async fn syno(
-    data: web::Data<AppData>,
-    synorequest: web::Query<SynoRequest>,
-) -> Result<HttpResponse, HttpResponse> {
+pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>) -> Result<HttpResponse, Error> {
     let now = Instant::now();
 
     let cache_r = &data.cache_r;
@@ -54,7 +51,7 @@ pub async fn syno(
         if value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL) {
             return Ok(HttpResponse::Ok()
                 .content_type("application/json")
-                .body(&*value.http_response));
+                .json(&*value.http_response));
         }
     }
 
@@ -77,6 +74,11 @@ pub async fn syno(
     trace!("MISS {}ms", now.elapsed().as_millis());
     match response {
         Ok(packages) => {
+            let packages = packages.map_err(|e| {
+                debug!("{}", e);
+                error::ErrorInternalServerError(e)
+            })?;
+
             let http_response = serde_json::to_string(&packages).unwrap();
             let value = CacheValue {
                 http_response: Arc::new(http_response),
@@ -94,16 +96,7 @@ pub async fn syno(
         }
         Err(err) => {
             error!("{:?}", err);
-            match err {
-                BlockingError::Error(err) => match err.downcast_ref::<diesel::result::Error>().unwrap() {
-                    diesel::result::Error::NotFound => {
-                        debug!("{}", err);
-                        Err(HttpResponse::NotFound().finish())
-                    }
-                    _ => Err(HttpResponse::InternalServerError().finish()),
-                },
-                BlockingError::Canceled => Err(HttpResponse::InternalServerError().finish()),
-            }
+            Err(error::ErrorInternalServerError(err))
         }
     }
 }
@@ -118,11 +111,16 @@ fn get_package(conn: &DbConn) -> Result<Vec<DbPackage>> {
 
 pub async fn list_packages(data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || get_package(&conn)).await.map_err(|e| {
-        debug!("{}", e);
-        HttpResponse::InternalServerError().finish()
-    })?;
-
+    let response = web::block(move || get_package(&conn))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?;
     Ok(HttpResponse::Ok().json(response))
 }
 
@@ -137,10 +135,16 @@ fn get_version(conn: &DbConn, num: DbId) -> Result<Vec<DbVersion>> {
 
 pub async fn get_package_version(data: web::Data<AppData>, id: web::Path<DbId>) -> Result<HttpResponse, HttpResponse> {
     let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || get_version(&conn, *id)).await.map_err(|e| {
-        debug!("{}", e);
-        HttpResponse::InternalServerError().finish()
-    })?;
+    let response = web::block(move || get_version(&conn, *id))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?;
     if response.is_empty() {
         return Err(HttpResponse::NotFound().finish());
     }

@@ -1,6 +1,6 @@
 use crate::AppData;
 use crate::{models::*, DbId};
-use actix_web::{delete, get, post, put, web, Error, HttpRequest, HttpResponse};
+use actix_web::{delete, error, get, post, put, web, Error, HttpRequest, HttpResponse};
 use anyhow::Result;
 extern crate serde_derive;
 extern crate serde_qs as qs;
@@ -26,7 +26,11 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
         .await
         .map_err(|e| {
             debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
         })?;
 
     Ok(HttpResponse::Ok().json(response))
@@ -131,7 +135,11 @@ pub async fn post(
             .await
             .map_err(|e| {
                 debug!("{}", e);
-                HttpResponse::InternalServerError().finish()
+                error::ErrorInternalServerError(e)
+            })?
+            .map_err(|e| {
+                debug!("{}", e);
+                error::ErrorInternalServerError(e)
             })?;
     Ok(HttpResponse::Ok().json(response))
 }
@@ -145,7 +153,11 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
         .await
         .map_err(|e| {
             debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
         })?;
 
     Ok(HttpResponse::Ok().json(response))
@@ -153,12 +165,19 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 
 #[delete("/build/{id}")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN")]
-pub async fn delete_id(web::Path(id): web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+pub async fn delete_id(path: web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let id = path.into_inner();
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::delete(&conn, id)).await.map_err(|e| {
-        debug!("{}", e);
-        HttpResponse::InternalServerError().finish()
-    })?;
+    let response = web::block(move || DbBuild::delete(&conn, id))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?;
 
     Ok(HttpResponse::Ok().json(response))
 }
@@ -178,7 +197,11 @@ pub async fn active(post_data: web::Json<BuildActive>, app_data: web::Data<AppDa
         .await
         .map_err(|e| {
             debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
         })?;
 
     Ok(HttpResponse::Ok().json(response))

@@ -3,6 +3,7 @@
 *.sqlite
 *.db
 ruspk*.sql
+spkrepo.sql
 schema.rs
 .vscode/launch.json
 server/*.json

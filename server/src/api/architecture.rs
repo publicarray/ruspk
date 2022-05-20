@@ -1,7 +1,7 @@
 use crate::models::*;
 use crate::utils;
 use crate::AppData;
-use actix_web::{delete, get, post, web, Error, HttpRequest, HttpResponse};
+use actix_web::{delete, error, get, post, web, Error, HttpRequest, HttpResponse};
 use actix_web_grants::proc_macro::has_any_role;
 use anyhow::Result;
 
@@ -18,9 +18,12 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
         .await
         .map_err(|e| {
             debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
         })?;
-
     Ok(HttpResponse::Ok().json(response))
 }
 
@@ -33,9 +36,12 @@ pub async fn post(architecture: web::Json<NewArchitecture>, data: web::Data<AppD
         .await
         .map_err(|e| {
             debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
         })?;
-
     Ok(HttpResponse::Ok().json(response))
 }
 
@@ -48,8 +54,11 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
         .await
         .map_err(|e| {
             debug!("{}", e);
-            HttpResponse::InternalServerError().finish()
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
         })?;
-
     Ok(HttpResponse::Ok().json(response))
 }
