@@ -49,9 +49,10 @@ pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>
         trace!("HIT {}ms", now.elapsed().as_millis());
         debug!("cache age {}", value.insert_time.elapsed().as_secs());
         if value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL) {
+            let response = &*value.http_response;
             return Ok(HttpResponse::Ok()
                 .content_type("application/json")
-                .json(&*value.http_response));
+                .body(response.to_owned()));
         }
     }
 
