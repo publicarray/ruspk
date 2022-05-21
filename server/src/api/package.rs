@@ -3,7 +3,7 @@ use crate::AppData;
 use crate::DbId;
 use crate::CACHE_TTL;
 use crate::{models::*, CacheValue};
-use actix_web::{delete, error, error::BlockingError, get, post, web, Error, HttpRequest, HttpResponse};
+use actix_web::{delete, error, get, post, web, Error, HttpRequest, HttpResponse};
 use actix_web_grants::proc_macro::has_any_role;
 use anyhow::Result;
 use std::sync::Arc;

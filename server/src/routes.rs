@@ -1,5 +1,5 @@
 use crate::models::*;
-use actix_web::{error, error::BlockingError, web, Error, HttpRequest, HttpResponse, Responder};
+use actix_web::{error, web, Error, HttpRequest, HttpResponse, Responder};
 
 use crate::synopackagelist::*;
 use crate::{AppData, CacheValue, Db64, Db8, DbConn, DbId, CACHE_TTL};
