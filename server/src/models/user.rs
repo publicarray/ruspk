@@ -36,7 +36,7 @@ pub struct UserWithKey {
     pub confirmed_at: Option<NaiveDateTime>,
 }
 impl UserWithKey {
-    fn remove_password(&mut self) {
+    fn remove_password_from_output(&mut self) {
         // FixMe
         self.password = "".to_string();
     }
@@ -99,9 +99,17 @@ impl User {
                     user::confirmed_at,
                 ))
                 .first::<UserWithKey>(conn)?;
+            debug!("{:?}", user);
+            debug!(
+                "{:?} | {:?}  | {:?}",
+                password,
+                &user.password,
+                bcrypt::hash(password, 12)
+            );
             let valid = verify(password, &user.password)?;
+            debug!("{:?} | {:?} | {:?}", password, &user.password, valid);
             if valid {
-                user.remove_password(); //todo fix me
+                user.remove_password_from_output(); //todo fix me
                 let roles = UserRole::belonging_to(&user)
                     .inner_join(role::table)
                     .select((role::id, role::name, role::description))
@@ -125,9 +133,12 @@ impl User {
                     user::confirmed_at,
                 ))
                 .first::<UserWithKey>(conn)?;
+            debug!("{:?}", user);
+            debug!("{:?} | {:?}", password, &user.password);
             let valid = verify(password, &user.password)?;
+            debug!("{:?} | {:?} | {:?}", password, &user.password, valid);
             if valid {
-                user.remove_password(); //todo fix me
+                user.remove_password_from_output(); //todo fix me
                 let roles = UserRole::belonging_to(&user)
                     .inner_join(role::table)
                     .select((role::id, role::name, role::description))

@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate log;
 use actix_web::web::Data;
+use anyhow::{Context, Result};
 use env_logger::Env;
 use lazy_static::lazy_static;
 #[macro_use]
@@ -10,6 +11,17 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 extern crate chrono;
+
+extern crate regex;
+
+extern crate sequoia_openpgp as openpgp;
+use openpgp::cert::prelude::*;
+use openpgp::packet::prelude::*;
+use openpgp::{
+    parse::{PacketParser, Parse},
+    serialize::SerializeInto,
+    types::Curve,
+};
 
 use actix_cors::Cors;
 use actix_files as fs;
@@ -93,6 +105,12 @@ lazy_static! {
 
     #[derive(Copy, Clone, Debug)]
     pub static ref STORAGE_PATH: String = std::env::var("STORAGE_PATH").unwrap_or_else(|_| "packages".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref PGP_KEY_PATH: String = std::env::var("PGP_KEY_PATH").unwrap_or_else(|_| "pgpkey.pem".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref GNUPG_TIMESTAMP_URL: String = std::env::var("GNUPG_TIMESTAMP_URL").unwrap_or_else(|_| "http://timestamp.synology.com/timestamp.php".to_string());
 }
 
 // Cache Type
@@ -116,6 +134,8 @@ async fn main() -> std::io::Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     lazy_static::initialize(&CACHE_TTL);
     lazy_static::initialize(&URL);
+    lazy_static::initialize(&PGP_KEY_PATH);
+    lazy_static::initialize(&GNUPG_TIMESTAMP_URL);
     trace!("CACHE_TTL:{}", *CACHE_TTL);
     let db_url = std::env::var("DATABASE_URL").expect("missing DATABASE_URL");
     let listen_addr = std::env::var("LISTEN").unwrap_or_else(|_| "127.0.0.1".to_string());
@@ -128,22 +148,60 @@ async fn main() -> std::io::Result<()> {
     info!("Starting server at: {}", &bind);
 
     // get public key / keychain
-    let public_key = match std::env::var("PUBLIC_KEY_FILE") {
-        Ok(public_key_filename) => {
-            debug!("loading public key: {}", public_key_filename);
-            match utils::read_file(&public_key_filename) {
-                Ok(public_key) => public_key,
-                Err(err) => {
-                    error!("Unable to get public key '{}'. {}", public_key_filename, err);
-                    "".to_string()
-                }
-            }
-        }
-        Err(err) => {
-            warn!("PUBLIC_KEY_FILE {}", err);
-            "".to_string()
-        }
-    };
+    // let pgp_key_path = std::env::var("PGP_KEY_PATH").unwrap_or_else(|_| "pgpkey.pem".to_string());
+    // let tsk = openpgp::Cert::from_file(&pgp_key_path).context("Failed to read key").unwrap();
+    let tsk = openpgp::Cert::from_file(&*PGP_KEY_PATH)
+        .context("Failed to read key")
+        .unwrap();
+
+    // let mut keys = Vec::new();
+    // let p = &crate::openpgp::policy::StandardPolicy::new();
+    // let mut n = 0;
+    // for key in tsk.keys().with_policy(p, None).alive().revoked(false).for_signing().secret().map(|ka| ka.key()) {
+    //     keys.push({
+    //         let mut key = key.clone();
+    //         if key.secret().is_encrypted() {
+    //             // let password = read_from_sdin (Some(&format!("Please enter password to decrypt {}/{}: ",tsk, key)))?;
+    //             let password = "";
+    //             let algo = key.pk_algo();
+    //             key.secret_mut()
+    //                 .decrypt_in_place(algo, &password.into())
+    //                 .context("decryption failed").unwrap();
+    //         }
+    //         n += 1;
+    //         key.into_keypair().unwrap();
+    //     });
+    // }
+
+    // if n==0 {
+    //     error!("No valid signing key found");
+    // }
+
+    // let keypair = tsk
+    //     .keys().unencrypted_secret()
+    //     .with_policy(p, None).supported().alive().revoked(false).for_signing()
+    //     .next().unwrap().key().clone().into_keypair().unwrap();
+
+    let public_key = String::from_utf8(tsk.armored().to_vec().unwrap()).unwrap();
+    debug!("Public Key: {}", public_key);
+    info!("Loaded Key: {}", tsk.fingerprint());
+    // let ppr = PacketParser::from_file(&pgp_key_path).unwrap();
+    // let mut public_key = "".to_string();
+    // for certo in CertParser::from(ppr) {
+    //     match certo {
+    //         Ok(cert) => {
+    //             info!("Key: {}", cert.fingerprint());
+    //             public_key = String::from_utf8(cert.armored().to_vec().unwrap()).unwrap();
+    //             debug!("public Key: {}", public_key);
+    //             for ua in cert.userids() {
+    //                 info!("  User ID: {}", ua.userid());
+    //             }
+    //         }
+    //         Err(err) => {
+    //             error!("Error reading keyring: {}", err);
+    //         }
+    //     }
+    // }
 
     let (cache_r, raw_cache_w) = evmap::new();
     let cache_w = Arc::new(Mutex::new(raw_cache_w));

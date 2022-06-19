@@ -28,7 +28,6 @@ sqlite = ["diesel/sqlite"]
 # sqlite = ["diesel/sqlite", "diesel_migrations/sqlite", "libsqlite3-sys"]
 
 [dependencies]
-
 # Errors
 anyhow = "1.0"
 # Logs
@@ -43,13 +42,20 @@ r2d2 = "0.8"
 libsqlite3-sys = { version = "0.24", features = ["bundled"], optional = true }
 
 # OpenPHP - rpgp check signatures
+sequoia-openpgp = "*"
 # pgp = "0.7"
 md5 = "0.7"
 async-tar = "0.4"
+# https://github.com/alexcrichton/tar-rs/pull/178
+# https://github.com/alexcrichton/tar-rs/issues/177
+tar = { git = "https://github.com/dvc94ch/tar-rs", branch = "append-entry" }
+
 tempfile = "3"
 futures = "0.3"
 async-std = "1.10"
 #sanitize-filename = "0.3.0"
+
+regex = "1"
 
 # grab environment vars
 dotenv = "0.15"
@@ -70,6 +76,11 @@ rand = "0.8"
 bcrypt = "0.13"
 # argon2 = "0.3"
 # rand_core = { version = "0.6", features = ["std"] }
+
+# to make standalone http requests
+awc = { version = "3", features = ["rustls"] }
+rustls = "0.20"
+webpki-roots = "*"
 
 # Serialization/Deserialization
 serde_json = "1"

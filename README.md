@@ -24,7 +24,7 @@ Available Features: `mysql`, `postgres` and `sqlite`
 
 ```sh
 # NAS package list request
-curl -sv 'http://127.0.0.1:8080/?package_update_channel=beta&unique=synology_apollolake_418play&build=24922&language=enu&major=6&micro=2&arch=apollolake&minor=2&timezone=Melbourne&nano=4' | jq
+curl -sv 'http://127.0.0.1:8080/nas?package_update_channel=beta&unique=synology_apollolake_418play&build=24922&language=enu&major=6&micro=2&arch=apollolake&minor=2&timezone=Melbourne&nano=4' | jq
 
 # upload new package (wip)
 http --verify=no --ignore-stdin --auth $PUBLISH_API_KEY: POST $PUBLISH_URL/packages @$SPK_FILE_NAME
@@ -157,3 +157,29 @@ Optimised build (**not** used for benchmarks and no measurable improvement):
 <https://github.com/image-rs/image>
 
 <https://tlakomy.com/the-truth-about-cookies-tokens-and-apis>
+
+
+
+
+## Create a Key
+
+```sh
+cargo install sq
+sq key generate --userid "synocommunity.com" --export pgpkey.pem
+# or
+gpg --generate-key
+```
+
+## Reset Database
+
+```sh
+psql -U postgres -d ruspk -f server/db/reset.sql && psql -U ruspk -d ruspk -f server/db/spkrepo.sql
+```
+
+## Analyse Postgres Database
+
+This is so the query planner has more information so it can make better choices.
+
+```sh
+vacuumdb -v -U postgres -Z ruspk
+```
