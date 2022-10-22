@@ -9,7 +9,7 @@ use std::io::Write;
 #[postgres(type_name = "icon_size")]
 pub struct IconSize;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, FromSqlRow, AsExpression)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, FromSqlRow, AsExpression)]
 pub enum IconSizeEnum {
     Icon72,
     Icon120,

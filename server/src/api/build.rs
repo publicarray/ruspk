@@ -2,11 +2,10 @@ use std::io::{Read, Write};
 
 use crate::AppData;
 use crate::{models::*, DbId};
-use actix_web::{delete, dev::Response, error, get, post, put, web, Error, HttpRequest, HttpResponse};
+use actix_web::{delete, error, get, post, put, web, Error, HttpRequest, HttpResponse};
 use anyhow::{Context, Result};
-use awc::{http::header, Client, Connector};
-use openpgp::serialize::stream::{Armorer, LiteralWriter, Message, Signer};
-use openpgp::{packet::signature, parse::Parse};
+use openpgp::serialize::stream::{Armorer, Message, Signer};
+use openpgp::{parse::Parse};
 extern crate serde_derive;
 extern crate serde_qs as qs;
 use crate::utils;
@@ -19,7 +18,6 @@ use async_std::{io, prelude::*};
 use async_tar::Archive;
 use futures::StreamExt;
 use regex::Regex;
-use rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore};
 
 #[get("/api/build")]
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
@@ -222,7 +220,6 @@ pub async fn post(
             let mut signature_file = std::fs::File::create("syno_signature2.asc")?;
             signature_file.write_all(&body)?;
 
-
             let file1 = std::fs::File::open(filepath.clone())?; // new write file handler
             let mut input = tar::Archive::new(file1);
 
@@ -230,15 +227,15 @@ pub async fn post(
             let file = std::fs::File::create(filepath_tmp.clone())?; // new write file handler
             let mut builder = tar::Builder::new(file);
             builder.append_archive(&mut input).unwrap();
-            builder.append_file(
-                "syno_signature.asc",
-                &mut std::fs::File::open("syno_signature2.asc").unwrap(),
-            )
-            .unwrap();
+            builder
+                .append_file(
+                    "syno_signature.asc",
+                    &mut std::fs::File::open("syno_signature2.asc").unwrap(),
+                )
+                .unwrap();
             builder.finish().unwrap();
             debug!("copy archive");
             async_std::fs::copy(filepath_tmp, filepath.clone()).await?;
-
         }
     }
 
@@ -275,7 +272,7 @@ pub async fn post(
             info.package,
             info.version.split('-').collect::<Vec<&str>>()[1], // package revision
             info.os_min_ver.split('-').collect::<Vec<&str>>()[1], // firmware build
-            info.arch.replace(" ", "-")
+            info.arch.replace(' ', "-")
         ));
 
         debug!("rename: {:?}->{:?}", filepath, new_filepath);
@@ -285,7 +282,7 @@ pub async fn post(
     }
 
     // serialise info file to a struct & save info into database
-//    let response = "not saved, please uncomment me";
+    //    let response = "not saved, please uncomment me";
     let conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response =
         web::block(move || DbBuild::create_build(&conn, info, install_wizard, uninstall_wizard, upgrade_wizard))

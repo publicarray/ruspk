@@ -29,7 +29,7 @@ pub struct Paginate {
 }
 
 pub fn fuzzy_search(q: &str) -> String {
-    let replaced = q.replace("-", " ").replace(" ", "%");
+    let replaced = q.replace('-', " ").replace(' ', "%");
     format!("%{}%", replaced)
 }
 /// retrieve HTTP GET Parameters for pagination

@@ -134,6 +134,9 @@ cargo audit
 # Get latest versions defined in Cargo.toml
 # $ cargo install cargo-update
 cargo update
+# update Cargo.toml
+# $ cargo install cargo-edit
+cargo upgrade
 # check of errors
 cargo check
 # show errors in your favourite editor

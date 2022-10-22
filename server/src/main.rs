@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate log;
 use actix_web::web::Data;
-use anyhow::{Context, Result};
+use anyhow::{Context};
 use env_logger::Env;
 use lazy_static::lazy_static;
 #[macro_use]
@@ -15,12 +15,9 @@ extern crate chrono;
 extern crate regex;
 
 extern crate sequoia_openpgp as openpgp;
-use openpgp::cert::prelude::*;
-use openpgp::packet::prelude::*;
 use openpgp::{
-    parse::{PacketParser, Parse},
+    parse::{Parse},
     serialize::SerializeInto,
-    types::Curve,
 };
 
 use actix_cors::Cors;
