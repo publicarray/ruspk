@@ -5,9 +5,9 @@ use crate::{Db64, DbId};
 use chrono::NaiveDateTime;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
-#[belongs_to(DbBuild, foreign_key = "build_id")]
-#[belongs_to(DbArchitecture, foreign_key = "architecture_id")]
-#[table_name = "download"]
+#[diesel(belongs_to(DbBuild, foreign_key = build_id))]
+#[diesel(belongs_to(DbArchitecture, foreign_key = architecture_id))]
+#[diesel(table_name = download)]
 pub struct DbDownload {
     pub id: DbId,
     pub build_id: DbId,

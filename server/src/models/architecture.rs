@@ -4,21 +4,21 @@ use crate::{schema::*, utils};
 use anyhow::{Context, Result};
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
-#[table_name = "architecture"]
+#[diesel(table_name = architecture)]
 pub struct DbArchitecture {
     pub id: DbId,
     pub code: String,
 }
 
 #[derive(Serialize, Deserialize, Insertable, Clone)]
-#[table_name = "architecture"]
+#[diesel(table_name = architecture)]
 pub struct NewArchitecture {
     pub code: String,
 }
 
 impl DbArchitecture {
     pub fn find_all(
-        conn: &Connection,
+        conn: &mut Connection,
         limit: i64,
         offset: i64,
         search_term: String,
@@ -31,11 +31,11 @@ impl DbArchitecture {
             .load::<DbArchitecture>(conn)
     }
 
-    pub fn find_by_id(i: DbId, conn: &Connection) -> QueryResult<DbArchitecture> {
+    pub fn find_by_id(i: DbId, conn: &mut Connection) -> QueryResult<DbArchitecture> {
         architecture::table.find(i).get_result::<DbArchitecture>(conn)
     }
 
-    pub fn get_architecture_id(conn: &Connection, arch: &str) -> Result<DbId> {
+    pub fn get_architecture_id(conn: &mut Connection, arch: &str) -> Result<DbId> {
         let arch = match arch {
             "88f6281" => "88f628x",
             "88f6282" => "88f628x",
@@ -52,14 +52,14 @@ impl DbArchitecture {
         Ok(architecture_id)
     }
 
-    pub fn create(conn: &Connection, code: String) -> QueryResult<DbArchitecture> {
+    pub fn create(conn: &mut Connection, code: String) -> QueryResult<DbArchitecture> {
         let arch = diesel::insert_into(architecture::table)
             .values(&architecture::code.eq(code))
             .get_result::<DbArchitecture>(conn)?;
         Ok(arch)
     }
 
-    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
+    pub fn delete(conn: &mut Connection, id: DbId) -> QueryResult<usize> {
         // todo remove everything else linked to the architecture
         let result = diesel::delete(architecture::table.filter(architecture::id.eq(id))).execute(conn)?;
         Ok(result)

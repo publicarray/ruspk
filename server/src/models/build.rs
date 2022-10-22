@@ -12,9 +12,9 @@ use diesel::prelude::*;
 use diesel::QueryDsl;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
-#[belongs_to(DbVersion, foreign_key = "version_id")]
-#[belongs_to(DbFirmware, foreign_key = "firmware_id")]
-#[table_name = "build"]
+#[diesel(belongs_to(DbVersion, foreign_key = version_id))]
+#[diesel(belongs_to(DbFirmware, foreign_key = firmware_id))]
+#[diesel(table_name = build)]
 pub struct DbBuild {
     pub id: DbId,
     pub version_id: DbId,
@@ -28,8 +28,8 @@ pub struct DbBuild {
     pub active: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
-#[table_name = "build"]
+#[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
+#[diesel(table_name = build)]
 pub struct BuildTmp {
     pub id: DbId,
     pub package: String,
@@ -42,8 +42,8 @@ pub struct BuildTmp {
     pub active: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
-#[table_name = "build"]
+#[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
+#[diesel(table_name = build)]
 pub struct Build {
     pub id: DbId,
     pub package: String,
@@ -118,7 +118,7 @@ pub struct Info {
 
 impl DbBuild {
     pub fn create_build(
-        conn: &Connection,
+        conn: &mut Connection,
         info: Info,
         install_wizard: bool,
         _uninstall_wizard: bool,
@@ -166,7 +166,7 @@ impl DbBuild {
         }
 
         //////
-        conn.build_transaction().read_write().run(|| {
+        conn.build_transaction().read_write().run(|conn| {
             let firmware_id = firmware::table
                 .filter(firmware::build.eq(&fw_build))
                 .filter(firmware::version.eq(&fw_version))
@@ -306,7 +306,7 @@ impl DbBuild {
         }
     }
 
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Build>> {
+    pub fn find_all(conn: &mut Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Build>> {
         // https://github.com/ChristophWurst/diesel_many_to_many/
         // https://www.reddit.com/r/rust/comments/frkta2/manytomany_relationships_in_diesel_does_anybody/
         // https://stackoverflow.com/questions/52279553/what-is-the-standard-pattern-to-relate-three-tables-many-to-many-relation-with
@@ -357,14 +357,14 @@ impl DbBuild {
         Ok(builds)
     }
 
-    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
-        conn.build_transaction().read_write().run(|| {
+    pub fn delete(conn: &mut Connection, id: DbId) -> QueryResult<usize> {
+        conn.build_transaction().read_write().run(|conn| {
             diesel::delete(build_architecture::table.filter(build_architecture::build_id.eq(id))).execute(conn)?;
             diesel::delete(build::table.filter(build::id.eq(id))).execute(conn)
         })
     }
 
-    pub fn active(conn: &Connection, id: DbId, active: bool) -> QueryResult<DbBuild> {
+    pub fn active(conn: &mut Connection, id: DbId, active: bool) -> QueryResult<DbBuild> {
         // must return `active` value from DB
         diesel::update(build::table.filter(build::id.eq(id)))
             .set(build::active.eq(active))

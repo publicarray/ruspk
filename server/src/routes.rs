@@ -56,11 +56,11 @@ pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>
         }
     }
 
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
     let keyring = data.keyring.clone();
     let response = web::block(move || {
         get_packages_for_device_lang(
-            &conn,
+            &mut conn,
             &keyring,
             &synorequest.language,
             &synorequest.arch,
@@ -102,7 +102,7 @@ pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>
     }
 }
 
-fn get_package(conn: &DbConn) -> Result<Vec<DbPackage>> {
+fn get_package(conn: &mut DbConn) -> Result<Vec<DbPackage>> {
     use crate::schema::package;
     let p = package::table
         .load::<DbPackage>(conn)
@@ -111,8 +111,8 @@ fn get_package(conn: &DbConn) -> Result<Vec<DbPackage>> {
 }
 
 pub async fn list_packages(data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || get_package(&conn))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || get_package(&mut conn))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -125,7 +125,7 @@ pub async fn list_packages(data: web::Data<AppData>) -> Result<HttpResponse, Err
     Ok(HttpResponse::Ok().json(response))
 }
 
-fn get_version(conn: &DbConn, num: DbId) -> Result<Vec<DbVersion>> {
+fn get_version(conn: &mut DbConn, num: DbId) -> Result<Vec<DbVersion>> {
     use crate::schema::version::dsl::*;
     let v = version
         .filter(package_id.eq(num))
@@ -135,8 +135,8 @@ fn get_version(conn: &DbConn, num: DbId) -> Result<Vec<DbVersion>> {
 }
 
 pub async fn get_package_version(data: web::Data<AppData>, id: web::Path<DbId>) -> Result<HttpResponse, HttpResponse> {
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || get_version(&conn, *id))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || get_version(&mut conn, *id))
         .await
         .map_err(|e| {
             debug!("{}", e);

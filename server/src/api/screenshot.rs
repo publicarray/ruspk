@@ -9,8 +9,8 @@ use anyhow::Result;
 #[get("/screenshot")]
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbScreenshot::find_all(&conn, limit, offset, q))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbScreenshot::find_all(&mut conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -26,8 +26,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 #[delete("/screenshot")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbScreenshot::delete(&conn, post_data.id))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbScreenshot::delete(&mut conn, post_data.id))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -44,8 +44,8 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 #[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn delete_id(path: web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let id = path.into_inner();
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbScreenshot::delete(&conn, id))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbScreenshot::delete(&mut conn, id))
         .await
         .map_err(|e| {
             debug!("{}", e);

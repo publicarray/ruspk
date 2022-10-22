@@ -9,8 +9,8 @@ use anyhow::Result;
 #[get("/firmware")]
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbFirmware::find_all(&conn, limit, offset, q))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbFirmware::find_all(&mut conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -32,8 +32,8 @@ pub struct CreateFirmware {
 #[post("/firmware")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn post(post_data: web::Json<CreateFirmware>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbFirmware::create(&conn, post_data.version.clone(), post_data.build))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbFirmware::create(&mut conn, post_data.version.clone(), post_data.build))
         .await
         .map_err(|e| {
             debug!("{}", e);

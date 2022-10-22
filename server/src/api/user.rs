@@ -11,8 +11,8 @@ use anyhow::Result;
 pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     //utils::validate_api_key(&req)?;
     let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || User::find_all(&conn, limit, offset, q))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || User::find_all(&mut conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -29,8 +29,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 #[has_any_role("ADMIN")]
 pub async fn delete(del_user: web::Json<utils::IdType>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     //utils::validate_api_key(&req)?;
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || User::delete(&conn, del_user.id))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || User::delete(&mut conn, del_user.id))
         .await
         .map_err(|e| {
             debug!("{}", e);

@@ -27,8 +27,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
     // let limit = json_data.size.unwrap_or(q_limit);
     // let offset = json_data.page.unwrap_or(q_offset);
 
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::find_all(&conn, limit, offset, q))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::find_all(&mut conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -283,9 +283,9 @@ pub async fn post(
 
     // serialise info file to a struct & save info into database
     //    let response = "not saved, please uncomment me";
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
     let response =
-        web::block(move || DbBuild::create_build(&conn, info, install_wizard, uninstall_wizard, upgrade_wizard))
+        web::block(move || DbBuild::create_build(&mut conn, info, install_wizard, uninstall_wizard, upgrade_wizard))
             .await
             .map_err(|e| {
                 debug!("{}", e);
@@ -303,8 +303,8 @@ pub async fn post(
 // pub async fn get_builds(req: HttpRequest, json_data: web::Json<utils::Paginate>, data: web::Data<AppData>) -> Result<HttpResponse, Error>{
 #[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::delete(&conn, post_data.id))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::delete(&mut conn, post_data.id))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -322,8 +322,8 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 #[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn delete_id(path: web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let id = path.into_inner();
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::delete(&conn, id))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::delete(&mut conn, id))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -347,8 +347,8 @@ pub struct BuildActive {
 #[put("/build/active")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn active(post_data: web::Json<BuildActive>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbBuild::active(&conn, post_data.id, post_data.active))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbBuild::active(&mut conn, post_data.id, post_data.active))
         .await
         .map_err(|e| {
             debug!("{}", e);

@@ -39,9 +39,9 @@ pub async fn validator(req: ServiceRequest, credentials: BearerAuth) -> Result<S
 pub async fn login(info: web::Json<Auth>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let user_info = info.into_inner();
     debug!("{:?}", user_info);
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
     let (user, roles) =
-        web::block(move || User::login(&conn, &user_info.username, &user_info.email, &user_info.password))
+        web::block(move || User::login(&mut conn, &user_info.username, &user_info.email, &user_info.password))
             .await
             .map_err(|e| {
                 debug!("{}", e);

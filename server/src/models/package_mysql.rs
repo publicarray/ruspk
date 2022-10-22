@@ -10,7 +10,7 @@ use diesel::query_builder::SqlQuery;
 use diesel::sql_query;
 use diesel::sql_types::{BigInt, Bool, Integer, Nullable, Text};
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
-#[table_name = "package"]
+#[diesel(table_name = package)]
 pub struct DbPackage {
     pub id: u64,
     pub author_user_id: Option<u64>,
@@ -27,7 +27,7 @@ pub struct Package {
 }
 
 impl DbPackage {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64) -> QueryResult<Vec<Package>> {
+    pub fn find_all(conn: &mut Connection, limit: i64, offset: i64) -> QueryResult<Vec<Package>> {
         package::table
             .order(package::id.desc())
             .limit(limit)
@@ -37,7 +37,7 @@ impl DbPackage {
             .load::<Package>(conn)
     }
 
-    pub fn create_package(conn: &Connection, author_id: Option<i64>, name: String) -> QueryResult<DbPackage> {
+    pub fn create_package(conn: &mut Connection, author_id: Option<i64>, name: String) -> QueryResult<DbPackage> {
         let new_package = (
             package::author_user_id.eq(author_id),
             package::name.eq(name),
@@ -50,7 +50,7 @@ impl DbPackage {
         Ok(package)
     }
 
-    pub fn delete_package(conn: &Connection, id: i64) -> QueryResult<usize> {
+    pub fn delete_package(conn: &mut Connection, id: i64) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|| {
             let builds = diesel::delete(build::table.filter(
                 build::version_id.eq_any(version::table.filter(version::package_id.eq(id)).select(version::id)),
@@ -73,7 +73,7 @@ impl DbPackage {
         _major: u8,
         _micro: u8,
         _minor: u8,
-        conn: &Connection,
+        conn: &mut Connection,
     ) -> Result<Vec<DBQueryResultPackage>> {
         let language_id = DbLanguage::get_language_id(conn, lang);
         let architecture_id = DbArchitecture::get_architecture_id(conn, arch)?; // todo return 404
@@ -153,7 +153,7 @@ impl DbPackage {
 }
 
 pub fn bind_and_load(
-    conn: &Connection,
+    conn: &mut Connection,
     query: SqlQuery,
     language_id: u64,
     architecture_id: u64,
@@ -179,44 +179,44 @@ pub struct DBQueryResultPackage {
     pub package_id: u64,
     #[sql_type = "Unsigned<BigInt>"]
     pub version_id: u64,
-    #[sql_type = "Bool"]
+    #[diesel(sql_type = Bool)]
     pub beta: bool,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub conflictpkgs: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub deppkgs: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub changelog: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub desc: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub distributor: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub distributor_url: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub dname: Option<String>,
     // download_count: u64,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub link: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub maintainer: Option<String>,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub maintainer_url: Option<String>,
-    #[sql_type = "Text"]
+    #[diesel(sql_type = Text)]
     pub package: String,
-    #[sql_type = "Nullable<Bool>"]
+    #[diesel(sql_type = Nullable<Bool>)]
     pub qinst: Option<bool>,
-    #[sql_type = "Nullable<Bool>"]
+    #[diesel(sql_type = Nullable<Bool>)]
     pub qstart: Option<bool>,
-    #[sql_type = "Nullable<Bool>"]
+    #[diesel(sql_type = Nullable<Bool>)]
     pub qupgrade: Option<bool>,
     // recent_download_count: u64,
-    #[sql_type = "Text"]
+    #[diesel(sql_type = Text)]
     pub upstream_version: String,
     #[sql_type = "Unsigned<Integer>"]
     pub revision: u32,
-    #[sql_type = "Nullable<Text>"]
+    #[diesel(sql_type = Nullable<Text>)]
     pub md5: Option<String>,
-    #[sql_type = "Nullable<Integer>"]
+    #[diesel(sql_type = Nullable<Integer>)]
     pub size: Option<i32>,
 }

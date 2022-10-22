@@ -35,7 +35,7 @@ log = "0.4"
 env_logger = "0.9"
 # Database
 # diesel = { git = "https://github.com/diesel-rs/diesel",  features = ["chrono", "r2d2"] }
-diesel = { version = "1.4", features = ["chrono", "r2d2"] }
+diesel = { version = "2.0", features = ["chrono", "r2d2"] }
 r2d2 = "0.8"
 # diesel_migrations = "1.4.0"
 # Bundled SQLites

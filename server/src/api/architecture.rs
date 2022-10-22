@@ -13,8 +13,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
     let (limit, offset, q) = utils::handle_query_parameters(req.query_string());
     // let limit = json_data.size.unwrap_or(q_limit);
     // let offset = json_data.page.unwrap_or(q_offset);
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::find_all(&conn, limit, offset, q))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbArchitecture::find_all(&mut conn, limit, offset, q))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -31,8 +31,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 #[post("/architecture")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn post(architecture: web::Json<NewArchitecture>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::create(&conn, architecture.code.clone()))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbArchitecture::create(&mut conn, architecture.code.clone()))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -49,8 +49,8 @@ pub async fn post(architecture: web::Json<NewArchitecture>, data: web::Data<AppD
 #[delete("/architecture")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN")]
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbArchitecture::delete(&conn, post_data.id))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbArchitecture::delete(&mut conn, post_data.id))
         .await
         .map_err(|e| {
             debug!("{}", e);

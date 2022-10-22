@@ -45,49 +45,50 @@ pub use self::user::*;
 pub use self::version::*;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
-#[belongs_to(DbBuild, foreign_key = "build_id")]
-#[belongs_to(Build, foreign_key = "build_id")]
-#[belongs_to(BuildTmp, foreign_key = "build_id")]
-#[belongs_to(DbArchitecture, foreign_key = "architecture_id")]
-#[primary_key(build_id, architecture_id)]
-#[table_name = "build_architecture"]
+#[diesel(belongs_to(DbBuild, foreign_key = build_id))]
+#[diesel(belongs_to(Build, foreign_key = build_id))]
+#[diesel(belongs_to(BuildTmp, foreign_key = build_id))]
+#[diesel(belongs_to(DbArchitecture, foreign_key = architecture_id))]
+#[diesel(primary_key(build_id, architecture_id))]
+#[diesel(table_name = build_architecture)]
+
 pub struct DbBuildArchitecture {
     pub build_id: DbId,
     pub architecture_id: DbId,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
-#[belongs_to(BuildTmp, foreign_key = "build_id")]
-#[primary_key(build_id, architecture_id)]
-#[table_name = "build_architecture"]
+#[diesel(belongs_to(BuildTmp, foreign_key = build_id))]
+#[diesel(primary_key(build_id, architecture_id))]
+#[diesel(table_name = build_architecture)]
 pub struct BuildArchitecture {
     pub build_id: DbId,
     pub architecture_id: DbId,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
-#[primary_key(package_id, user_id)]
-#[table_name = "package_user_maintainer"]
+#[diesel(primary_key(package_id, user_id))]
+#[diesel(table_name = package_user_maintainer)]
 pub struct DbPackageUserMaintainer {
     pub package_id: DbId,
     pub user_id: DbId,
 }
 
 #[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
-#[belongs_to(DbRole, foreign_key = "role_id")]
-#[belongs_to(DbUser, foreign_key = "user_id")]
-#[belongs_to(User, foreign_key = "user_id")]
-#[belongs_to(UserWithKey, foreign_key = "user_id")]
-#[primary_key(user_id, role_id)]
-#[table_name = "user_role"]
+#[diesel(belongs_to(DbRole, foreign_key = role_id))]
+#[diesel(belongs_to(DbUser, foreign_key = user_id))]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(UserWithKey, foreign_key = user_id))]
+#[diesel(primary_key(user_id, role_id))]
+#[diesel(table_name = user_role)]
 pub struct UserRole {
     pub user_id: DbId,
     pub role_id: DbId,
 }
 
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
-#[primary_key(version_id, package_id)]
-#[table_name = "version_service_dependency"]
+#[diesel(primary_key(version_id, package_id))]
+#[diesel(table_name = version_service_dependency)]
 pub struct DbVersionServiceDependency {
     pub version_id: DbId,
     pub package_id: DbId,

@@ -5,8 +5,8 @@ use crate::{DbId, Dbu32};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug, Clone)]
-#[belongs_to(DbPackage, foreign_key = "package_id")]
-#[table_name = "version"]
+#[diesel(belongs_to(DbPackage, foreign_key = package_id))]
+#[diesel(table_name = version)]
 pub struct DbVersion {
     pub id: DbId,
     pub package_id: DbId,
@@ -47,7 +47,7 @@ pub struct Version {
 }
 
 impl DbVersion {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Version>> {
+    pub fn find_all(conn: &mut Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Version>> {
         version::table
             .order(version::id.desc())
             .filter(displayname::name.ilike(utils::fuzzy_search(&search_term)))
@@ -81,8 +81,8 @@ impl DbVersion {
             .load::<Version>(conn)
     }
 
-    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
-        conn.build_transaction().read_write().run(|| {
+    pub fn delete(conn: &mut Connection, id: DbId) -> QueryResult<usize> {
+        conn.build_transaction().read_write().run(|conn| {
             let build_ids = build::table
                 .filter(build::version_id.eq(id))
                 .select(build::id)

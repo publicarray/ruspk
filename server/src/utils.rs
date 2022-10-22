@@ -79,8 +79,8 @@ pub fn validate_api_key(req: &HttpRequest) -> Result<(), Error> {
     let api_key = credentials.user_id();
 
     let app_data = req.app_data::<web::Data<AppData>>().unwrap();
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let user = User::validate_api_key(&conn, api_key.to_string())
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let user = User::validate_api_key(&mut conn, api_key.to_string())
         .map_err(|_| error::ErrorUnauthorized("\
         {
             \"message\": \"The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password), or your browser doesn't understand how to supply the credentials required.\"

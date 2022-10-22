@@ -31,8 +31,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
     }
 
     // prepare response (cache miss)
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::find_all(&conn, limit, offset, q)).await;
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbPackage::find_all(&mut conn, limit, offset, q)).await;
     trace!("MISS {}ms", now.elapsed().as_millis());
     match response {
         Ok(packages) => {
@@ -78,8 +78,8 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
 #[get("/api/package/{name}")]
 pub async fn get(path: web::Path<String>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let package_name = path.into_inner();
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::find(&conn, package_name))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbPackage::find(&mut conn, package_name))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -102,8 +102,8 @@ pub struct PostPackage {
 #[post("/package")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn post(post_data: web::Json<PostPackage>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::create_package(&conn, post_data.author_id, post_data.name.clone()))
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbPackage::create_package(&mut conn, post_data.author_id, post_data.name.clone()))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -119,8 +119,8 @@ pub async fn post(post_data: web::Json<PostPackage>, data: web::Data<AppData>) -
 #[delete("/package")]
 #[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::delete(&conn, post_data.id))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbPackage::delete(&mut conn, post_data.id))
         .await
         .map_err(|e| {
             debug!("{}", e);
@@ -137,8 +137,8 @@ pub async fn delete(post_data: web::Json<utils::IdType>, app_data: web::Data<App
 #[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn delete_id(path: web::Path<i32>, app_data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let id = path.into_inner();
-    let conn = app_data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::delete(&conn, id))
+    let mut conn = app_data.pool.get().expect("couldn't get db connection from pool");
+    let response = web::block(move || DbPackage::delete(&mut conn, id))
         .await
         .map_err(|e| {
             debug!("{}", e);

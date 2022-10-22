@@ -3,7 +3,7 @@ use crate::DbId;
 use crate::{schema::*, utils};
 use diesel::prelude::*;
 #[derive(Serialize, Deserialize, Queryable, Identifiable, Debug, Clone)]
-#[table_name = "screenshot"]
+#[diesel(table_name = screenshot)]
 pub struct DbScreenshot {
     pub id: DbId,
     pub package_id: DbId,
@@ -18,7 +18,7 @@ pub struct Screenshot {
 }
 
 impl DbScreenshot {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Screenshot>> {
+    pub fn find_all(conn: &mut Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<Screenshot>> {
         screenshot::table
             .order(screenshot::id.desc())
             .filter(package::name.ilike(utils::fuzzy_search(&search_term)))
@@ -29,14 +29,14 @@ impl DbScreenshot {
             .load::<Screenshot>(conn)
     }
 
-    pub fn from_package(package_id: DbId, conn: &Connection) -> Vec<DbScreenshot> {
+    pub fn from_package(package_id: DbId, conn: &mut Connection) -> Vec<DbScreenshot> {
         screenshot::table
             .filter(screenshot::package_id.eq(package_id))
             .load::<Self>(conn)
             .expect("Error loading screenshots")
     }
 
-    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
+    pub fn delete(conn: &mut Connection, id: DbId) -> QueryResult<usize> {
         // todo remove file
         let result = diesel::delete(screenshot::table.filter(screenshot::id.eq(id))).execute(conn)?;
         Ok(result)

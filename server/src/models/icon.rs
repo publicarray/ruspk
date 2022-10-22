@@ -8,8 +8,8 @@ use diesel::prelude::*;
 use crate::models::IconSizeEnum;
 
 #[derive(Serialize, Deserialize, Queryable, Associations, Identifiable, Debug)]
-#[belongs_to(DbVersion, foreign_key = "version_id")]
-#[table_name = "icon"]
+#[diesel(belongs_to(DbVersion, foreign_key = version_id))]
+#[diesel(table_name = icon)]
 pub struct DbIcon {
     pub id: DbId,
     pub version_id: DbId,
@@ -23,7 +23,7 @@ pub struct DbIcon {
 }
 
 impl DbIcon {
-    pub fn from_version(version_id: DbId, conn: &Connection) -> Vec<Self> {
+    pub fn from_version(version_id: DbId, conn: &mut Connection) -> Vec<Self> {
         icon::table
             .filter(icon::version_id.eq(version_id))
             .load::<Self>(conn)
@@ -31,7 +31,7 @@ impl DbIcon {
     }
 
     #[cfg(any(feature = "mysql", feature = "sqlite"))]
-    pub fn retina_from_version(version_id: DbId, conn: &Connection) -> Vec<Self> {
+    pub fn retina_from_version(version_id: DbId, conn: &mut Connection) -> Vec<Self> {
         #[cfg(any(feature = "mysql", feature = "sqlite"))]
         let retina_img_size: i32 = 256;
         #[cfg(feature = "postgres")]

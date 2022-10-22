@@ -131,7 +131,7 @@ impl Default for Package {
 }
 
 pub fn get_packages_for_device_lang(
-    conn: &DbConn,
+    conn: &mut DbConn,
     keyring: &str,
     lang: &str,
     arch: &str,

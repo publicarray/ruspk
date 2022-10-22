@@ -11,8 +11,8 @@ use bcrypt::verify;
 extern crate bcrypt;
 use anyhow::Result;
 
-#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
-#[table_name = "user"]
+#[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
+#[diesel(table_name = user)]
 pub struct DbUser {
     pub id: DbId,
     pub username: String,
@@ -24,8 +24,8 @@ pub struct DbUser {
     pub confirmed_at: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
-#[table_name = "user"]
+#[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
+#[diesel(table_name = user)]
 pub struct UserWithKey {
     pub id: DbId,
     pub username: String,
@@ -42,8 +42,8 @@ impl UserWithKey {
     }
 }
 
-#[derive(Serialize, Deserialize, Associations, Identifiable, Queryable, Debug, Clone)]
-#[table_name = "user"]
+#[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
+#[diesel(table_name = user)]
 pub struct User {
     pub id: DbId,
     pub username: String,
@@ -53,7 +53,7 @@ pub struct User {
 }
 
 impl User {
-    pub fn find_all(conn: &Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<User>> {
+    pub fn find_all(conn: &mut Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<User>> {
         user::table
             .order(user::id.desc())
             .filter(user::username.like(utils::fuzzy_search(&search_term)))
@@ -63,13 +63,13 @@ impl User {
             .load::<User>(conn)
     }
 
-    pub fn delete(conn: &Connection, id: DbId) -> QueryResult<usize> {
+    pub fn delete(conn: &mut Connection, id: DbId) -> QueryResult<usize> {
         let result = diesel::delete(user::table.filter(user::id.eq(id))).execute(conn)?;
         Ok(result)
     }
 
     // Auth
-    pub fn validate_api_key(conn: &Connection, key: String) -> QueryResult<User> {
+    pub fn validate_api_key(conn: &mut Connection, key: String) -> QueryResult<User> {
         user::table
             .filter(user::api_key.eq(key).and(user::active.eq(true)))
             .select((user::id, user::username, user::email, user::active, user::confirmed_at))
@@ -77,7 +77,7 @@ impl User {
     }
 
     pub fn login(
-        conn: &Connection,
+        conn: &mut Connection,
         username: &Option<String>,
         email: &Option<String>,
         password: &str,
