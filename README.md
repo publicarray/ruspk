@@ -176,7 +176,7 @@ gpg --generate-key
 ## Reset Database
 
 ```sh
-psql -U postgres -d ruspk -f server/db/reset.sql && psql -U ruspk -d ruspk -f server/db/spkrepo.sql
+psql -U postgres -d ruspk -f server/db/reset.sql && psql -U ruspk -d ruspk -f server/db/synorepo.sql
 ```
 
 ## Analyse Postgres Database
