@@ -1,5 +1,8 @@
 
 module.exports = {
+    experimental: {
+        runtime: 'experimental-edge',
+    },
     poweredByHeader: false,
     images: {
         reactStrictMode: true,
