@@ -6,8 +6,8 @@ export default function Post({ title, body, id }) {
       <h2>{title}</h2>
       <p>{body}</p>
       <Link href={`/post/${id}`}>
-        <a>Read more...</a>
+        Read more...
       </Link>
     </article>
-  )
+  );
 }

@@ -18,8 +18,8 @@ pub fn read_file(file_name: &str) -> Result<String> {
 }
 
 pub fn str_to_u64(str: &str) -> u64 {
-    // trace!("str_to_u64: {}",  str.parse::<u64>().unwrap());
-    str.parse().unwrap()
+    trace!("str_to_u64: {}", str);
+    str.parse().expect("Input is not a valid positive digit that fits into u64")
 }
 
 #[derive(Deserialize)]

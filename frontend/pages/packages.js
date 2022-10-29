@@ -35,12 +35,15 @@ export default function Packages(props) {
             <main className="flex flex-wrap overflow-x-hidden">
                 {data.map(row => {
                     return (
-                        <Link key={row.name}
-                                href={{
-                                pathname: '/package/[name]',
-                                query: { name: row.name },
-                            }}>
-                            <a className="text-black bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-900 dark:hover:bg-gray-700 p-4 m-2 flex-auto rounded-md md:w-72">
+                        <Link
+                            key={row.name}
+                            href={{
+                            pathname: '/package/[name]',
+                            query: { name: row.name },
+                        }}
+                            className="text-black bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-900 dark:hover:bg-gray-700 p-4 m-2 flex-auto rounded-md md:w-72"
+                            legacyBehavior>
+
                                 <div>
                                     <h2 className="text-2xl text-center mb-2">{row.displayname}</h2>
                                     <div className="flex justify-center">
@@ -50,9 +53,9 @@ export default function Packages(props) {
                                     {/* <p className="mb-2">{row.author}</p> */}
                                     {/* <p className="mb-2">{row.description}</p> */}
                                 </div>
-                            </a>
-                        </Link>
-                    )
+
+                            </Link>
+                    );
                 })}
             </main>
             <div className="flex mb-4">
@@ -60,5 +63,5 @@ export default function Packages(props) {
                 <Button className="ml-auto" onClick={() => setPageIndex(pageIndex + 1)}>Next</Button>
             </div>
         </Layout>
-  )
+    );
 }

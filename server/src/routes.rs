@@ -47,7 +47,7 @@ pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>
 
     if let Some(value) = cache_r.get_one(&key) {
         trace!("HIT {}ms", now.elapsed().as_millis());
-        debug!("cache age {}", value.insert_time.elapsed().as_secs());
+        debug!("cache age {}, use cache?{}", value.insert_time.elapsed().as_secs(), value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL));
         if value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL) {
             let response = &*value.http_response;
             return Ok(HttpResponse::Ok()

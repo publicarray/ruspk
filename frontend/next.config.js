@@ -1,12 +1,12 @@
 
 module.exports = {
-    experimental: {
-        runtime: 'experimental-edge',
-    },
+    swcMinify: true,
+    // experimental: {
+    //     runtime: 'experimental-edge',
+    // },
     poweredByHeader: false,
     images: {
-        reactStrictMode: true,
-        loader: 'custom',
+        // loader: 'custom',
         domains: [
             'localhost',
             '127.0.0.1',
