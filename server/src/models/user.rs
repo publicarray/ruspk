@@ -11,6 +11,9 @@ use bcrypt::verify;
 extern crate bcrypt;
 use anyhow::Result;
 
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
+
 #[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
 #[diesel(table_name = user)]
 pub struct DbUser {
@@ -142,6 +145,38 @@ impl User {
                 return Ok((user, roles));
             }
         }
+        Err(diesel::result::Error::NotFound.into())
+    }
+
+    pub fn send_reset_link(
+        conn: &mut Connection,
+        email: &String,
+    ) -> Result<(UserWithKey, Vec<DbRole>)> {
+        // let hashed_password = bcrypt::hash(password, 12)?;
+        // debug!("{:?}", hashed_password);
+
+        let user = user::table
+            .filter(user::email.eq(email).and(user::active.eq(true)))
+            .select((
+                user::id,
+                user::username,
+                user::password,
+                user::email,
+                user::active,
+                user::api_key,
+                user::confirmed_at,
+            ))
+            .first::<UserWithKey>(conn)?;
+
+        debug!("{:?}", user);
+
+        let token: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(30)
+            .map(char::from)
+            .collect();
+        debug!("Password Reset Token: {:?}", token);
+
         Err(diesel::result::Error::NotFound.into())
     }
 

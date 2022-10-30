@@ -58,28 +58,27 @@ export default function ScreenshotPage() {
                 setIsOpen={setIsOpen}
                 title="Insert Architecture"
                 buttons={<Button className="" type="submit">Save</Button>}
+                onSubmit={handleSubmit}
             >
-                <form onSubmit={handleSubmit}>
-                    <label className="block">
-                        Package:
-                        <input name="package" type="text"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        ></input>
-                    </label>
-                    {/* <select name="package">
-                        <option value="grapefruit">Grapefruit</option>
-                        <option value="lime">Lime</option>
-                        <option value="coconut">Coconut</option>
-                        <option value="mango">Mango</option>
-                    </select> */}
-                    <label className="block">
-                        Screenshot:
-                        <input name="files" type="file" ref={fileInput}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        ></input>
-                    </label>
-                </form>
-            </Model>
+                <label className="block">
+                    Package:
+                    <input name="package" type="text"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    ></input>
+                </label>
+                {/* <select name="package">
+                    <option value="grapefruit">Grapefruit</option>
+                    <option value="lime">Lime</option>
+                    <option value="coconut">Coconut</option>
+                    <option value="mango">Mango</option>
+                </select> */}
+                <label className="block">
+                    Screenshot:
+                    <input name="files" type="file" ref={fileInput}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    ></input>
+                </label>
+        </Model>
         </Layout>
     );
 }

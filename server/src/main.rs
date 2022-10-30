@@ -232,6 +232,8 @@ async fn main() -> std::io::Result<()> {
             //.service(web::resource("/package").route(web::get().to(routes::list_packages)))
             //.service(web::resource("/package/{id}").route(web::get().to(routes::get_package_version)))
             .service(auth::login)
+            .service(auth::new_reset)
+            // .service(auth::reset)
             // home /packages
             .service(package::get_all)
             // home /package detail view

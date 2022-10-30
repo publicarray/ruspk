@@ -3,9 +3,14 @@ import { Fragment, useState } from "react";
 import Button from "./close-btn";
 
 // https://headlessui.dev/react/dialog
-export default function Model({ isOpen, setIsOpen, title, description, children, buttons, close = "Cancel" }) {
+export default function Model({ isOpen, setIsOpen, title, description, children, buttons, onSubmit, close = "Cancel" }) {
     function closeModal() {
         setIsOpen(false);
+    }
+    function OptionalForm(props) {
+        if (typeof onSubmit === 'function') {
+            return <form onSubmit={onSubmit}>{props.children}</form>;
+        }
     }
 
     return (
@@ -46,27 +51,29 @@ export default function Model({ isOpen, setIsOpen, title, description, children,
                             leaveTo="opacity-0 scale-95"
                         >
                             <div className="flex flex-col h-full justify-between max-w-lg m-auto transform bg-white dark:bg-gray-900 dark:text-white shadow-m rounded-3xl">
-                                <header className="p-6 mb-4 text-xl font-medium leading-6 text-white bg-gray-700 rounded-t-2xl">
-                                    <Dialog.Title as="h3">
-                                        { title }
-                                    </Dialog.Title>
-                                </header>
-                                <main className="px-6">
-                                    {description &&
-                                        <Dialog.Description className="mb-2 text-gray-700 dark:text-gray-200">
-                                            { description }
-                                        </Dialog.Description>
-                                    }
-                                    {children &&
-                                        <div className="mb-2 text-gray-700 dark:text-gray-200">
-                                            { children }
-                                        </div>
-                                    }
-                                </main>
-                                <footer className="p-6 mt-4 bg-gray-100 dark:bg-gray-800 flex justify-end rounded-b-2xl">
-                                    <Button onClick={closeModal} className="mr-4">{close}</Button>
-                                    { buttons }
-                                </footer>
+                                <OptionalForm>
+                                    <header className="p-6 mb-4 text-xl font-medium leading-6 text-white bg-gray-700 rounded-t-2xl">
+                                        <Dialog.Title as="h3">
+                                            { title }
+                                        </Dialog.Title>
+                                    </header>
+                                    <main className="px-6">
+                                        {description &&
+                                            <Dialog.Description className="mb-2 text-gray-700 dark:text-gray-200">
+                                                { description }
+                                            </Dialog.Description>
+                                        }
+                                        {children &&
+                                            <div className="mb-2 text-gray-700 dark:text-gray-200">
+                                                { children }
+                                            </div>
+                                        }
+                                    </main>
+                                    <footer className="p-6 mt-4 bg-gray-100 dark:bg-gray-800 flex justify-end rounded-b-2xl">
+                                        <Button onClick={closeModal} className="mr-4">{close}</Button>
+                                        { buttons }
+                                    </footer>
+                                </OptionalForm>
                             </div>
                         </Transition.Child>
                     </div>

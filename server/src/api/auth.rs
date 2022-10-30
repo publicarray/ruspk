@@ -12,6 +12,11 @@ pub struct Auth {
     password: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ResetRequest {
+    email: String,
+}
+
 use crate::claims::Claims;
 use actix_web::dev::ServiceRequest;
 use actix_web_grants::permissions::AttachPermissions;
@@ -64,6 +69,27 @@ pub async fn login(info: web::Json<Auth>, data: web::Data<AppData>) -> Result<Ht
 
     // Return token for work with example handlers
     Ok(HttpResponse::Ok().json(jwt))
+}
+
+#[post("/newreset")]
+pub async fn new_reset(info: web::Json<ResetRequest>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+    let user_info = info.into_inner();
+    debug!("{:?}", user_info);
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let (user, roles) =
+        web::block(move || User::send_reset_link(&mut conn, &user_info.email))
+            .await
+            .map_err(|e| {
+                debug!("{}", e);
+                error::ErrorInternalServerError(e)
+            })?
+            .map_err(|e| {
+                debug!("{}", e);
+                error::ErrorInternalServerError(e)
+            })?;
+
+    // Return token for work with example handlers
+    Ok(HttpResponse::Ok().json(""))
 }
 
 // #[post("/profile")]

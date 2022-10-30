@@ -36,15 +36,14 @@ export default function ArchitecturePage() {
                 setIsOpen={setIsOpen}
                 title="Insert Architecture"
                 buttons={<Button className="" type="submit">Submit Query</Button>}
+                onSubmit={handleSubmit}
             >
-                <form onSubmit={handleSubmit}>
-                    <label className="block">
-                        Architecture:
-                        <input name="code" type="text"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        ></input>
-                    </label>
-                </form>
+                <label className="block">
+                    Architecture:
+                    <input name="code" type="text"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    ></input>
+                </label>
             </Model>
         </Layout>
     );
