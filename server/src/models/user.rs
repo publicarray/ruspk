@@ -76,18 +76,14 @@ impl User {
             .first::<User>(conn)
     }
 
-    pub fn login(
+    fn find_user(
         conn: &mut Connection,
         username: &Option<String>,
         email: &Option<String>,
-        password: &str,
-    ) -> Result<(UserWithKey, Vec<DbRole>)> {
-        // let hashed_password = hash(password, 12)?;
-        // debug!("{:?}", hashed_password);
+    ) -> Result<UserWithKey> {
         if let Some(email) = email {
             debug!("{:?}", email);
-
-            let mut user = user::table
+            return Ok(user::table
                 .filter(user::email.eq(email).and(user::active.eq(true)))
                 .select((
                     user::id,
@@ -98,30 +94,10 @@ impl User {
                     user::api_key,
                     user::confirmed_at,
                 ))
-                .first::<UserWithKey>(conn)?;
-            debug!("{:?}", user);
-            debug!(
-                "{:?} | {:?}  | {:?}",
-                password,
-                &user.password,
-                bcrypt::hash(password, 12)
-            );
-            let valid = verify(password, &user.password)?;
-            debug!("{:?} | {:?} | {:?}", password, &user.password, valid);
-            if valid {
-                user.remove_password_from_output(); //todo fix me
-                let roles = UserRole::belonging_to(&user)
-                    .inner_join(role::table)
-                    .select((role::id, role::name, role::description))
-                    .load::<DbRole>(conn)?;
-                if !roles.is_empty() {
-                    // user has at least one role
-                    return Ok((user, roles));
-                }
-            }
+                .first::<UserWithKey>(conn)?);
         } else if let Some(username) = username {
             debug!("{:?}", username);
-            let mut user = user::table
+            return Ok(user::table
                 .filter(user::username.eq(username).and(user::active.eq(true)))
                 .select((
                     user::id,
@@ -132,24 +108,71 @@ impl User {
                     user::api_key,
                     user::confirmed_at,
                 ))
-                .first::<UserWithKey>(conn)?;
-            debug!("{:?}", user);
-            debug!("{:?} | {:?}", password, &user.password);
-            let valid = verify(password, &user.password)?;
-            debug!("{:?} | {:?} | {:?}", password, &user.password, valid);
-            if valid {
-                user.remove_password_from_output(); //todo fix me
-                let roles = UserRole::belonging_to(&user)
-                    .inner_join(role::table)
-                    .select((role::id, role::name, role::description))
-                    .load::<DbRole>(conn)?;
-                if !roles.is_empty() {
-                    // user has at least one role
-                    return Ok((user, roles));
-                }
+                .first::<UserWithKey>(conn)?);
+        }
+        Err(diesel::result::Error::NotFound.into())
+    }
+
+    pub fn login(
+        conn: &mut Connection,
+        username: &Option<String>,
+        email: &Option<String>,
+        password: &str,
+    ) -> Result<(UserWithKey, Vec<DbRole>)> {
+        // let hashed_password = bcrypt::hash(password, 12)?;
+        // debug!("{:?}", hashed_password);
+        let mut user = Self::find_user(conn, username, email)?;
+        debug!("{:?}", user);
+        debug!(
+            "{:?} | {:?}  | {:?}",
+            password,
+            &user.password,
+            bcrypt::hash(password, 12)
+        );
+        let valid = verify(password, &user.password)?;
+        debug!("{:?} | {:?} | {:?}", password, &user.password, valid);
+        if valid {
+            user.remove_password_from_output(); //todo fix me
+            let roles = UserRole::belonging_to(&user)
+                .inner_join(role::table)
+                .select((role::id, role::name, role::description))
+                .load::<DbRole>(conn)?;
+            if !roles.is_empty() {
+                // user has at least one role
+                return Ok((user, roles));
             }
         }
+        Err(diesel::result::Error::NotFound.into())
+    }
 
+    pub fn reset(
+        conn: &mut Connection,
+        username: &Option<String>,
+        email: &Option<String>,
+        new_password: &str,
+        reset_token: &str,
+    ) -> Result<(UserWithKey, Vec<DbRole>)> {
+        // let hashed_password = bcrypt::hash(password, 12)?;
+        // debug!("{:?}", hashed_password);
+        let mut user = Self::find_user(conn, username, email)?;
+
+        debug!("{:?}", user);
+        debug!(
+            "{:?} | {:?}  | {:?}",
+            new_password,
+            &user.password,
+            bcrypt::hash(new_password, 12)
+        );
+        let valid = verify(new_password, &user.password)?;
+        debug!("{:?} | {:?} | {:?}", new_password, &user.password, valid);
+        if valid {
+            user.remove_password_from_output(); //todo fix me
+            let roles = UserRole::belonging_to(&user)
+                .inner_join(role::table)
+                .select((role::id, role::name, role::description))
+                .load::<DbRole>(conn)?;
+            return Ok((user, roles));
+        }
         Err(diesel::result::Error::NotFound.into())
     }
 }

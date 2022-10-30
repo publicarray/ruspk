@@ -6,8 +6,7 @@ export default function Nav() {
         <nav className="bg-gray-100 dark:bg-gray-900 flex flex-wrap md:flex-row justify-between md:items-center md:space-x-4 py-6 px-6 relative">
             <Link
                 href="/admin"
-                className="block text-xl lg:text-2xl font-bold cursor-pointer"
-                legacyBehavior>
+                className="block text-xl lg:text-2xl font-bold cursor-pointer">
                 <span className="text-blue-600 dark:text-blue-400">Syno</span><span className="text-gray-500 dark:text-gray-200">Community</span>- Admin
             </Link>
 
