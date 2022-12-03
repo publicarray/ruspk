@@ -6,6 +6,7 @@ module.exports = {
     // },
     poweredByHeader: false,
     images: {
+        unoptimized: true,
         // loader: 'custom',
         domains: [
             'localhost',

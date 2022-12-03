@@ -20,7 +20,7 @@ export default function IndexPage() {
                             </svg>
                         </a>
                      .</p>
-                    <p className="mb-4">Join us on Discord! <a href="https://discord.gg/nnN9fgE7EF" title="Discord"><img className="inline filter hover:scale-110 hover:brightness-125 transition" width="194" height="28" src="https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge" alt="Join Discord Button"/></a></p>
+                    <p className="mb-4">Join us on Discord! <a href="https://discord.gg/nnN9fgE7EF" title="Discord"><Image className="inline filter hover:scale-110 hover:brightness-125 transition" width="194" height="28" src="https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge" alt="Join Discord Button"/></a></p>
                     <p className="mb-4">Only packages that are modified to be compatible with DSM7 by the associated developers can execute on DSM7.0. If not,the package cannot be able to function after upgrading from DSM6.2 to DSM7.0.</p>
                 </div>
                 <div id="summary" className="flex text-center md:flex-row flex-col">
@@ -61,7 +61,7 @@ export default function IndexPage() {
                     <h3 className="text-xl my-2">Step 2</h3>
                     <p>In the <strong>Package Sources</strong> tab, click <strong>Add</strong>, type <em>SynoCommunity</em> as <strong>Name</strong> and <em><code>https://packages.synocommunity.com/</code></em> as <strong>Location</strong> and then press <strong>OK</strong> to validate.</p>
                     <h3 className="text-xl my-2">Step 3</h3>
-                    <p>Go back to the <strong>Package Center</strong> and enjoy SynoCommunity's packages in the <strong>Community</strong> tab.</p>
+                    <p>Go back to the <strong>Package Center</strong> and enjoy SynoCommunity&apos;s packages in the <strong>Community</strong> tab.</p>
                 </div>
                 <div id="bleeding-edge" className="my-10 text-sm">
                     <h2 className="text-2xl my-2">
@@ -79,7 +79,7 @@ export default function IndexPage() {
                         </svg>
                         Open Source
                     </h2>
-                    <p className="mb-4"><a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity">SynoCommunity</a>'s packages are built with <a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity/spksrc">spksrc</a>, a cross-compilation framework dedicated to build packages for Synology NAS.</p>
+                    <p className="mb-4"><a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity">SynoCommunity</a>&apos;s packages are built with <a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity/spksrc">spksrc</a>, a cross-compilation framework dedicated to build packages for Synology NAS.</p>
                     <h3 id="contribute" className="text-xl my-2">Contribute</h3>
                     <p>We welcome package related bug reports, patches and feature requests on our <a className="text-blue-600 hover:text-blue-70 dark:text-blue-400 dark:hover:text-blue-600 0 hover:underline" href="https://github.com/SynoCommunity/spksrc/issues">issue tracker</a>. You can also support us by donating to our contributors.</p>
                 </div>
