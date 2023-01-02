@@ -35,6 +35,9 @@ export default function BuildPage() {
 
     let del = async function (index, data) {
         const response = await fetch(`${url}/${data[index].id}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("jwt")
+            },
             method: "DELETE",
         });
 

@@ -16,6 +16,9 @@ export default function VersionPage() {
 
     let del = async function (row, data) {
         const response = await fetch(`${url}/${row.values.id}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("jwt")
+            },
             method: "DELETE",
         });
         if (response.ok) {

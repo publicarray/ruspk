@@ -27,6 +27,7 @@ pub async fn validator(req: ServiceRequest, credentials: BearerAuth) -> Result<S
     let result = claims::decode_jwt(credentials.token());
     match result {
         Ok(claims) => {
+            trace!("{:?}", claims);
             req.attach(claims.permissions);
             Ok(req)
         }

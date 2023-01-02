@@ -92,8 +92,10 @@ impl DbVersion {
                     .execute(conn)?;
             }
             let builds = diesel::delete(build::table.filter(build::version_id.eq(id))).execute(conn)?;
+            let description = diesel::delete(description::table.filter(description::version_id.eq(id))).execute(conn)?;
+            let displayname = diesel::delete(displayname::table.filter(displayname::version_id.eq(id))).execute(conn)?;
             let versions = diesel::delete(version::table.filter(version::id.eq(id))).execute(conn)?;
-            Ok(builds + versions) // number of rows effected
+            Ok(builds + versions + description + displayname) // number of rows effected
         })
     }
 }
