@@ -1,6 +1,10 @@
 import Layout from "../components/layout";
 import Head from 'next/head';
 
+export const config = {
+    runtime: 'experimental-edge',
+}
+
 export default function LogoutPage() {
     if (typeof window !== "undefined") {
         localStorage.removeItem("jwt");

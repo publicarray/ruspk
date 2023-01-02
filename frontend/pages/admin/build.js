@@ -10,6 +10,10 @@ import { Switch } from '@headlessui/react'
 import { useState, useEffect } from 'react';
 import { createColumnHelper } from "@tanstack/react-table";
 
+export const config = {
+    runtime: 'experimental-edge',
+}
+
 export default function BuildPage() {
     const router = useRouter()
     const url = `${API}/${API_VER}/build`

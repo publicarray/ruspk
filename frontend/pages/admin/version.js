@@ -10,6 +10,10 @@ import { postJsonForm } from "../../utils";
 import { useRouter } from 'next/router'
 import { createColumnHelper } from "@tanstack/react-table";
 
+export const config = {
+    runtime: 'experimental-edge',
+}
+
 export default function VersionPage() {
     const url = `${API}/${API_VER}/version`
     const router = useRouter()

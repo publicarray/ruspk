@@ -7,6 +7,10 @@ import { useState } from "react";
 import Button from "../components/button";
 import Image from "../components/image";
 
+export const config = {
+    runtime: 'experimental-edge',
+}
+
 export default function Packages(props) {
 
     const [pageIndex, setPageIndex] = useState(1);

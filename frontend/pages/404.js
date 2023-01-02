@@ -1,10 +1,5 @@
 import Layout from "../components/layout";
-import Image from "../components/image";
 import Head from 'next/head'
-
-// export const config = {
-//     runtime: 'experimental-edge',
-// }
 
 export default function NotFound() {
     return (

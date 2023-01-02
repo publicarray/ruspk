@@ -8,6 +8,10 @@ import { postJsonForm, API, API_VER } from "../../utils";
 import DeleteBtn from "../../components/delete-btn";
 import { createColumnHelper } from "@tanstack/react-table";
 
+export const config = {
+    runtime: 'experimental-edge',
+}
+
 export default function PackagePage() {
     const url = `${API}/${API_VER}/package`
     let [isOpen, setIsOpen] = useState(false);
