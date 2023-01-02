@@ -83,7 +83,8 @@ export default function Table(props) {
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <td
-                                            className="py-3 px-6 text-left sm:whitespace-nowrap"
+                                            className="py-3 px-6 text-left"
+                                            // className="py-3 px-6 text-left sm:whitespace-nowrap"
                                             key={cell.id}
                                         >
                                             {flexRender(

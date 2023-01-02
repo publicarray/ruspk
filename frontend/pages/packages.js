@@ -41,18 +41,17 @@ export default function Packages(props) {
                             pathname: '/package/[name]',
                             query: { name: row.name },
                         }}
-                            className="text-black bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-900 dark:hover:bg-gray-700 p-4 m-2 flex-auto rounded-md md:w-72"
-                            legacyBehavior>
-
-                                <div>
+                            className="text-black bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-900 dark:hover:bg-gray-700 p-4 m-2 flex-auto rounded-md md:w-72">
+                                <span className="block">
                                     <h2 className="text-2xl text-center mb-2">{row.displayname}</h2>
-                                    <div className="flex justify-center">
+                                    {/* <h2 className="text-2xl text-center mb-2 truncate">{row.displayname}</h2> */}
+                                    <span className="flex justify-center">
                                         <Image className="rounded-xl mb-2" src={`${CDN}/${row.name}/${row.revision}/icon256.png`} width="256" height="256" title={row.name} alt=""/>
-                                    </div>
+                                    </span>
                                     <p className="text-center text-gray-500 dark:text-gray-400 text-sm">v{row.version}-{row.revision}</p>
                                     {/* <p className="mb-2">{row.author}</p> */}
                                     {/* <p className="mb-2">{row.description}</p> */}
-                                </div>
+                                </span>
 
                             </Link>
                     );
