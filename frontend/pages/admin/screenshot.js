@@ -6,9 +6,11 @@ import { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import { formatImage, postJsonForm, API, API_VER } from '../../utils';
 import DeleteBtn from "../../components/delete-btn";
+import { useRouter } from 'next/router'
 
 export default function ScreenshotPage() {
     const url = `${API}/${API_VER}/screenshot`
+    const router = useRouter()
     let [isOpen, setIsOpen] = useState(false);
     const [data, setData] = useState([]);
 
@@ -27,6 +29,19 @@ export default function ScreenshotPage() {
     //     { id: 1, package: "Syncthing", image: "https://packages.synocommunity.com/syncthing/screenshot_1.jpg" },
     // ];
 
+    let del = async function (row, data) {
+        const response = await fetch(`${url}/${row.values.id}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("jwt")
+            },
+            method: "DELETE",
+        });
+        if (response.ok) {
+            data.splice(row.index, 1) // update table
+            router.push("/admin/screenshot", undefined, {shallow: true}) // force refresh of internal data
+        }
+    }
+
     const columns = [
         { Header: 'ID', accessor: 'id' },
         { Header: 'Package', accessor: 'package' },
@@ -37,7 +52,7 @@ export default function ScreenshotPage() {
             Cell: (props) => {
                 return (
                     <div>
-                        <span onClick={() => del(props.row.index, props.data)}>
+                        <span onClick={() => del(props.row, props.data)}>
                             <DeleteBtn></DeleteBtn>
                         </span>
                     </div>

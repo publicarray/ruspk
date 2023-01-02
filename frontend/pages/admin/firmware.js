@@ -38,21 +38,20 @@ export default function FirmwarePage() {
                 setIsOpen={setIsOpen}
                 title="Insert Firmware"
                 buttons={<Button className="" type="submit">Submit Query</Button>}
+                onSubmit={handleSubmit}
             >
-                <form onSubmit={handleSubmit}>
-                    <label className="block">
-                        Version:
-                        <input name="version" type="text"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        ></input>
-                    </label>
-                    <label className="block">
-                        Build:
-                        <input name="build" type="text"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        ></input>
-                    </label>
-                </form>
+                <label className="block">
+                    Version:
+                    <input name="version" type="text"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    ></input>
+                </label>
+                <label className="block">
+                    Build:
+                    <input name="build" type="number"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    ></input>
+                </label>
             </Model>
         </Layout>
     );

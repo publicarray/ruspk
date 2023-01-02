@@ -252,6 +252,7 @@ async fn main() -> std::io::Result<()> {
                     .service(architecture::post)
                     .service(architecture::delete)
                     .service(architecture::get_all)
+                    .service(firmware::post)
                     .service(firmware::get_all)
                     .service(version::delete)
                     .service(version::delete_id)

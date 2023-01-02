@@ -153,6 +153,7 @@ impl DbPackage {
         Ok(package)
     }
 
+    // todo: update or delete on table "build" violates foreign key constraint "build_architecture_build_id_fkey" on table "build_architecture"
     pub fn delete(conn: &mut Connection, id: i32) -> QueryResult<usize> {
         conn.build_transaction().read_write().run(|conn| {
             let builds = diesel::delete(build::table.filter(

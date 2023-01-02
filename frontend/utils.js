@@ -74,5 +74,15 @@ export async function postJsonForm(url, event, multipleInputs = []) {
         data[field] = formData.getAll(field);
     }
 
+    // if input field is a number expect int json type as well
+    let inputs = event.target.querySelectorAll('input')
+    console.log(inputs)
+    for (let i = 0; i < inputs.length; i++) {
+        const input = inputs[i];
+        if (input.type == "number") {
+            data[input.name] = parseInt([input.value])
+        }
+    }
+
     return await postJson(url, data);
 }
