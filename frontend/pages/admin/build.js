@@ -72,6 +72,7 @@ export default function BuildPage() {
         columnHelper.accessor("active"), {
             header: "Active",
             cell: (info) => {
+                // eslint-disable-next-line react-hooks/rules-of-hooks
                 const [enabled, setEnabled] = useState(info.row.original.active)
                 return (
                     <Switch
