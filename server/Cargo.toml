@@ -32,7 +32,7 @@ sqlite = ["diesel/sqlite"]
 anyhow = "1.0"
 # Logs
 log = "0.4"
-env_logger = "0.9"
+env_logger = "0.10.0"
 # Database
 # diesel = { git = "https://github.com/diesel-rs/diesel",  features = ["chrono", "r2d2"] }
 diesel = { version = "2.0", features = ["chrono", "r2d2"] }
@@ -68,7 +68,7 @@ actix-web = { version = "4", features = ["rustls"] }
 actix-rt = "2"
 actix-files = "0.6"
 actix-cors = "0.6"
-actix-web-httpauth = "0.6"
+actix-web-httpauth = "0.8.0"
 # actix-identity = "0.3.1"
 actix-web-grants = "3"
 jsonwebtoken = "8"

@@ -21,12 +21,18 @@ use actix_web::dev::ServiceRequest;
 use actix_web_grants::permissions::AttachPermissions;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 
-pub async fn validator(req: ServiceRequest, credentials: BearerAuth) -> Result<ServiceRequest, Error> {
+// https://github.com/DDtKey/actix-web-grants/blob/main/examples/jwt-httpauth/src/main.rs
+pub async fn validator(req: ServiceRequest, credentials: BearerAuth) -> Result<ServiceRequest, (Error, ServiceRequest)> {
     // We just get permissions from JWT
-    let claims = claims::decode_jwt(credentials.token())?;
-    debug!("{:?}", &claims);
-    req.attach(claims.permissions);
-    Ok(req)
+    let result = claims::decode_jwt(credentials.token());
+    match result {
+        Ok(claims) => {
+            req.attach(claims.permissions);
+            Ok(req)
+        }
+        // required by `actix-web-httpauth` validator signature
+        Err(e) => Err((e, req))
+    }
 }
 
 // Login handler for generating a token.

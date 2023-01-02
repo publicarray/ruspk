@@ -28,6 +28,7 @@ pub fn generate_secret() -> String {
     s
 }
 
+// https://github.com/DDtKey/actix-web-grants/blob/main/examples/jwt-httpauth/src/claims.rs
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Claims {
     pub username: String,
