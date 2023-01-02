@@ -47,7 +47,11 @@ pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>
 
     if let Some(value) = cache_r.get_one(&key) {
         trace!("HIT {}ms", now.elapsed().as_millis());
-        debug!("cache age {}, use cache?{}", value.insert_time.elapsed().as_secs(), value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL));
+        debug!(
+            "cache age {}, use cache?{}",
+            value.insert_time.elapsed().as_secs(),
+            value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL)
+        );
         if value.insert_time.elapsed().as_secs() < utils::str_to_u64(&CACHE_TTL) {
             let response = &*value.http_response;
             return Ok(HttpResponse::Ok()
@@ -87,7 +91,7 @@ pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>
             };
             let cache_w_arc = Arc::clone(&data.cache_w);
             let mut cache_w = cache_w_arc.lock().unwrap();
-            if cache_r.get(&key).map(|rs| rs.len()) == None {
+            if cache_r.get(&key).map(|rs| rs.len()).is_none() {
                 cache_w.insert(key, value);
             } else {
                 cache_w.update(key, value);

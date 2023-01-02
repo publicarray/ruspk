@@ -4,8 +4,8 @@ use crate::AppData;
 use crate::{models::*, DbId};
 use actix_web::{delete, error, get, post, put, web, Error, HttpRequest, HttpResponse};
 use anyhow::{Context, Result};
+use openpgp::parse::Parse;
 use openpgp::serialize::stream::{Armorer, Message, Signer};
-use openpgp::{parse::Parse};
 extern crate serde_derive;
 extern crate serde_qs as qs;
 use crate::utils;
@@ -186,7 +186,10 @@ pub async fn post(
     //let mut signature_file = std::io::Cursor::new(sig_buf);
     let signature_filepath = tmp_dir.path().join("syno_signature.asc");
     let mut signature_file = std::fs::File::create("syno_signature.asc")?;
-    sign(p, &mut signature_file, &to_sign, &tsk);
+    match sign(p, &mut signature_file, &to_sign, &tsk) {
+        Err(err) => panic!("{:?}", err),
+        Ok(_sig) => (),
+    };
 
     //let signature = String::from_utf8(sig_buf).unwrap();
     let mut signature = String::new();

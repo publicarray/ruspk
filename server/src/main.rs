@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate log;
 use actix_web::web::Data;
-use anyhow::{Context};
+use anyhow::Context;
 use env_logger::Env;
 use lazy_static::lazy_static;
 #[macro_use]
@@ -15,10 +15,7 @@ extern crate chrono;
 extern crate regex;
 
 extern crate sequoia_openpgp as openpgp;
-use openpgp::{
-    parse::{Parse},
-    serialize::SerializeInto,
-};
+use openpgp::{parse::Parse, serialize::SerializeInto};
 
 use actix_cors::Cors;
 use actix_files as fs;
@@ -246,9 +243,8 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api")
                     .wrap(auth)
-                    // .service(auth::profile)
-                    .service(user::get_all)
                     .service(auth::profile)
+                    .service(user::get_all)
                     .service(user::delete)
                     .service(build::delete)
                     .service(build::active)

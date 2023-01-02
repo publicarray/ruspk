@@ -11,8 +11,8 @@ use bcrypt::verify;
 extern crate bcrypt;
 use anyhow::Result;
 
-use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 
 #[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
 #[diesel(table_name = user)]
@@ -106,20 +106,16 @@ impl User {
                 active: user.active,
                 api_key: user.api_key,
                 confirmed_at: user.confirmed_at,
-                roles
+                roles,
             };
             // user has at least one role
             return Ok(u);
         }
-        // return Ok((user, None));
+        // todo: fix when there aren't roles assigned yet
         Err(diesel::result::Error::NotFound.into())
     }
 
-    fn find_user(
-        conn: &mut Connection,
-        username: &Option<String>,
-        email: &Option<String>,
-    ) -> Result<UserWithKey> {
+    fn find_user(conn: &mut Connection, username: &Option<String>, email: &Option<String>) -> Result<UserWithKey> {
         if let Some(email) = email {
             debug!("{:?}", email);
             return Ok(user::table
@@ -184,10 +180,7 @@ impl User {
         Err(diesel::result::Error::NotFound.into())
     }
 
-    pub fn send_reset_link(
-        conn: &mut Connection,
-        email: &String,
-    ) -> Result<(UserWithKey, Vec<DbRole>)> {
+    pub fn send_reset_link(conn: &mut Connection, email: &String) -> Result<(UserWithKey, Vec<DbRole>)> {
         // let hashed_password = bcrypt::hash(password, 12)?;
         // debug!("{:?}", hashed_password);
 

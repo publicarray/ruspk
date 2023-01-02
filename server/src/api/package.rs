@@ -48,7 +48,7 @@ pub async fn get_all(req: HttpRequest, data: web::Data<AppData>) -> Result<HttpR
             };
             let cache_w_arc = Arc::clone(&data.cache_w);
             let mut cache_w = cache_w_arc.lock().unwrap();
-            if cache_r.get(&key).map(|rs| rs.len()) == None {
+            if cache_r.get(&key).map(|rs| rs.len()).is_none() {
                 cache_w.insert(key, value);
             } else {
                 cache_w.update(key, value);
@@ -103,16 +103,17 @@ pub struct PostPackage {
 #[has_any_role("ADMIN", "PACKAGE_ADMIN", "DEVELOPER")]
 pub async fn post(post_data: web::Json<PostPackage>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let mut conn = data.pool.get().expect("couldn't get db connection from pool");
-    let response = web::block(move || DbPackage::create_package(&mut conn, post_data.author_id, post_data.name.clone()))
-        .await
-        .map_err(|e| {
-            debug!("{}", e);
-            error::ErrorInternalServerError(e)
-        })?
-        .map_err(|e| {
-            debug!("{}", e);
-            error::ErrorInternalServerError(e)
-        })?;
+    let response =
+        web::block(move || DbPackage::create_package(&mut conn, post_data.author_id, post_data.name.clone()))
+            .await
+            .map_err(|e| {
+                debug!("{}", e);
+                error::ErrorInternalServerError(e)
+            })?
+            .map_err(|e| {
+                debug!("{}", e);
+                error::ErrorInternalServerError(e)
+            })?;
     Ok(HttpResponse::Ok().json(response))
 }
 

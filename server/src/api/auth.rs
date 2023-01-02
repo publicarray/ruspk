@@ -1,9 +1,7 @@
 use crate::AppData;
 use crate::{claims, models::*};
-use actix_web::{error, post, get, web, Error, HttpResponse};
-use actix_web_grants::proc_macro::has_any_role;
+use actix_web::{error, get, post, web, Error, HttpResponse};
 use anyhow::Result;
-// use actix_web_grants::proc_macro::has_any_role;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Auth {
@@ -77,17 +75,16 @@ pub async fn new_reset(info: web::Json<ResetRequest>, data: web::Data<AppData>) 
     let user_info = info.into_inner();
     debug!("{:?}", user_info);
     let mut conn = data.pool.get().expect("couldn't get db connection from pool");
-    let (user, roles) =
-        web::block(move || User::send_reset_link(&mut conn, &user_info.email))
-            .await
-            .map_err(|e| {
-                debug!("{}", e);
-                error::ErrorInternalServerError(e)
-            })?
-            .map_err(|e| {
-                debug!("{}", e);
-                error::ErrorInternalServerError(e)
-            })?;
+    let (user, roles) = web::block(move || User::send_reset_link(&mut conn, &user_info.email))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?;
 
     // Return token for work with example handlers
     Ok(HttpResponse::Ok().json(""))
@@ -103,7 +100,6 @@ pub async fn profile(data: web::Data<AppData>, credentials: BearerAuth) -> Resul
         .map_err(|e| {
             debug!("{}", e);
             error::ErrorInternalServerError(e)
-            // HttpResponse::Unauthorized().finish()
         })?
         .map_err(|e| {
             debug!("{}", e);
