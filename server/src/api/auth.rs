@@ -1,6 +1,7 @@
 use crate::AppData;
 use crate::{claims, models::*};
-use actix_web::{error, post, web, Error, HttpResponse};
+use actix_web::{error, post, get, web, Error, HttpResponse};
+use actix_web_grants::proc_macro::has_any_role;
 use anyhow::Result;
 // use actix_web_grants::proc_macro::has_any_role;
 
@@ -92,19 +93,22 @@ pub async fn new_reset(info: web::Json<ResetRequest>, data: web::Data<AppData>) 
     Ok(HttpResponse::Ok().json(""))
 }
 
-// #[post("/profile")]
-// pub async fn profile(auth: web::Json<Auth>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
-//     let conn = data.pool.get().expect("couldn't get db connection from pool");
-//     debug!("{:?}", auth.password);
-//     debug!("{:?}", auth.username);
-//     debug!("{:?}", auth.email);
-//     let user = web::block(move || User::login(&conn, &auth.username, &auth.email, &auth.password))
-//         .await
-//         .map_err(|e| {
-//             debug!("{}", e);
-//             HttpResponse::Unauthorized().finish()
-//         })?;
-
-//     debug!("{:?}", user);
-//     Ok(HttpResponse::Ok().json(user))
-// }
+#[get("/profile")]
+pub async fn profile(data: web::Data<AppData>, credentials: BearerAuth) -> Result<HttpResponse, Error> {
+    let claims = claims::decode_jwt(credentials.token())?;
+    info!("{:?}", &claims);
+    let mut conn = data.pool.get().expect("couldn't get db connection from pool");
+    let user = web::block(move || User::get(&mut conn, claims.username))
+        .await
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+            // HttpResponse::Unauthorized().finish()
+        })?
+        .map_err(|e| {
+            debug!("{}", e);
+            error::ErrorInternalServerError(e)
+        })?;
+    info!("{:?}", user);
+    Ok(HttpResponse::Ok().json(user))
+}

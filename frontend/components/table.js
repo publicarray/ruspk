@@ -1,5 +1,5 @@
 import { useTable, useAsyncDebounce } from 'react-table'
-import { fetchJson, fetchJsonAuth } from "../utils";
+import { fetchJson, fetchJsonWithAuth } from "../utils";
 import useSWR from 'swr'
 import React from 'react';
 
@@ -13,10 +13,10 @@ export default function Table(props) {
     let pageSize = 15
     let sortBy = ""
     let filters = ""
-    let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonAuth);
+    let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonWithAuth);
     // console.log(typeof window !== "undefined", localStorage.getItem("jwt"))
     // if (typeof window !== "undefined" && localStorage.getItem("jwt")) {
-    //     let t = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonAuth);
+    //     let t = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonWithAuth);
     //     data = t.data;
     //     error = t.error;
     // } else {

@@ -55,6 +55,18 @@ pub struct User {
     pub confirmed_at: Option<NaiveDateTime>,
 }
 
+#[derive(Serialize, Deserialize, Identifiable, Queryable, Debug, Clone)]
+#[diesel(table_name = user)]
+pub struct UserRolesWithKey {
+    pub id: DbId,
+    pub username: String,
+    pub email: String,
+    pub active: bool,
+    pub api_key: Option<String>,
+    pub confirmed_at: Option<NaiveDateTime>,
+    pub roles: Vec<DbRole>,
+}
+
 impl User {
     pub fn find_all(conn: &mut Connection, limit: i64, offset: i64, search_term: String) -> QueryResult<Vec<User>> {
         user::table
@@ -77,6 +89,30 @@ impl User {
             .filter(user::api_key.eq(key).and(user::active.eq(true)))
             .select((user::id, user::username, user::email, user::active, user::confirmed_at))
             .first::<User>(conn)
+    }
+
+    pub fn get(conn: &mut Connection, username: String) -> Result<UserRolesWithKey> {
+        let mut user = Self::find_user(conn, &Some(username), &None)?;
+        user.remove_password_from_output(); //todo fix me
+        let roles = UserRole::belonging_to(&user)
+            .inner_join(role::table)
+            .select((role::id, role::name, role::description))
+            .load::<DbRole>(conn)?;
+        if !roles.is_empty() {
+            let u = UserRolesWithKey {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                active: user.active,
+                api_key: user.api_key,
+                confirmed_at: user.confirmed_at,
+                roles
+            };
+            // user has at least one role
+            return Ok(u);
+        }
+        // return Ok((user, None));
+        Err(diesel::result::Error::NotFound.into())
     }
 
     fn find_user(

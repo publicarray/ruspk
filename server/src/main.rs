@@ -248,6 +248,7 @@ async fn main() -> std::io::Result<()> {
                     .wrap(auth)
                     // .service(auth::profile)
                     .service(user::get_all)
+                    .service(auth::profile)
                     .service(user::delete)
                     .service(build::delete)
                     .service(build::active)

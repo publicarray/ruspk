@@ -1,7 +1,7 @@
 // retrieve data
 export const fetchJson = (url) => fetch(url).then((res) => res.json())
 
-export const fetchJsonAuth = (url) => {
+export const fetchJsonWithAuth = (url) => {
     let config = {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem("jwt")
