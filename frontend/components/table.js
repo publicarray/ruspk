@@ -29,7 +29,7 @@ export default function Table(props) {
         } else {
             props.setData(new_data)
         }
-    }, [new_data])
+    }, [new_data, props])
         // if (!props.setData) {
         //     return <></>;
         // }
