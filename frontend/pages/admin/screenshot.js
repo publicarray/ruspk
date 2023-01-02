@@ -7,6 +7,7 @@ import { Dialog } from "@headlessui/react";
 import { formatImage, postJsonForm, API, API_VER } from '../../utils';
 import DeleteBtn from "../../components/delete-btn";
 import { useRouter } from 'next/router'
+import { createColumnHelper } from "@tanstack/react-table";
 
 export default function ScreenshotPage() {
     const url = `${API}/${API_VER}/screenshot`
@@ -29,36 +30,39 @@ export default function ScreenshotPage() {
     //     { id: 1, package: "Syncthing", image: "https://packages.synocommunity.com/syncthing/screenshot_1.jpg" },
     // ];
 
-    let del = async function (row, data) {
-        const response = await fetch(`${url}/${row.values.id}`, {
+    let del = async function (id, index) {
+        const response = await fetch(`${url}/${id}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem("jwt")
             },
             method: "DELETE",
         });
         if (response.ok) {
-            data.splice(row.index, 1) // update table
+            data.splice(index, 1) // update table
             router.push("/admin/screenshot", undefined, {shallow: true}) // force refresh of internal data
         }
     }
 
+    const columnHelper = createColumnHelper();
     const columns = [
-        { Header: 'ID', accessor: 'id' },
-        { Header: 'Package', accessor: 'package' },
-        { Header: 'Image', accessor: 'path', Cell: ({ value }) => formatImage(value)},
-        {
-            Header: "Actions",
-            accessor: "actions",
-            Cell: (props) => {
-                return (
-                    <div>
-                        <span onClick={() => del(props.row, props.data)}>
-                            <DeleteBtn></DeleteBtn>
-                        </span>
-                    </div>
-                );
+        columnHelper.accessor("id"),
+        columnHelper.accessor("package"),
+        columnHelper.accessor("path", {
+            header: "Image",
+            cell: (info) => formatImage(info.getValue()),
+        }),
+        columnHelper.accessor("actions", {
+            header: "Actions",
+            cell:  (info) => {
+            return (
+                <div>
+                    <span onClick={i => del(info.row.original.id, info.row.index)}>
+                        <DeleteBtn></DeleteBtn>
+                    </span>
+                </div>
+            );
             },
-        }
+        }),
     ];
 
     return (

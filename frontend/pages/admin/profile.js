@@ -6,7 +6,7 @@ import { fetchJsonWithAuth, API, API_VER } from "../../utils";
 export default function ProfilePage() {
     const url = `${API}/${API_VER}/profile`;
     let { data, error, isLoading } = useSWR(`${url}`, fetchJsonWithAuth);
-    if (error) return console.error(error); <div>failed to load</div>;
+    if (error) {console.error(error); return<div>failed to load</div>};
     if (isLoading) return <div>loading...</div>;
     if (!data) return <div>loading...</div>;
 
@@ -16,7 +16,7 @@ export default function ProfilePage() {
 
     return (
       <Layout>
-        <h1 className="font-semibold text-xl">{data.username}'s Profile</h1>
+        <h1 className="font-semibold text-xl">{data.username}&apos;s Profile</h1>
         <h2 className="font-semibold text-l">Permissions</h2>
         <ul>{listPermissions}</ul>
         <h2 className="font-semibold text-l">API Key</h2>

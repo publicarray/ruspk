@@ -6,6 +6,7 @@ import { Dialog } from "@headlessui/react";
 import Model from "../../components/model";
 import { postJsonForm, API, API_VER } from "../../utils";
 import DeleteBtn from "../../components/delete-btn";
+import { createColumnHelper } from "@tanstack/react-table";
 
 export default function PackagePage() {
     const url = `${API}/${API_VER}/package`
@@ -23,8 +24,8 @@ export default function PackagePage() {
     }
 
 
-    let del = async function (index, data) {
-        const response = await fetch(`${url}/${data[index].id}`, {
+    let del = async function (id, index) {
+        const response = await fetch(`${url}/${id}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem("jwt")
             },
@@ -42,25 +43,28 @@ export default function PackagePage() {
     //     { id: 1, name: "bitlbee", author: "Diaoul", maintainers: "", insert_date: "2015-01-28 22:00:44.967691" },
     // ];
 
+
+    const columnHelper = createColumnHelper();
     const columns = [
-        { Header: 'ID', accessor: 'id'},
-        { Header: 'Name', accessor: 'name'},
-        { Header: 'Author', accessor: 'author'}, // author_user_id
-        // { Header: 'Maintainers', accessor: 'maintainers',},
-        { Header: 'Insert Date', accessor: 'insert_date'},
-        {
-            Header: "Actions",
-            accessor: "actions",
-            Cell: (props) => {
-                return (
-                    <div>
-                        <span onClick={() => del(props.row.index, props.data)}>
-                            <DeleteBtn></DeleteBtn>
-                        </span>
-                    </div>
-                );
+        columnHelper.accessor("id"),
+        columnHelper.accessor("name"),
+        columnHelper.accessor("author"),
+        // columnHelper.accessor("maintainers"),
+        columnHelper.accessor("insert_date", {
+            header: "Insert Data",
+        }),
+        columnHelper.accessor("actions", {
+            header: "Actions",
+            cell:  (info) => {
+            return (
+                <div>
+                    <span onClick={i => del(info.row.original.id, info.row.index)}>
+                        <DeleteBtn></DeleteBtn>
+                    </span>
+                </div>
+            );
             },
-        }
+        }),
     ];
 
     return (

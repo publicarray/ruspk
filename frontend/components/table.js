@@ -1,60 +1,48 @@
-import { useTable, useAsyncDebounce } from 'react-table'
+import {
+    createColumnHelper,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from "@tanstack/react-table";
 import { fetchJson, fetchJsonWithAuth } from "../utils";
-import useSWR from 'swr'
-import React from 'react';
+import useSWR from "swr";
+import React from "react";
+import { useState } from "react";
 
 // https://react-table.tanstack.com/
+// https://react-table-v7.tanstack.com/docs/quick-start
 export default function Table(props) {
     let pageIndex = props.pageIndex;
     if (!pageIndex || pageIndex <= 0) {
         pageIndex = 1
+        // props.setPageIndex(1);
     }
-
-    let pageSize = 15
-    let sortBy = ""
-    let filters = ""
-    let { data, error } = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonWithAuth);
-    // console.log(typeof window !== "undefined", localStorage.getItem("jwt"))
-    // if (typeof window !== "undefined" && localStorage.getItem("jwt")) {
-    //     let t = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonWithAuth);
-    //     data = t.data;
-    //     error = t.error;
-    // } else {
-    //     let t = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJson);
-    //     data = t.data;
-    //     error = t.error;
-    // }
-    let isLoading = !error && !data;
-    let isError = !error;
-
-    if (error) {
-        console.error(error)
-    }
-
-    // for the preload table
-    if (!props.setData) {
-        return <></>;
-    }
-
-    // only update when the data changes
+    let pageSize = 15;
+    let sortBy = "";
+    let filters = "";
+    let r = useSWR(`${props.url}?page=${pageIndex}&size=${pageSize}`, fetchJsonWithAuth);
+    let error = r.error;
+    let new_data = r.data;
     React.useEffect(() => {
-        if (!data) {
+        if (!new_data) {
             props.setData([])
         } else {
-            props.setData(data)
+            props.setData(new_data)
         }
-    }, [data])
+    }, [new_data])
+        // if (!props.setData) {
+        //     return <></>;
+        // }
+    if (error) {console.error(error)};
+    // if (!new_data) return <div>loading...</div>;
+    // setData(r.data)
+    // return <div>loading...</div>;
 
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-    } = useTable({
-        columns: props.columns,
+    const table = useReactTable({
         data: props.data,
-    })
+        columns: props.columns,
+        getCoreRowModel: getCoreRowModel(),
+    });
 
     return (
         <div className="flex overflow-x-auto">
@@ -65,39 +53,51 @@ export default function Table(props) {
             `}</style>
             <div className="w-full">
                 <div className="bg-white dark:bg-gray-900 shadow-md rounded my-6">
-                    <table className="w-full table-auto" {...getTableProps()}>
+                    <table className="w-full table-auto">
                         <thead>
-                            {
-                                headerGroups.map(headerGroup => (
-                                    <tr className="bg-gray-200 text-black dark:bg-black dark:text-gray-300 uppercase text-sm leading-normal" {...headerGroup.getHeaderGroupProps()}>
-                                        {
-                                            headerGroup.headers.map(column => (
-                                                <th className="py-3 px-6 text-left" {...column.getHeaderProps()}>{column.render('Header')}</th>
-                                            ))
-                                        }
-                                    </tr>
-                                ))
-                            }
+                            {table.getHeaderGroups().map(headerGroup => (
+                                <tr
+                                    className="bg-gray-200 text-black dark:bg-black dark:text-gray-300 uppercase text-sm leading-normal"
+                                    key={headerGroup.id}
+                                >
+                                    {headerGroup.headers.map((header) => (
+                                        <th
+                                            className="py-3 px-6 text-left"
+                                            key={header.id}
+                                        >{header.isPlaceholder
+                                            ? null :
+                                            flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                        </th>
+                                    ))}
+                                </tr>
+                            ))}
                         </thead>
-                        <tbody className="text-gray-700 dark:text-gray-300 text-sm" {...getTableBodyProps()}>
-                            {rows.map(row => {
-                                prepareRow(row)
-                                return (
-                                    <tr className="border-b border-gray-200 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800" {...row.getRowProps()}>
-                                        {row.cells.map(cell => {
-                                            return (
-                                                <td className="py-3 px-6 text-left sm:whitespace-nowrap" {...cell.getCellProps({'data-header': cell.column.render('Header').toLowerCase()})}>
-                                                    {cell.render('Cell')}
-                                                </td>
-                                            )
-                                        })}
-                                    </tr>
-                                )
-                            })}
+                        <tbody className="text-gray-700 dark:text-gray-300 text-sm">
+                            {table.getRowModel().rows.map((row) => (
+                                <tr
+                                    className="border-b border-gray-200 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
+                                    key={row.id}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <td
+                                            className="py-3 px-6 text-left sm:whitespace-nowrap"
+                                            key={cell.id}
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    )
+    );
 }

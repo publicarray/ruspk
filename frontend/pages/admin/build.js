@@ -8,6 +8,7 @@ import { formatBoolean, formatArray,API, API_VER } from '../../utils';
 import { useRouter } from 'next/router'
 import { Switch } from '@headlessui/react'
 import { useState, useEffect } from 'react';
+import { createColumnHelper } from "@tanstack/react-table";
 
 export default function BuildPage() {
     const router = useRouter()
@@ -33,8 +34,8 @@ export default function BuildPage() {
         }
     }
 
-    let del = async function (index, data) {
-        const response = await fetch(`${url}/${data[index].id}`, {
+    let del = async function (id, index) {
+        const response = await fetch(`${url}/${id}`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem("jwt")
             },
@@ -51,49 +52,59 @@ export default function BuildPage() {
         }
     }
 
-    let columns = [
-        { Header: 'ID', accessor: 'id',},
-        { Header: 'Package', accessor: 'package',},
-        { Header: 'Upstream Version', accessor: 'upstream_version',},
-        { Header: 'Revision', accessor: 'revision',},
-        { Header: 'Architectures', accessor: row => formatArray(row.architectures),},
-        { Header: 'Firmware', accessor: 'firmware',},
-        { Header: 'Publisher', accessor: 'publisher',},
-        { Header: 'Insert Date', accessor: 'insert_date',},
-        { Header: 'Active', accessor: 'active',
-        Cell: (props) => {
-            const [enabled, setEnabled] = useState(props.value)
-            return (
-                <Switch
-                    checked={enabled}
-                    onChange={() => toggleActivation(enabled, setEnabled, props.row.index, props.data)}
-                    className={`${
-                        enabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
-                    } relative inline-flex items-center h-6 rounded-full w-11`}
-                    >
-                    <span className="sr-only">Toggle Activation</span>
-                    <span
-                        className={`${
-                        enabled ? 'translate-x-6' : 'translate-x-1'
-                        } inline-block w-4 h-4 transform bg-white rounded-full`}
-                    />
-                </Switch>
-            )}
-        },
-        {
-            Header: "Actions",
-            accessor: "actions",
-            Cell: (props) => {
+
+    const columnHelper = createColumnHelper();
+    const columns = [
+        columnHelper.accessor("id"),
+        columnHelper.accessor("package"),
+        columnHelper.accessor("upstream_version", {
+            header: "Upstream Version"
+        }),
+        columnHelper.accessor("revision"),
+        columnHelper.accessor("architectures", {
+            cell: (info) => formatArray(info.getValue()),
+        }),
+        columnHelper.accessor("firmware"),
+        columnHelper.accessor("publisher"),
+        columnHelper.accessor("insert_date", {
+            header: "Insert Date",
+        }),
+        columnHelper.accessor("active"), {
+            header: "Active",
+            cell: (info) => {
+                const [enabled, setEnabled] = useState(info.row.original.active)
                 return (
-                    <div>
-                        <span onClick={() => del(props.row.index, props.data)}>
-                            <DeleteBtn></DeleteBtn>
-                        </span>
-                    </div>
-                );
+                    <Switch
+                        checked={enabled}
+                        onChange={() => toggleActivation(enabled, setEnabled, info.row.index, info.table.options.data)}
+                        className={`${
+                            enabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                        } relative inline-flex items-center h-6 rounded-full w-11`}
+                        >
+                        <span className="sr-only">Toggle Activation</span>
+                        <span
+                            className={`${
+                            enabled ? 'translate-x-6' : 'translate-x-1'
+                            } inline-block w-4 h-4 transform bg-white rounded-full`}
+                        />
+                    </Switch>
+                )
+            }
+        },
+        columnHelper.accessor("actions", {
+            cell:  (info) => {
+            return (
+                <div>
+                    <span onClick={i => del(info.row.original.id, info.row.index)}>
+                        <DeleteBtn></DeleteBtn>
+                    </span>
+                </div>
+            );
             },
-        }
+        }),
     ];
+
+
 
     return (
         <Layout>

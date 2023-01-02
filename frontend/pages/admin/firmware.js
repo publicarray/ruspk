@@ -4,6 +4,7 @@ import TablePaginate from "../../components/table-paginate";
 import { useState } from "react";
 import Model from "../../components/model";
 import { postJsonForm,API, API_VER } from "../../utils";
+import { createColumnHelper } from "@tanstack/react-table";
 
 export default function FirmwarePage() {
     const url = `${API}/${API_VER}/firmware`
@@ -20,10 +21,11 @@ export default function FirmwarePage() {
         setIsOpen(true);
     }
 
+    const columnHelper = createColumnHelper();
     const columns = [
-        { Header: 'ID', accessor: 'id',},
-        { Header: 'version', accessor: 'version',},
-        { Header: 'Build', accessor: 'build',},
+        columnHelper.accessor("id"),
+        columnHelper.accessor("version"),
+        columnHelper.accessor("build")
     ];
 
     return (
