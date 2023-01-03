@@ -186,3 +186,22 @@ This is so the query planner has more information so it can make better choices.
 ```sh
 vacuumdb -v -U postgres -Z ruspk
 ```
+
+## Docker
+
+```sh
+podman pull docker.io/rust docker.io/postgres
+podman build -t ruspk .
+podman run --name postgres -e POSTGRES_PASSWORD=ruspk --shm-size=256MB -d ruspk
+podman run --name ruspk -p 8080:8080 -e DATABASE_URL=postgresql://ruspk:ruspk@postgres/ruspk ruspk
+```
+
+### Docker Compose
+```sh
+podman-compose down
+#podman volume rm ruspk_db-data
+podman-compose up -d
+podman cp server/db/synorepo.sql ruspk_db:/synorepo.sql
+podman-compose exec db psql -U ruspk -d ruspk -f /synorepo.sql
+podman-compose logs -f ruspk
+```

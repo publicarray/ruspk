@@ -1,0 +1,36 @@
+version: '3.1'
+services:
+  db:
+    image: docker.io/postgres:15
+    container_name: ruspk_db
+    restart: always
+    shm_size: 256MB
+    environment:
+      POSTGRES_USER: ruspk
+      POSTGRES_PASSWORD: ruspk
+      POSTGRES_DB: ruspk
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  ruspk:
+    image: ruspk
+    container_name: ruspk_api
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://ruspk:ruspk@ruspk_db/ruspk
+      LISTEN: 0.0.0.0
+      PORT: 8080
+    ports:
+      - 8080:8080
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
