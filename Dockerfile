@@ -23,8 +23,6 @@ RUN apt-get update && apt-get install -qy --no-install-recommends \
 
 COPY --from=ruspk-build /usr/local/cargo/bin/ /usr/local/cargo/bin/
 COPY entrypoint.sh /
-#COPY server/db/reset.sql
-COPY server/db/synorepo.sql /
 
 # HEALTHCHECK --interval=1m --timeout=5s \
 #   CMD curl -f http://localhost:8080/ || exit 1
