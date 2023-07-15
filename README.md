@@ -10,9 +10,7 @@ Only postgres is supported at the moment.
 
 ```sh
 cargo install diesel_cli
-cargo install ruspk --features postgres
-cargo install ruspk --no-default-features --features mysql
-cargo install ruspk --no-default-features --features sqlite
+# cargo install ruspk
 echo 'DATABASE_URL=postgresql://user:pass@localhost/dbname' > .env
 diesel migration --migration-dir migrations/postgres/ run
 ruspk
@@ -20,6 +18,42 @@ ruspk
 
 Available Features: `mysql`, `postgres` and `sqlite`
 
+### Quick start
+
+```sh
+# arch
+sudo pacman -S postgresql git rustup
+rustup default stable
+# ubuntu
+sudo apt install postgresql postgresql-contrib libpq-dev git cargo clang llvm pkg-config nettle-dev socat
+curl https://get.acme.sh | sh -s email=email@example.com
+
+fish_add_path /home/seb/.cargo/bin
+git clone https://github.com/publicarray/ruspk && cd ruspk
+sudo su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data"
+sudo systemctl enable --now postgresql
+#journalctl -xeu postgresql.service
+
+#createuser -U postgres -P ruspk
+#createdb ruspk -U postgres
+
+#psql -U postgres
+sudo -u postgres psql
+create database ruspk;
+create user ruspk with encrypted password 'ruspk';
+grant all privileges on database ruspk to ruspk;
+ALTER DATABASE ruspk OWNER TO ruspk;
+GRANT USAGE, CREATE ON SCHEMA PUBLIC TO ruspk;
+exit
+#psql -U ruspk
+
+echo 'DATABASE_URL=postgresql://ruspk:ruspk@localhost/ruspk' > .env
+cargo install diesel_cli --no-default-features --features postgres
+diesel migration --migration-dir migrations/postgres/ run
+& cargo run
+yarn --cwd frontend dev
+
+```
 ### Test the API
 
 ```sh
@@ -88,6 +122,7 @@ Upgrade Database
 
 ```sh
 paru -S postgresql-12-upgrade
+
 sudo systemctl stop postgresql
 sudo mv /var/lib/postgres/data /var/lib/postgres/olddata
 sudo mkdir /var/lib/postgres/data

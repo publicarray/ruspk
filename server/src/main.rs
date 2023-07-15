@@ -16,7 +16,8 @@ extern crate regex;
 
 extern crate sequoia_openpgp as openpgp;
 use openpgp::{parse::Parse, serialize::SerializeInto};
-
+use rustls::{Certificate, PrivateKey, ServerConfig};
+use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys};
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{middleware, web, App, HttpServer};
@@ -134,12 +135,21 @@ async fn main() -> std::io::Result<()> {
     let db_url = std::env::var("DATABASE_URL").expect("missing DATABASE_URL");
     let listen_addr = std::env::var("LISTEN").unwrap_or_else(|_| "127.0.0.1".to_string());
     let listen_port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+    let tls_key = std::env::var("TLS_KEY").unwrap_or_else(|_| "server/key.pem".to_string());
+    let tls_cert = std::env::var("TLS_CERT").unwrap_or_else(|_| "server/cert.pem".to_string());
     let manager = ConnectionManager::<Connection>::new(db_url);
     let pool = r2d2::Pool::builder()
         .build(manager)
         .expect("Failed to create database connection pool.");
+    let mut tls_config:Option<rustls::ServerConfig> = None;
+    if std::path::Path::new(&tls_key).exists() {
+        tls_config = Some(load_rustls_config(&tls_key, &tls_cert));
+    }
+
     let bind = format!("{}:{}", listen_addr, listen_port);
     info!("Starting server at: {}", &bind);
+
+    // if file at &PGP_KEY_PATH exists
 
     // get public key / keychain
     // let pgp_key_path = std::env::var("PGP_KEY_PATH").unwrap_or_else(|_| "pgpkey.pem".to_string());
@@ -200,7 +210,7 @@ async fn main() -> std::io::Result<()> {
     let (cache_r, raw_cache_w) = evmap::new();
     let cache_w = Arc::new(Mutex::new(raw_cache_w));
     // Start HTTP server
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         let cors = Cors::default()
             // .allowed_origin("https://localhost:3000")
             .allow_any_origin()
@@ -277,8 +287,49 @@ async fn main() -> std::io::Result<()> {
         //         .index_file("index.html")
         //         .prefer_utf8(true),
         // )
-    })
-    .bind(&bind)?
-    .run()
-    .await
+    });
+
+    if let Some(tls_config) = tls_config {
+        server.bind_rustls(&bind, tls_config)?
+        .run()
+        .await
+    } else {
+        server.bind(&bind)?
+        .run()
+        .await
+    }
+}
+
+use std::fs::File;
+use std::io::BufReader;
+fn load_rustls_config(key:&String, cert:&String) -> rustls::ServerConfig {
+    // init server config builder with safe defaults
+    let config = ServerConfig::builder()
+        .with_safe_defaults()
+        .with_no_client_auth();
+
+    // load TLS key/cert files
+    let cert_file = &mut BufReader::new(File::open(cert).unwrap());
+    let key_file = &mut BufReader::new(File::open(key).unwrap());
+
+    // convert files to key/cert objects
+    let cert_chain = certs(cert_file)
+        .unwrap()
+        .into_iter()
+        .map(Certificate)
+        .collect();
+    // let mut keys: Vec<PrivateKey> = pkcs8_private_keys(key_file)
+    let mut keys: Vec<PrivateKey> = rsa_private_keys(key_file)
+        .unwrap()
+        .into_iter()
+        .map(PrivateKey)
+        .collect();
+
+    // exit if no keys could be parsed
+    if keys.is_empty() {
+        eprintln!("Could not locate PKCS 8 private keys.");
+        std::process::exit(1);
+    }
+
+    config.with_single_cert(cert_chain, keys.remove(0)).unwrap()
 }
