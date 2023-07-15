@@ -17,7 +17,7 @@ extern crate regex;
 extern crate sequoia_openpgp as openpgp;
 use openpgp::{parse::Parse, serialize::SerializeInto};
 use rustls::{Certificate, PrivateKey, ServerConfig};
-use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys};
+use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys, ec_private_keys};
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{middleware, web, App, HttpServer};
@@ -290,19 +290,20 @@ async fn main() -> std::io::Result<()> {
     });
 
     if let Some(tls_config) = tls_config {
+        info!("TLS=Enabled");
         server.bind_rustls(&bind, tls_config)?
-        .run()
-        .await
+            .run()
+            .await
     } else {
         server.bind(&bind)?
-        .run()
-        .await
+            .run()
+            .await
     }
 }
 
 use std::fs::File;
 use std::io::BufReader;
-fn load_rustls_config(key:&String, cert:&String) -> rustls::ServerConfig {
+fn load_rustls_config(key: &String, cert: &String) -> rustls::ServerConfig {
     // init server config builder with safe defaults
     let config = ServerConfig::builder()
         .with_safe_defaults()
@@ -318,16 +319,28 @@ fn load_rustls_config(key:&String, cert:&String) -> rustls::ServerConfig {
         .into_iter()
         .map(Certificate)
         .collect();
-    // let mut keys: Vec<PrivateKey> = pkcs8_private_keys(key_file)
-    let mut keys: Vec<PrivateKey> = rsa_private_keys(key_file)
+    let mut keys: Vec<PrivateKey> = ec_private_keys(key_file)
         .unwrap()
         .into_iter()
         .map(PrivateKey)
         .collect();
-
+    if keys.is_empty() {
+        keys = pkcs8_private_keys(key_file)
+            .unwrap()
+            .into_iter()
+            .map(PrivateKey)
+            .collect();  
+    }
+    if keys.is_empty() {
+        keys = rsa_private_keys(key_file)
+            .unwrap()
+            .into_iter()
+            .map(PrivateKey)
+            .collect();  
+    }
     // exit if no keys could be parsed
     if keys.is_empty() {
-        eprintln!("Could not locate PKCS 8 private keys.");
+        eprintln!("TLS: Could not locate private keys. {}", key);
         std::process::exit(1);
     }
 
