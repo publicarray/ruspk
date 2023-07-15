@@ -80,6 +80,7 @@ bcrypt = "0.13"
 # to make standalone http requests
 awc = { version = "3", features = ["rustls"] }
 rustls = "0.20"
+rustls-pemfile = "1"
 webpki-roots = "*"
 
 # Serialization/Deserialization
@@ -98,7 +99,7 @@ chrono = { version = "0.4", features = ["serde"] }
 
 evmap = "10"
 evmap-derive = "0.2"
-actix-ratelimit = "0.3.1"
+#actix-ratelimit = "0.3.1" # uses openssl and memcached
 
 
 # https://crates.io/crates/semver
