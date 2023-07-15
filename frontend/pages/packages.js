@@ -50,7 +50,7 @@ export default function Packages(props) {
                                     <h2 className="text-2xl text-center mb-2">{row.displayname}</h2>
                                     {/* <h2 className="text-2xl text-center mb-2 truncate">{row.displayname}</h2> */}
                                     <span className="flex justify-center">
-                                        <Image className="rounded-xl mb-2" src={`${CDN}/${row.name}/${row.revision}/icon256.png`} width="256" height="256" title={row.name} alt=""/>
+                                        <Image className="rounded-xl mb-2" src={`${CDN}/${row.name}/${row.revision}/icon_256.png`} width="256" height="256" title={row.name} alt=""/>
                                     </span>
                                     <p className="text-center text-gray-500 dark:text-gray-400 text-sm">v{row.version}-{row.revision}</p>
                                     {/* <p className="mb-2">{row.author}</p> */}

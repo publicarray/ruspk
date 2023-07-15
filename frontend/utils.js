@@ -14,7 +14,7 @@ export const fetchJsonWithAuth = (url) => {
 export const API = "https://syno-api.seby.io:8443"
 export const API_VER = "api"
 export const CDN = "https://packages.synocommunity.com"
-export const IMAGE_CDN = "https://synocommunity.com"
+export const IMAGE_CDN = "https://packages.synocommunity.com"
 
 // table formats
 export function formatBoolean(data) {

@@ -50,7 +50,9 @@ exit
 echo 'DATABASE_URL=postgresql://ruspk:ruspk@localhost/ruspk' > .env
 cargo install diesel_cli --no-default-features --features postgres
 diesel migration --migration-dir migrations/postgres/ run
-& cargo run
+cargo install cargo-watch
+cargo watch -x run
+#& cargo run
 yarn --cwd frontend dev
 
 ```
