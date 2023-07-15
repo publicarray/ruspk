@@ -14,6 +14,7 @@ export const fetchJsonWithAuth = (url) => {
 export const API = "https://syno-api.seby.io:8443"
 export const API_VER = "api"
 export const CDN = "https://packages.synocommunity.com"
+export const IMAGE_CDN = "https://synocommunity.com"
 
 // table formats
 export function formatBoolean(data) {
@@ -37,7 +38,7 @@ export function formatArray(array) {
 
 import Image from "./components/image"
 export function formatImage(url, alt, title) {
-    return <Image src={`${CDN}/${url}`} alt={alt} title={title} width="100" height="100"/>
+    return <Image src={`${IMAGE_CDN}/${url}`} alt={alt} title={title} width="100" height="100"/>
 }
 
 // send data
