@@ -33,6 +33,7 @@ use evmap_derive::ShallowCopy;
 use crate::api::*;
 
 pub mod utils;
+pub mod filestorage;
 
 pub mod api;
 pub mod models;
@@ -100,6 +101,21 @@ lazy_static! {
 
     #[derive(Copy, Clone, Debug)]
     pub static ref STORAGE_PATH: String = std::env::var("STORAGE_PATH").unwrap_or_else(|_| "packages".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref STORAGE_S3_API: String = std::env::var("STORAGE_S3_API").unwrap_or_else(|_| "https://s3.amazonaws.com".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref STORAGE_S3_ID: String = std::env::var("STORAGE_S3_ID").unwrap_or_else(|_| "".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref STORAGE_S3_SECRET_KEY: String = std::env::var("STORAGE_S3_SECRET_KEY").unwrap_or_else(|_| "".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref STORAGE_S3_REGION: String = std::env::var("STORAGE_S3_REGION").unwrap_or_else(|_| "auto".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref STORAGE_S3_BUCKET: String = std::env::var("STORAGE_S3_BUCKET").unwrap_or_else(|_| "".to_string());
 
     #[derive(Copy, Clone, Debug)]
     pub static ref PGP_KEY_PATH: String = std::env::var("PGP_KEY_PATH").unwrap_or_else(|_| "pgpkey.pem".to_string());

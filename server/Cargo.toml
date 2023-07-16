@@ -100,7 +100,7 @@ chrono = { version = "0.4", features = ["serde"] }
 evmap = "10"
 evmap-derive = "0.2"
 #actix-ratelimit = "0.3.1" # uses openssl and memcached
-
+rust-s3 = "0.32"
 
 # https://crates.io/crates/semver
 # https://crates.io/crates/infer

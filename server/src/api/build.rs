@@ -9,6 +9,7 @@ use openpgp::serialize::stream::{Armorer, Message, Signer};
 extern crate serde_derive;
 extern crate serde_qs as qs;
 use crate::utils;
+use crate::filestorage;
 use crate::PGP_KEY_PATH;
 use crate::STORAGE_PATH;
 use crate::STORAGE_TYPE;
@@ -87,7 +88,9 @@ fn sign(
 }
 
 // todo optimisations
-#[post("/api/build")]
+// #[post("/api/build")]
+// spksrc POST new build/package api_key endpoint
+#[post("/packages")]
 pub async fn post(
     req: HttpRequest,
     mut body: web::Payload,
@@ -253,36 +256,12 @@ pub async fn post(
 
     // serialise info file to a struct
     let info: Info = toml::from_str(&info_contents).map_err(|_| actix_web::error::ParseError::Incomplete)?;
-    let icon256path = tmp_dir.path().join("PACKAGE_ICON_256.PNG");
+    let icon256path: std::path::PathBuf = tmp_dir.path().join("PACKAGE_ICON_256.PNG");
     // move file
-    if *STORAGE_TYPE == "filesystem" && !STORAGE_PATH.is_empty() {
-        // path / package name / package revision
-        let file_path_str = format!(
-            "{}/{}/{}",
-            &*STORAGE_PATH,
-            info.package,
-            info.version.split('-').collect::<Vec<&str>>()[1]
-        );
-        let file_path = Path::new(&file_path_str);
-        if let Err(e) = async_std::fs::create_dir_all(file_path).await {
-            if e.kind() != io::ErrorKind::AlreadyExists {
-                panic!("{:?}", e)
-            }
-        }
-
-        let new_filepath = file_path.join(format!(
-            "{}.v{}.f{}[{}].spk",
-            info.package,
-            info.version.split('-').collect::<Vec<&str>>()[1], // package revision
-            info.os_min_ver.split('-').collect::<Vec<&str>>()[1], // firmware build
-            info.arch.replace(' ', "-")
-        ));
-
-        debug!("rename: {:?}->{:?}", filepath, new_filepath);
-        //async_std::fs::rename(filepath, new_filepath).await?; // /tmp is in memory (tmpfs) and therefore a different filesystem
-        async_std::fs::copy(filepath, new_filepath).await?;
-        async_std::fs::copy(icon256path, file_path.join("icon_256.png")).await?;
-    }
+    let _ = match filestorage::store_file(&info, filepath, icon256path).await {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e),
+    };
 
     // serialise info file to a struct & save info into database
     //    let response = "not saved, please uncomment me";
