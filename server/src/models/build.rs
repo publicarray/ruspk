@@ -67,7 +67,9 @@ pub struct Info {
 
     pub displayname: Option<String>,
     pub displayname_fre: Option<String>,
+    pub displayname_ger: Option<String>,
     pub description_fre: Option<String>,
+    pub description_ger: Option<String>,
     pub maintainer_url: Option<String>,
     pub distributor: Option<String>,
     pub distributor_url: Option<String>,

@@ -262,11 +262,9 @@ pub async fn post(
         .replace("=\"No\"", "=false")
         .replace("=\"NO\"", "=false");
 
-    debug!("INFO2: {}", &info_contents);
     // serialise info file to a struct
     let info: Info = toml::from_str(&info_contents).map_err(|_| actix_web::error::ParseError::Incomplete)?;
-    debug!("Info3: {:?}", &info);
-    
+    debug!("Info serialised: {:?}", &info);
     let icon256path: std::path::PathBuf = tmp_dir.path().join("PACKAGE_ICON_256.PNG");
     // move file
     let _ = match filestorage::store_file(&info, filepath, icon256path).await {
