@@ -180,7 +180,7 @@ async fn main() -> std::io::Result<()> {
         //tsk = Some(temp_tsk);
         pgp_key = Some(temp_key);
     } else {
-        debug!("No signing key file found at: {}!", &*PGP_KEY_PATH);
+        warn!("No signing key file found at '{}'. SPK Sining is disabled!", &*PGP_KEY_PATH);
     }
 
     let (cache_r, raw_cache_w) = evmap::new();
