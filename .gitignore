@@ -12,3 +12,7 @@ frontend/dist
 server/public
 tmp
 packages/*
+*.pgp
+*.pem
+*.key
+gnupg
