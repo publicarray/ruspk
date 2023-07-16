@@ -11,11 +11,11 @@ extern crate serde_qs as qs;
 use crate::utils;
 use crate::filestorage;
 use crate::PGP_KEY_PATH;
-use crate::STORAGE_PATH;
-use crate::STORAGE_TYPE;
+
+
 use actix_web_grants::proc_macro::has_any_role;
 use async_std::path::Path;
-use async_std::{io, prelude::*};
+use async_std::{prelude::*};
 use async_tar::Archive;
 use futures::StreamExt;
 use regex::Regex;
@@ -179,70 +179,77 @@ pub async fn post(
         }
     }
 
-    let tsk = openpgp::Cert::from_file(&*PGP_KEY_PATH)
-        .context("Failed to read key")
-        .unwrap();
-    let p = &crate::openpgp::policy::StandardPolicy::new();
-    // syno_signature.asc
-    // let sig_buf = String::new();
-    //let sig_buf = Vec::new();
-    //let mut signature_file = std::io::Cursor::new(sig_buf);
-    let signature_filepath = tmp_dir.path().join("syno_signature.asc");
-    let mut signature_file = std::fs::File::create("syno_signature.asc")?;
-    match sign(p, &mut signature_file, &to_sign, &tsk) {
-        Err(err) => panic!("{:?}", err),
-        Ok(_sig) => (),
-    };
+    // OpenPGP
+    // only sign if file at &PGP_KEY_PATH exists
+    if std::path::Path::new(&*PGP_KEY_PATH).exists() {
+        debug!("siging..");
+        let tsk = openpgp::Cert::from_file(&*PGP_KEY_PATH)
+            .context("Failed to read key")
+            .unwrap();
+        let p = &crate::openpgp::policy::StandardPolicy::new();
+        // syno_signature.asc
+        // let sig_buf = String::new();
+        //let sig_buf = Vec::new();
+        //let mut signature_file = std::io::Cursor::new(sig_buf);
+        let _signature_filepath = tmp_dir.path().join("syno_signature.asc");
+        let mut signature_file = std::fs::File::create("syno_signature.asc")?;
+        match sign(p, &mut signature_file, &to_sign, &tsk) {
+            Err(err) => panic!("{:?}", err),
+            Ok(_sig) => (),
+        };
 
-    //let signature = String::from_utf8(sig_buf).unwrap();
-    let mut signature = String::new();
-    let mut sig_file = std::fs::File::open("syno_signature.asc")?;
-    //signature_file.read_to_string(&mut signature)?;
-    sig_file.read_to_string(&mut signature)?;
+        //let signature = String::from_utf8(sig_buf).unwrap();
+        let mut signature = String::new();
+        let mut sig_file = std::fs::File::open("syno_signature.asc")?;
+        //signature_file.read_to_string(&mut signature)?;
+        sig_file.read_to_string(&mut signature)?;
 
-    let client = awc::Client::builder()
-        .connector(awc::Connector::new().rustls(std::sync::Arc::new(utils::rustls_config())))
-        .finish();
+        let client = awc::Client::builder()
+            .connector(awc::Connector::new().rustls(std::sync::Arc::new(utils::rustls_config())))
+            .finish();
 
-    debug!("signature:{}", signature);
-    let res = client
-        .post(&*crate::GNUPG_TIMESTAMP_URL)
-        .insert_header(("User-Agent", "ruspk/1.0"))
-        .insert_header(("Content-Type", "multipart/form-data; boundary=X-BOUNDARY"))
-        .send_body(format!(
-            "{}{}{}",
-            "--X-BOUNDARY\r\nContent-Disposition: form-data; name=\"file\"; filename=\"syno_signature.asc\"\r\n",
-            signature,
-            "\r\n--X-BOUNDARY--\r\n"
-        ))
-        .await;
+        debug!("signature:{}", signature);
+        let res = client
+            .post(&*crate::GNUPG_TIMESTAMP_URL)
+            .insert_header(("User-Agent", "ruspk/1.0"))
+            .insert_header(("Content-Type", "multipart/form-data; boundary=X-BOUNDARY"))
+            .send_body(format!(
+                "{}{}{}",
+                "--X-BOUNDARY\r\nContent-Disposition: form-data; name=\"file\"; filename=\"syno_signature.asc\"\r\n",
+                signature,
+                "\r\n--X-BOUNDARY--\r\n"
+            ))
+            .await;
 
-    debug!("Response: {:?}", res);
-    if res.is_ok() {
-        let body = res.unwrap().body().await?;
-        if body.is_ascii() {
-            let body_str = std::str::from_utf8(&body).unwrap();
-            debug!("Response: {}", body_str);
-            let mut signature_file = std::fs::File::create("syno_signature2.asc")?;
-            signature_file.write_all(&body)?;
+        debug!("Response: {:?}", res);
+        if res.is_ok() {
+            let body = res.unwrap().body().await?;
+            if body.is_ascii() {
+                let body_str = std::str::from_utf8(&body).unwrap();
+                debug!("Response: {}", body_str);
+                let mut signature_file = std::fs::File::create("syno_signature2.asc")?;
+                signature_file.write_all(&body)?;
 
-            let file1 = std::fs::File::open(filepath.clone())?; // new write file handler
-            let mut input = tar::Archive::new(file1);
+                let file1 = std::fs::File::open(filepath.clone())?; // new write file handler
+                let mut input = tar::Archive::new(file1);
 
-            let filepath_tmp = tmp_dir.path().join("temp2.spk");
-            let file = std::fs::File::create(filepath_tmp.clone())?; // new write file handler
-            let mut builder = tar::Builder::new(file);
-            builder.append_archive(&mut input).unwrap();
-            builder
-                .append_file(
-                    "syno_signature.asc",
-                    &mut std::fs::File::open("syno_signature2.asc").unwrap(),
-                )
-                .unwrap();
-            builder.finish().unwrap();
-            debug!("copy archive");
-            async_std::fs::copy(filepath_tmp, filepath.clone()).await?;
+                let filepath_tmp = tmp_dir.path().join("temp2.spk");
+                let file = std::fs::File::create(filepath_tmp.clone())?; // new write file handler
+                let mut builder = tar::Builder::new(file);
+                builder.append_archive(&mut input).unwrap();
+                builder
+                    .append_file(
+                        "syno_signature.asc",
+                        &mut std::fs::File::open("syno_signature2.asc").unwrap(),
+                    )
+                    .unwrap();
+                builder.finish().unwrap();
+                debug!("copy archive");
+                async_std::fs::copy(filepath_tmp, filepath.clone()).await?;
+            }
         }
+    } else {
+        debug!("Not siging the file, no sining key found!");
     }
 
     // convert to booleans hack

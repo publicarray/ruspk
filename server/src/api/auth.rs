@@ -82,7 +82,7 @@ pub async fn new_reset(info: web::Json<ResetRequest>, data: web::Data<AppData>) 
     let user_info = info.into_inner();
     debug!("{:?}", user_info);
     let mut conn = data.pool.get().expect("couldn't get db connection from pool");
-    let (user, roles) = web::block(move || User::send_reset_link(&mut conn, &user_info.email))
+    let (_user, _roles) = web::block(move || User::send_reset_link(&mut conn, &user_info.email))
         .await
         .map_err(|e| {
             debug!("{}", e);

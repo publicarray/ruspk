@@ -65,7 +65,7 @@ pub async fn syno(data: web::Data<AppData>, synorequest: web::Query<SynoRequest>
     let response = web::block(move || {
         get_packages_for_device_lang(
             &mut conn,
-            &keyring,
+            keyring.as_deref(),
             &synorequest.language,
             &synorequest.arch,
             synorequest.build,

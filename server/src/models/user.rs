@@ -214,7 +214,7 @@ impl User {
         username: &Option<String>,
         email: &Option<String>,
         new_password: &str,
-        reset_token: &str,
+        _reset_token: &str,
     ) -> Result<(UserWithKey, Vec<DbRole>)> {
         // let hashed_password = bcrypt::hash(password, 12)?;
         // debug!("{:?}", hashed_password);

@@ -1,5 +1,5 @@
 use crate::models::*;
-use anyhow::{Context, Result};
+use anyhow::{Result};
 use s3::Region;
 // use async_std::path::PathBuf;
 use std::path::PathBuf;

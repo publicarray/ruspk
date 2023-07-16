@@ -15,6 +15,7 @@ extern crate chrono;
 extern crate regex;
 
 extern crate sequoia_openpgp as openpgp;
+use openpgp::Cert;
 use openpgp::{parse::Parse, serialize::SerializeInto};
 use rustls::{Certificate, PrivateKey, ServerConfig};
 use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys, ec_private_keys};
@@ -136,7 +137,7 @@ pub struct AppData {
     pool: DbPool,
     cache_r: evmap::ReadHandle<String, CacheValue>,
     cache_w: Arc<Mutex<evmap::WriteHandle<String, CacheValue>>>,
-    keyring: String,
+    keyring: Option<String>,
 }
 
 #[actix_rt::main]
@@ -165,63 +166,22 @@ async fn main() -> std::io::Result<()> {
     let bind = format!("{}:{}", listen_addr, listen_port);
     info!("Starting server at: {}", &bind);
 
+    // OpenPGP
+    //let mut tsk:Option<Cert> = None;
+    let mut pgp_key:Option<String> = None;
     // if file at &PGP_KEY_PATH exists
-
-    // get public key / keychain
-    // let pgp_key_path = std::env::var("PGP_KEY_PATH").unwrap_or_else(|_| "pgpkey.pem".to_string());
-    // let tsk = openpgp::Cert::from_file(&pgp_key_path).context("Failed to read key").unwrap();
-    let tsk = openpgp::Cert::from_file(&*PGP_KEY_PATH)
-        .context("Failed to read key")
-        .unwrap();
-
-    // let mut keys = Vec::new();
-    // let p = &crate::openpgp::policy::StandardPolicy::new();
-    // let mut n = 0;
-    // for key in tsk.keys().with_policy(p, None).alive().revoked(false).for_signing().secret().map(|ka| ka.key()) {
-    //     keys.push({
-    //         let mut key = key.clone();
-    //         if key.secret().is_encrypted() {
-    //             // let password = read_from_sdin (Some(&format!("Please enter password to decrypt {}/{}: ",tsk, key)))?;
-    //             let password = "";
-    //             let algo = key.pk_algo();
-    //             key.secret_mut()
-    //                 .decrypt_in_place(algo, &password.into())
-    //                 .context("decryption failed").unwrap();
-    //         }
-    //         n += 1;
-    //         key.into_keypair().unwrap();
-    //     });
-    // }
-
-    // if n==0 {
-    //     error!("No valid signing key found");
-    // }
-
-    // let keypair = tsk
-    //     .keys().unencrypted_secret()
-    //     .with_policy(p, None).supported().alive().revoked(false).for_signing()
-    //     .next().unwrap().key().clone().into_keypair().unwrap();
-
-    let public_key = String::from_utf8(tsk.armored().to_vec().unwrap()).unwrap();
-    debug!("Public Key: {}", public_key);
-    info!("Loaded Key: {}", tsk.fingerprint());
-    // let ppr = PacketParser::from_file(&pgp_key_path).unwrap();
-    // let mut public_key = "".to_string();
-    // for certo in CertParser::from(ppr) {
-    //     match certo {
-    //         Ok(cert) => {
-    //             info!("Key: {}", cert.fingerprint());
-    //             public_key = String::from_utf8(cert.armored().to_vec().unwrap()).unwrap();
-    //             debug!("public Key: {}", public_key);
-    //             for ua in cert.userids() {
-    //                 info!("  User ID: {}", ua.userid());
-    //             }
-    //         }
-    //         Err(err) => {
-    //             error!("Error reading keyring: {}", err);
-    //         }
-    //     }
-    // }
+    if std::path::Path::new(&*PGP_KEY_PATH).exists() {
+        let temp_tsk = Cert::from_file(&*PGP_KEY_PATH)
+            .context("Failed to read signing key")
+            .unwrap();
+        let temp_key = String::from_utf8(temp_tsk.armored().to_vec().unwrap()).unwrap();
+        debug!("Key: {}", temp_key);
+        info!("Loaded Key: {}", temp_tsk.fingerprint());
+        //tsk = Some(temp_tsk);
+        pgp_key = Some(temp_key);
+    } else {
+        debug!("No signing key file found at: {}!", &*PGP_KEY_PATH);
+    }
 
     let (cache_r, raw_cache_w) = evmap::new();
     let cache_w = Arc::new(Mutex::new(raw_cache_w));
@@ -245,7 +205,7 @@ async fn main() -> std::io::Result<()> {
                 pool: pool.clone(),
                 cache_r: cache_r.clone(),
                 cache_w: cache_w.clone(),
-                keyring: public_key.clone(),
+                keyring: pgp_key.clone(),
             }))
             .wrap(middleware::Logger::default())
             //.service(web::resource("/hello").route(web::get().to(routes::index)))

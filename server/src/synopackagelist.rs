@@ -132,7 +132,7 @@ impl Default for Package {
 
 pub fn get_packages_for_device_lang(
     conn: &mut DbConn,
-    keyring: &str,
+    keyring: Option<&str>,
     lang: &str,
     arch: &str,
     build: Db64,
@@ -152,7 +152,9 @@ pub fn get_packages_for_device_lang(
         packages: Vec::new(),
         ..Default::default()
     };
-    sr.set_key(keyring);
+    if let Some(keyring) = keyring {
+        sr.set_key(keyring);
+    }
 
     let packages = DbPackage::get_packages(lang, arch, build, beta, major, micro, minor, conn)?;
 

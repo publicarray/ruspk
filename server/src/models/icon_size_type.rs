@@ -1,3 +1,4 @@
+use diesel::backend::Backend;
 use diesel::deserialize::{self, FromSql};
 use diesel::pg::Pg;
 use diesel::serialize::{self, IsNull, Output, ToSql};
@@ -32,7 +33,7 @@ impl ToSql<IconSize, Pg> for IconSizeEnum {
 
 // https://docs.diesel.rs/diesel/deserialize/trait.FromSql.html
 impl FromSql<IconSize, Pg> for IconSizeEnum {
-    fn from_sql(value: backend::RawValue<'_, Pg>) -> deserialize::Result<Self> {
+    fn from_sql(value: <Pg as Backend>::RawValue<'_>) -> deserialize::Result<Self> {
         let bytes = value.as_bytes();
         match bytes {
             b"72" => Ok(IconSizeEnum::Icon72),
