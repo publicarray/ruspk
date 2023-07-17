@@ -27,6 +27,7 @@ pub async fn store_file(info: &Info, filepath: PathBuf, icon256path: PathBuf) ->
 
     if *STORAGE_TYPE == "filesystem" && !STORAGE_PATH.is_empty() {
         // path / package name / package revision
+        trace!("Using filesystem");
         let file_path_str = format!(
             "{}/{}/{}",
             &*STORAGE_PATH,
@@ -48,6 +49,7 @@ pub async fn store_file(info: &Info, filepath: PathBuf, icon256path: PathBuf) ->
         async_std::fs::copy(icon256path, file_path.join("icon_256.png")).await?;
     // S3 API
     } else if *STORAGE_TYPE == "s3" && !STORAGE_S3_API.is_empty() && STORAGE_S3_ID.is_empty() && !STORAGE_S3_REGION.is_empty() && !STORAGE_S3_SECRET_KEY.is_empty()  && !STORAGE_S3_BUCKET.is_empty() {
+        trace!("Using s3 api");
         let bucket_name = &**STORAGE_S3_BUCKET;
         let region_name = (*STORAGE_S3_REGION).clone();
         let endpoint = (*STORAGE_S3_API).clone();
@@ -66,7 +68,14 @@ pub async fn store_file(info: &Info, filepath: PathBuf, icon256path: PathBuf) ->
             new_filename
         );
 
-        let _ = bucket.put_object(new_filepath, content).await?;
+        // let s3_response = bucket.put_object_with_content_type(new_filepath, content, "application/zip").await?;
+        let s3_response = bucket.put_object(new_filepath, content).await?;
+        // debug!("s3: api response: {}", s3_response.to_string());
+        debug!("s3: api response code: {}", s3_response.status_code());
+        if s3_response.status_code() == 200 {
+            //
+        }
+
     }
     Ok(())
 }

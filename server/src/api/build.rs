@@ -12,7 +12,6 @@ use crate::utils;
 use crate::filestorage;
 use crate::PGP_KEY_PATH;
 
-
 use actix_web_grants::proc_macro::has_any_role;
 use async_std::path::Path;
 use async_std::{prelude::*};
@@ -205,8 +204,8 @@ pub async fn post(
         //signature_file.read_to_string(&mut signature)?;
         sig_file.read_to_string(&mut signature)?;
 
-        let client = awc::Client::builder()
-            .connector(awc::Connector::new().rustls(std::sync::Arc::new(utils::rustls_config())))
+        let client: awc::Client = awc::Client::builder()
+            .connector(awc::Connector::new().rustls(std::sync::Arc::new(utils::rustls_client_config())))
             .finish();
 
         debug!("signature:{}", signature);
@@ -267,10 +266,11 @@ pub async fn post(
     debug!("Info serialised: {:?}", info);
     let icon256path: std::path::PathBuf = tmp_dir.path().join("PACKAGE_ICON_256.PNG");
     // move file
-    let _ = match filestorage::store_file(&info, filepath, icon256path).await {
+    let fs_response = match filestorage::store_file(&info, filepath, icon256path).await {
         Ok(_) => Ok(()),
         Err(e) => Err(e),
     };
+    debug!("File saved! {:?}", fs_response);
 
     // serialise info file to a struct & save info into database
     //    let response = "not saved, please uncomment me";

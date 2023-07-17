@@ -94,7 +94,7 @@ pub fn validate_api_key(req: &HttpRequest) -> Result<(), Error> {
 
 use rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore};
 /// Create simple rustls client config from root certificates.
-pub fn rustls_config() -> ClientConfig {
+pub fn rustls_client_config() -> ClientConfig {
     let mut root_store = RootCertStore::empty();
     root_store.add_server_trust_anchors(
         webpki_roots::TLS_SERVER_ROOTS
@@ -107,4 +107,34 @@ pub fn rustls_config() -> ClientConfig {
         .with_safe_defaults()
         .with_root_certificates(root_store)
         .with_no_client_auth()
+}
+
+pub fn send_email(message: String, subject: String, to: String) {
+    use lettre::message::header::ContentType;
+    use lettre::transport::smtp::authentication::Credentials;
+    use lettre::{Message, SmtpTransport, Transport};
+
+    let email = Message::builder()
+        .from("ruspk <ruspk@seby.io>".parse().unwrap())
+        .to(to.parse().unwrap())
+        //.to("name <hello@seby.io>".parse().unwrap())
+        .subject(&subject)
+        .header(ContentType::TEXT_PLAIN)
+        .body(message)
+        .unwrap();
+
+    let creds = Credentials::new("smtp_username".to_owned(), "smtp_password".to_owned());
+
+    // Open a remote connection to gmail starttls_relay
+    //let mailer = SmtpTransport::starttls_relay("smtp.gmail.com")
+    let mailer = SmtpTransport::relay("smtp.gmail.com")
+        .unwrap()
+        .credentials(creds)
+        .build();
+
+    // Send the email
+    match mailer.send(&email) {
+        Ok(_) => debug!("Email sent successfully! {}", subject),
+        Err(e) => warn!("Could not send email: {:?}", e),
+    }
 }
