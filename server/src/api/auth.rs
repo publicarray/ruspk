@@ -32,7 +32,7 @@ pub async fn validator(req: ServiceRequest, credentials: BearerAuth) -> Result<S
             Ok(req)
         }
         // required by `actix-web-httpauth` validator signature
-        Err(e) => Err((e, req))
+        Err(e) => Err((e, req)),
     }
 }
 

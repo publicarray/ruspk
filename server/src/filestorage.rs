@@ -1,5 +1,5 @@
 use crate::models::*;
-use anyhow::{Result};
+use anyhow::Result;
 use s3::Region;
 // use async_std::path::PathBuf;
 use std::path::PathBuf;
@@ -15,7 +15,6 @@ use s3::creds::Credentials;
 // filepath: temp file path
 // icon256path: iconfile
 pub async fn store_file(info: &Info, filepath: PathBuf, icon256path: PathBuf) -> Result<()> {
-
     let new_filename = format!(
         "{}.v{}.f{}[{}].spk",
         info.package,
@@ -23,7 +22,6 @@ pub async fn store_file(info: &Info, filepath: PathBuf, icon256path: PathBuf) ->
         info.os_min_ver.split('-').collect::<Vec<&str>>()[1], // firmware build
         info.arch.replace(' ', "-")
     );
-
 
     if *STORAGE_TYPE == "filesystem" && !STORAGE_PATH.is_empty() {
         // path / package name / package revision
@@ -48,16 +46,25 @@ pub async fn store_file(info: &Info, filepath: PathBuf, icon256path: PathBuf) ->
         async_std::fs::copy(filepath, new_filepath).await?;
         async_std::fs::copy(icon256path, file_path.join("icon_256.png")).await?;
     // S3 API
-    } else if *STORAGE_TYPE == "s3" && !STORAGE_S3_API.is_empty() && STORAGE_S3_ID.is_empty() && !STORAGE_S3_REGION.is_empty() && !STORAGE_S3_SECRET_KEY.is_empty()  && !STORAGE_S3_BUCKET.is_empty() {
+    } else if *STORAGE_TYPE == "s3"
+        && !STORAGE_S3_API.is_empty()
+        && !STORAGE_S3_ID.is_empty()
+        && !STORAGE_S3_REGION.is_empty()
+        && !STORAGE_S3_SECRET_KEY.is_empty()
+        && !STORAGE_S3_BUCKET.is_empty()
+    {
         trace!("Using s3 api");
         let bucket_name = &**STORAGE_S3_BUCKET;
         let region_name = (*STORAGE_S3_REGION).clone();
         let endpoint = (*STORAGE_S3_API).clone();
-        let region = Region::Custom { region: region_name, endpoint };
+        let region = Region::Custom {
+            region: region_name,
+            endpoint,
+        };
         let credentials = Credentials::new(Some(&**STORAGE_S3_ID), Some(&**STORAGE_S3_SECRET_KEY), None, None, None)?;
         //let credentials = Credentials::default()?;
         let bucket = Bucket::new(bucket_name, region, credentials)?;
-        
+
         let contents = async_std::fs::read(filepath.clone()).await?;
         let content = contents.as_slice();
         //let content = "I want to go to S3".as_bytes();
@@ -72,10 +79,11 @@ pub async fn store_file(info: &Info, filepath: PathBuf, icon256path: PathBuf) ->
         let s3_response = bucket.put_object(new_filepath, content).await?;
         // debug!("s3: api response: {}", s3_response.to_string());
         debug!("s3: api response code: {}", s3_response.status_code());
-        if s3_response.status_code() == 200 {
+        if s3_response.status_code() != 200 {
             //
         }
-
+    } else {
+        error!("No storage for files configured!")
     }
     Ok(())
 }

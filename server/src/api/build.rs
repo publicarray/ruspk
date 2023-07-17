@@ -8,13 +8,13 @@ use openpgp::parse::Parse;
 use openpgp::serialize::stream::{Armorer, Message, Signer};
 extern crate serde_derive;
 extern crate serde_qs as qs;
-use crate::utils;
 use crate::filestorage;
+use crate::utils;
 use crate::PGP_KEY_PATH;
 
 use actix_web_grants::proc_macro::has_any_role;
 use async_std::path::Path;
-use async_std::{prelude::*};
+use async_std::prelude::*;
 use async_tar::Archive;
 use futures::StreamExt;
 use regex::Regex;
@@ -268,7 +268,10 @@ pub async fn post(
     // move file
     let fs_response = match filestorage::store_file(&info, filepath, icon256path).await {
         Ok(_) => Ok(()),
-        Err(e) => Err(e),
+        Err(e) => {
+            error!("Could not save file: {:?}", e);
+            Err(e)
+        }
     };
     debug!("File saved! {:?}", fs_response);
 
