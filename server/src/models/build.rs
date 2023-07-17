@@ -60,7 +60,7 @@ pub struct Build {
 pub struct Info {
     pub package: String,
     pub version: String,    // "1.2.3-0001"
-    pub os_min_ver: String, // X.Y-Z "7.0-40000" (older packages use "firmware" instead
+    pub os_min_ver: String, // X.Y-Z "7.0-40000" (older packages use "firmware" instead)
     pub description: String,
     pub arch: String, //space separated list "x86_64 alpine"
     pub maintainer: String,

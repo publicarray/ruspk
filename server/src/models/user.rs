@@ -205,6 +205,9 @@ impl User {
             .map(char::from)
             .collect();
         debug!("Password Reset Token: {:?}", token);
+        let message = format!("Password Reset URL: https://127.0.0.1:8080/reset/{}", token);
+
+        utils::send_email(message, "Synocommunity: Password Reset", &user.email);
 
         Err(diesel::result::Error::NotFound.into())
     }

@@ -119,6 +119,21 @@ lazy_static! {
     pub static ref STORAGE_S3_BUCKET: String = std::env::var("STORAGE_S3_BUCKET").unwrap_or_else(|_| "".to_string());
 
     #[derive(Copy, Clone, Debug)]
+    pub static ref SMTP_SERVER: String = std::env::var("SMTP_SERVER").unwrap_or_else(|_| "".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref SMTP_PORT: String = std::env::var("SMTP_PORT").unwrap_or_else(|_| "".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref SMTP_USERNAME: String = std::env::var("SMTP_USERNAME").unwrap_or_else(|_| "".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref SMTP_PASSWORD: String = std::env::var("SMTP_PASSWORD").unwrap_or_else(|_| "".to_string());
+
+    #[derive(Copy, Clone, Debug)]
+    pub static ref SMTP_FROM: String = std::env::var("SMTP_FROM").unwrap_or_else(|_| "".to_string());
+
+    #[derive(Copy, Clone, Debug)]
     pub static ref PGP_KEY_PATH: String = std::env::var("PGP_KEY_PATH").unwrap_or_else(|_| "pgpkey.pem".to_string());
 
     #[derive(Copy, Clone, Debug)]

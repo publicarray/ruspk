@@ -68,6 +68,7 @@ pub fn handle_query_parameters(query_str: &str) -> (i64, i64, String) {
     (limit, (offset - 1) * limit, query)
 }
 
+
 use crate::models;
 use crate::AppData;
 use actix_web::{error, error::Error, http::header::Header, web, HttpRequest};
@@ -109,25 +110,30 @@ pub fn rustls_client_config() -> ClientConfig {
         .with_no_client_auth()
 }
 
-pub fn send_email(message: String, subject: String, to: String) {
-    use lettre::message::header::ContentType;
-    use lettre::transport::smtp::authentication::Credentials;
-    use lettre::{Message, SmtpTransport, Transport};
+use lettre::message::header::ContentType;
+use lettre::transport::smtp::authentication::Credentials;
+use lettre::{Message, SmtpTransport, Transport};
+use crate::SMTP_SERVER;
+use crate::SMTP_PORT;
+use crate::SMTP_USERNAME;
+use crate::SMTP_PASSWORD;
+use crate::SMTP_FROM;
+
+pub fn send_email(message: String, subject: &str, to: &str) {
 
     let email = Message::builder()
-        .from("ruspk <ruspk@seby.io>".parse().unwrap())
+        .from((*SMTP_FROM).parse().unwrap())
         .to(to.parse().unwrap())
-        //.to("name <hello@seby.io>".parse().unwrap())
-        .subject(&subject)
+        .subject(&subject.to_string())
         .header(ContentType::TEXT_PLAIN)
         .body(message)
         .unwrap();
 
-    let creds = Credentials::new("smtp_username".to_owned(), "smtp_password".to_owned());
+    let creds = Credentials::new((*SMTP_USERNAME).clone(), (*SMTP_PASSWORD).clone());
 
-    // Open a remote connection to gmail starttls_relay
-    //let mailer = SmtpTransport::starttls_relay("smtp.gmail.com")
-    let mailer = SmtpTransport::relay("smtp.gmail.com")
+    // Open a remote connection to SMTP server
+    //let mailer = SmtpTransport::starttls_relay("")
+    let mailer = SmtpTransport::relay(&*SMTP_SERVER)
         .unwrap()
         .credentials(creds)
         .build();
