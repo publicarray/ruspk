@@ -3,9 +3,7 @@ import Button from "../../components/button";
 import useSWR from 'swr'
 import { fetchJsonWithAuth, API, API_VER } from "../../utils";
 
-export const config = {
-    runtime: 'experimental-edge',
-}
+export const runtime = 'edge';
 
 export default function ProfilePage() {
     const url = `${API}/${API_VER}/profile`;

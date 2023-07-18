@@ -6,9 +6,7 @@ import { useState } from "react";
 import { postJsonForm,API, API_VER } from "../../utils";
 import { createColumnHelper } from "@tanstack/react-table";
 
-export const config = {
-    runtime: 'experimental-edge',
-}
+export const runtime = 'edge';
 
 export default function ArchitecturePage() {
     const url = `${API}/${API_VER}/architecture`;

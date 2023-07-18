@@ -9,9 +9,7 @@ import DeleteBtn from "../../components/delete-btn";
 import { useRouter } from 'next/router'
 import { createColumnHelper } from "@tanstack/react-table";
 
-export const config = {
-    runtime: 'experimental-edge',
-}
+export const runtime = 'edge';
 
 export default function ScreenshotPage() {
     const url = `${API}/${API_VER}/screenshot`

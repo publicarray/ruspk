@@ -4,9 +4,7 @@ import Head from 'next/head';
 import {postJsonForm, API} from '../utils';
 import React, { useState } from "react";
 
-export const config = {
-    runtime: 'experimental-edge',
-}
+export const runtime = 'edge';
 
 export default function LoginPage() {
     const [processing, setProcessing] = useState(false);
