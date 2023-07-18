@@ -124,7 +124,7 @@ pub fn send_email(message: String, subject: &str, to: &str) {
     let email = Message::builder()
         .from((*SMTP_FROM).parse().unwrap())
         .to(to.parse().unwrap())
-        .subject(&subject.to_string())
+        .subject(subject.to_string())
         .header(ContentType::TEXT_PLAIN)
         .body(message)
         .unwrap();
@@ -133,7 +133,7 @@ pub fn send_email(message: String, subject: &str, to: &str) {
 
     // Open a remote connection to SMTP server
     //let mailer = SmtpTransport::starttls_relay("")
-    let mailer = SmtpTransport::relay(&*SMTP_SERVER)
+    let mailer = SmtpTransport::relay(&SMTP_SERVER)
         .unwrap()
         .credentials(creds)
         .build();
