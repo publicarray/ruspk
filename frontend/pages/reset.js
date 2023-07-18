@@ -6,7 +6,7 @@ import {postJsonForm, API} from '../utils';
 import React, { useState } from "react";
 import { useParams } from 'next/navigation'
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export default function ResetPage() {
     const router = useRouter()

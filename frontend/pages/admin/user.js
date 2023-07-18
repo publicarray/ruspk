@@ -7,7 +7,7 @@ import { formatBoolean } from '../../utils';
 import { useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export default function UserPage() {
     const url = `${API}/${API_VER}/user`;

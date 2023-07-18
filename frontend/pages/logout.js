@@ -1,7 +1,7 @@
 import Layout from "../components/layout";
 import Head from 'next/head';
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export default function LogoutPage() {
     if (typeof window !== "undefined") {

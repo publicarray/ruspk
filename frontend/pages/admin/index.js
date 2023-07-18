@@ -1,6 +1,6 @@
 import Layout from "../../components/layout-admin";
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export default function IndexPage() {
   return (

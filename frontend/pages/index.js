@@ -2,7 +2,7 @@ import Layout from "../components/layout";
 import Image from "../components/image";
 import Head from 'next/head'
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export default function IndexPage() {
     return (

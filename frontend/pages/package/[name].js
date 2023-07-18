@@ -7,7 +7,7 @@ import Link from 'next/link'
 import React, {useState, useEffect} from 'react';
 import Image from '../../components/image'
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export default function PackageDetail(props) {
     const router = useRouter()
