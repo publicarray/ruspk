@@ -12,8 +12,15 @@ pub struct Auth {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ResetRequest {
+pub struct NewResetRequest {
     email: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ResetRequest {
+    token: String,
+    password: String,
+    password_confirmation: String,
 }
 
 use crate::claims::Claims;
@@ -78,7 +85,7 @@ pub async fn login(info: web::Json<Auth>, data: web::Data<AppData>) -> Result<Ht
 }
 
 #[post("/newreset")]
-pub async fn new_reset(info: web::Json<ResetRequest>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
+pub async fn new_reset(info: web::Json<NewResetRequest>, data: web::Data<AppData>) -> Result<HttpResponse, Error> {
     let user_info = info.into_inner();
     debug!("{:?}", user_info);
     let mut conn = data.pool.get().expect("couldn't get db connection from pool");

@@ -16,10 +16,6 @@ export default function ResetPage() {
     const [errorMessage, setErrorMessage] = useState("");
     const [token, setToken] = useState(t);
 
-    // if (!t){
-    //     return <>No token found</>
-    // }
-
     let onSubmit = async function (event) {
         event.preventDefault();
         if (processing) {
